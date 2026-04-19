@@ -1,6 +1,52 @@
-[gd_scene load_steps=2 format=3 uid="uid://bmu70lgbcxdfx"]
+[gd_scene format=3 uid="uid://bmu70lgbcxdfx"]
 
-[ext_resource type="Script" path="res://scene/main/Main.cs" id="1_8i281"]
+[ext_resource type="Script" uid="uid://bhcyoymhtpk75" path="res://scene/main/Main.cs" id="1_8i281"]
 
-[node name="Main" type="Node2D" unique_id=1738038492]
+[node name="Main" type="Control" unique_id=1738038492]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_8i281")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1754075865]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0705882, 0.0862745, 0.12549, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=451438121]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=1359486035]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer" unique_id=2049302522]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/VBoxContainer" unique_id=588011213]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Top-Down Shooter Demo"
+horizontal_alignment = 1
+
+[node name="HintLabel" type="Label" parent="CenterContainer/PanelContainer/VBoxContainer" unique_id=1865134852]
+layout_mode = 2
+text = "Move: WASD
+Fire: Left Mouse (later phase)"
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="CenterContainer/PanelContainer/VBoxContainer" unique_id=1206648013]
+layout_mode = 2
+text = "Start"

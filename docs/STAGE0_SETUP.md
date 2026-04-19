@@ -1,8 +1,8 @@
-# Stage 0 Setup Notes
+# 阶段0：环境与项目初始化说明
 
-## Current structure
+## 当前项目结构
 
-This repository is already laid out for the phased shooter demo:
+当前仓库已经按分阶段 Shooter Demo 的方向整理出基础结构：
 
 ```text
 res://
@@ -12,12 +12,13 @@ res://
     player/
     bullet/
     enemy/
+    level/
     ui/
   script/
     common/
 ```
 
-This keeps scene files and scene-specific scripts close together:
+这种结构将场景文件与对应脚本放在相邻位置，便于后续阶段持续扩展：
 
 ```text
 res://scene/main/Main.tscn
@@ -26,47 +27,53 @@ res://scene/player/Player.tscn
 res://scene/player/Player.cs
 ```
 
-That layout matches the project plan and scales cleanly for later phases.
+后续新增的关卡场景也统一放入 `scene/level/`，例如：
 
-## AI-created script skeletons
+```text
+res://scene/level/Level01.tscn
+res://scene/level/Level01.cs
+```
 
-The following minimal C# files are now in place:
+## AI 已创建的脚本骨架
+
+阶段0完成后，项目中具备以下基础 C# 脚本：
 
 - `res://scene/main/Main.cs`
 - `res://scene/player/Player.cs`
 - `res://scene/bullet/Bullet.cs`
 - `res://scene/enemy/Enemy.cs`
 
-They are intentionally small. Phase 0 should only verify that Godot can load and bind C# scripts cleanly. Gameplay logic will be added in later phases.
+这些脚本在阶段0只承担“验证 Godot 能否正确加载并绑定 C#”的作用，不要求具备完整玩法逻辑。
 
-## Godot project settings to confirm
+## 需要在 Godot 中确认的项目设置
 
-For Phase 0, the main items to verify in Godot are:
+阶段0需要重点确认以下项目项：
 
 1. `Project Settings > Application > Run > Main Scene`
-   Set to `res://scene/main/Main.tscn`
+   设为 `res://scene/main/Main.tscn`
 2. `Project Settings > Dotnet > Assembly Name`
-   Keep it as `test_godot` unless you want the assembly renamed
-3. `Project > Reload Current Project` after first C# attachment if Godot asks to generate C# solution files
-4. Scene root for `Main.tscn`
-   Keep `Node2D` unless Phase 1 gives you a reason to change it
+   保持为 `test_godot`
+3. 如果 Godot 首次挂载 C# 脚本后提示生成工程文件
+   执行 `Create C# Solution` 或按提示重新加载项目
+4. `Main.tscn` 的场景根节点
+   阶段0可以保持简单结构，后续再根据功能演进调整
 
-## Expected C# side effects
+## C# 初始化后会自动生成的文件
 
-When Godot finishes its C# setup, it may generate files such as:
+Godot 完成 C# 初始化后，项目中可能自动生成以下内容：
 
 - `test_godot.csproj`
 - `.godot/mono/`
-- NuGet or Roslyn cache files
+- 相关缓存文件
 
-That is normal. Those generated files do not need to be hand-written first.
+这些文件属于正常生成结果，无需手动提前编写。
 
-## Phase 0 verification checklist
+## 阶段0验收清单
 
-1. Open the project in Godot
-2. Open `Main.tscn`
-3. Confirm `Main` is bound to `Main.cs`
-4. Run the project
-5. Check the output panel for `Main scene loaded.`
+1. 用 Godot 打开项目
+2. 打开 `Main.tscn`
+3. 确认 `Main` 已绑定 `Main.cs`
+4. 运行项目
+5. 确认没有 C# 编译错误
 
-If that message appears without C# compile errors, Phase 0 is complete from the AI side.
+如果以上检查都通过，则阶段0可以视为完成。

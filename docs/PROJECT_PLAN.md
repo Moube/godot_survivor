@@ -30,27 +30,28 @@
 
 ```text
 res://
-  scenes/
+  scene/
     main/
+    level/
     player/
     enemy/
     bullet/
     ui/
-  scripts/
+  asset/
+  script/
     common/
-  assets/
-    art/
-    audio/
 ```
 
-如果后续希望更贴近 Godot 的组织方式，也可以将脚本与场景就近放置，例如：
+推荐继续采用“场景与脚本就近放置”的方式，例如：
 
 ```text
-res://scenes/player/Player.tscn
-res://scenes/player/Player.cs
+res://scene/main/Main.tscn
+res://scene/main/Main.cs
+res://scene/level/Level01.tscn
+res://scene/level/Level01.cs
+res://scene/player/Player.tscn
+res://scene/player/Player.cs
 ```
-
-本 Demo 建议优先采用“场景与脚本就近放置”。
 
 ---
 
@@ -87,7 +88,7 @@ res://scenes/player/Player.cs
 3. 创建场景与节点。
 4. 在 Project Settings 中设置 Main Scene。
 5. 在编辑器顶部选项卡中找到 项目 > 工具 > C#，执行 `Create C# Solution`，生成 C# 工程文件。
-6. 在编辑中右上角 `Build`，确认 C# 项目可以成功编译。
+6. 在编辑器右上角执行 `Build`，确认 C# 项目可以成功编译。
 
 ---
 
@@ -95,42 +96,52 @@ res://scenes/player/Player.cs
 
 ### 目标
 
-先做出一个可控制角色移动的 2D 场景。
+建立最小可玩的基础流程：从开始菜单进入关卡，在关卡中生成玩家，并完成可视化移动、镜头跟随与基础碰撞验证。
 
 ### 任务
 
 1. 创建 `Player.tscn`。
 2. 使用 `CharacterBody2D` 作为玩家根节点。
-3. 添加可视节点，例如 `Sprite2D` 或临时 `ColorRect` / 简单贴图。
-4. 添加碰撞节点 `CollisionShape2D`。
-5. 配置输入映射：
+3. 添加玩家可视节点与碰撞节点：
+   - `CollisionShape2D`
+   - 临时可视节点（如 `Polygon2D` 或简单占位图形）
+   - `Camera2D`
+4. 配置输入映射：
    - `move_up`
    - `move_down`
    - `move_left`
    - `move_right`
-6. 编写玩家移动逻辑。
-7. 将玩家实例化到 `Main.tscn`。
-8. 添加 `Camera2D` 跟随玩家。
+   - `fire`（为后续阶段预留）
+5. 编写 `Player.cs` 中的基础移动逻辑。
+6. 将 `Main.tscn` 调整为开始菜单场景。
+7. 新建实际游玩的关卡场景，例如 `scene/level/Level01.tscn`。
+8. 由关卡场景在出生点实例化并加载 `Player.tscn`。
+9. 在关卡中加入临时背景参考元素，便于肉眼验证镜头跟随与位移。
+10. 在关卡中加入静态障碍物与边界墙，用于碰撞验收。
 
 ### 验收标准
 
-1. 玩家可以八方向或四方向移动。
-2. 镜头跟随正常。
-3. 角色碰撞体工作正常。
+1. 运行项目后先进入开始菜单。
+2. 点击开始按钮后能进入关卡场景。
+3. 玩家可以四方向或八方向移动。
+4. 镜头跟随正常，能通过背景参考明显看出位移。
+5. 玩家不能穿过关卡边界和测试障碍物，贴边移动表现正常。
 
 ### AI 可实现
 
 1. `Player.cs` 的移动逻辑实现。
 2. 输入读取与速度控制代码。
-3. `Main` 场景相关的实例化代码建议。
-4. 对 `_PhysicsProcess`、`Velocity`、`MoveAndSlide()` 用法进行解释。
+3. `Main.tscn` 菜单跳转逻辑。
+4. `Level01.tscn` / `Level01.cs` 的关卡组织与玩家实例化逻辑。
+5. 临时可视化占位方案与碰撞测试场景配置建议。
+6. 对 `_PhysicsProcess`、`Velocity`、`MoveAndSlide()` 用法进行解释。
 
 ### 需要你手动操作
 
 1. 在 Godot 中创建 `Player.tscn` 节点树。
 2. 在 Inspector 中配置 `CollisionShape2D` 形状。
 3. 在 Project Settings > Input Map 中配置输入。
-4. 将 `Camera2D` 作为玩家子节点或在场景中关联。
+4. 运行项目，验证移动、镜头与碰撞表现是否符合预期。
 
 ---
 
@@ -185,7 +196,7 @@ res://scenes/player/Player.cs
 2. 使用 `CharacterBody2D` 作为敌人根节点。
 3. 添加基础外观与碰撞。
 4. 实现敌人朝玩家移动。
-5. 在 `Main.tscn` 中放置一个或多个敌人。
+5. 在关卡场景中放置一个或多个敌人。
 6. 后续增加简单刷怪器 `Spawner`。
 
 ### 验收标准
@@ -205,7 +216,7 @@ res://scenes/player/Player.cs
 
 1. 创建 `Enemy.tscn` 节点树。
 2. 配置敌人的碰撞形状和图形资源。
-3. 在主场景中摆放初始出生点，或创建生成器节点。
+3. 在关卡场景中摆放初始出生点，或创建生成器节点。
 
 ---
 
@@ -261,7 +272,7 @@ res://scenes/player/Player.cs
    - 当前击杀数（可选）
 2. 创建 Game Over UI。
 3. 添加重新开始按钮。
-4. 增加开始界面或简单提示文本（可选）。
+4. 完善开始界面与流程跳转。
 5. 完成“开始 -> 游戏中 -> 结束 -> 重开”的流程闭环。
 
 ### 验收标准
@@ -338,15 +349,16 @@ res://scenes/player/Player.cs
 建议严格按以下顺序推进，不要跳步：
 
 1. `Main.tscn` 跑起来
-2. `Player.tscn` 可移动
-3. `Bullet.tscn` 可发射
-4. `Enemy.tscn` 可追踪
-5. 子弹命中敌人
-6. 玩家受伤与死亡
-7. 分数系统
-8. HUD 与 Game Over
-9. 刷怪与数值调整
-10. 音效和演示打磨
+2. `Level01.tscn` 可进入
+3. `Player.tscn` 可移动
+4. `Bullet.tscn` 可发射
+5. `Enemy.tscn` 可追踪
+6. 子弹命中敌人
+7. 玩家受伤与死亡
+8. 分数系统
+9. HUD 与 Game Over
+10. 刷怪与数值调整
+11. 音效和演示打磨
 
 原因：
 
@@ -414,8 +426,9 @@ res://scenes/player/Player.cs
 3. 配置输入映射
 4. 实现玩家移动
 5. 添加 `Camera2D`
+6. 创建一个最小可进入的关卡场景
 
-完成这一步后，再进入射击系统。不要同时启动敌人、UI、分数、音效。
+完成这一步后，再进入射击系统。不要同时启动敌人、复杂 UI、分数、音效。
 
 ---
 
@@ -424,8 +437,10 @@ res://scenes/player/Player.cs
 ### 里程碑 M1：可移动角色
 
 1. `Main.tscn`
-2. `Player.tscn`
-3. `Player.cs`
+2. `Level01.tscn`
+3. `Player.tscn`
+4. `Player.cs`
+5. `Level01.cs`
 
 ### 里程碑 M2：可射击
 
