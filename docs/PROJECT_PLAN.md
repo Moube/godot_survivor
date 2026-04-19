@@ -82,10 +82,12 @@ res://scenes/player/Player.cs
 
 ### 需要你手动操作
 
-1. 在 Godot 编辑器中打开项目。
-2. 创建场景与节点。
-3. 在 Project Settings 中设置 Main Scene。
-4. 确认本机 .NET / Godot C# 环境已正确安装。
+1. 确认本机 .NET / Godot C# 环境已正确安装。
+2. 在 Godot 编辑器中打开项目。
+3. 创建场景与节点。
+4. 在 Project Settings 中设置 Main Scene。
+5. 在编辑器顶部选项卡中找到 项目 > 工具 > C#，执行 `Create C# Solution`，生成 C# 工程文件。
+6. 在编辑中右上角 `Build`，确认 C# 项目可以成功编译。
 
 ---
 
