@@ -1,7 +1,8 @@
-[gd_scene format=3 uid="uid://c45q6dk6y8s0x"]
+[gd_scene load_steps=7 format=3 uid="uid://c45q6dk6y8s0x"]
 
 [ext_resource type="Script" uid="uid://cs8a5btntudxi" path="res://scene/level/Level01.cs" id="1_l9v2o"]
 [ext_resource type="PackedScene" uid="uid://2drw8henhjlg" path="res://scene/player/Player.tscn" id="2_a4a8r"]
+[ext_resource type="PackedScene" uid="uid://cdlrr0sqbofmc" path="res://scene/enemy/Enemy.tscn" id="3_2el3g"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_horizontal"]
 size = Vector2(960, 32)
@@ -18,8 +19,14 @@ size = Vector2(160, 48)
 [node name="Level01" type="Node2D" unique_id=618390061]
 script = ExtResource("1_l9v2o")
 PlayerScene = ExtResource("2_a4a8r")
+EnemyScene = ExtResource("3_2el3g")
 
 [node name="PlayerSpawn" type="Marker2D" parent="." unique_id=674187226]
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="SpawnTimer" type="Timer" parent="."]
+wait_time = 1.75
 
 [node name="Walls" type="Node2D" parent="." unique_id=1926392941]
 
