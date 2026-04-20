@@ -103,15 +103,15 @@ res://scene/player/Player.cs
 1. 创建 `Player.tscn`。
 2. 使用 `CharacterBody2D` 作为玩家根节点。
 3. 添加玩家可视节点与碰撞节点：
-   - `CollisionShape2D`
-   - 临时可视节点（如 `Polygon2D` 或简单占位图形）
-   - `Camera2D`
+  - `CollisionShape2D`
+  - 临时可视节点（如 `Polygon2D` 或简单占位图形）
+  - `Camera2D`
 4. 配置输入映射：
-   - `move_up`
-   - `move_down`
-   - `move_left`
-   - `move_right`
-   - `fire`（为后续阶段预留）
+  - `move_up`
+  - `move_down`
+  - `move_left`
+  - `move_right`
+  - `fire`（为后续阶段预留）
 5. 编写 `Player.cs` 中的基础移动逻辑。
 6. 将 `Main.tscn` 调整为开始菜单场景。
 7. 新建实际游玩的关卡场景，例如 `scene/level/Level01.tscn`。
@@ -267,9 +267,9 @@ res://scene/player/Player.cs
 ### 任务
 
 1. 创建 HUD：
-   - 玩家血量
-   - 当前分数
-   - 当前击杀数（可选）
+  - 玩家血量
+  - 当前分数
+  - 当前击杀数（可选）
 2. 创建 Game Over UI。
 3. 添加重新开始按钮。
 4. 完善开始界面与流程跳转。
@@ -305,23 +305,23 @@ res://scene/player/Player.cs
 ### 任务
 
 1. 加入基础音效：
-   - 射击
-   - 命中
-   - 死亡
+  - 射击
+  - 命中
+  - 死亡
 2. 增加基础视觉反馈：
-   - 子弹命中闪烁
-   - 死亡消失效果
-   - 屏幕震动（可选）
+  - 子弹命中闪烁
+  - 死亡消失效果
+  - 屏幕震动（可选）
 3. 调整数值：
-   - 玩家速度
-   - 子弹速度
-   - 射击频率
-   - 敌人速度
-   - 刷怪频率
+  - 玩家速度
+  - 子弹速度
+  - 射击频率
+  - 敌人速度
+  - 刷怪频率
 4. 修复明显体验问题：
-   - 出生点过近
-   - 子弹穿透异常
-   - UI 显示错位
+  - 出生点过近
+  - 子弹穿透异常
+  - UI 显示错位
 
 ### 验收标准
 

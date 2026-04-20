@@ -1,12 +1,14 @@
-[gd_scene format=3 uid="uid://2drw8henhjlg"]
+[gd_scene load_steps=5 format=3 uid="uid://2drw8henhjlg"]
 
 [ext_resource type="Script" uid="uid://ef1nsxf0aail" path="res://scene/player/Player.cs" id="1_tt56r"]
+[ext_resource type="PackedScene" uid="uid://bdkj03kvhgalx" path="res://scene/bullet/Bullet.tscn" id="2_q2vlq"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_tt56r"]
 radius = 12.0
 
 [node name="Player" type="CharacterBody2D" unique_id=920766203]
 script = ExtResource("1_tt56r")
+BulletScene = ExtResource("2_q2vlq")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1725065643]
 shape = SubResource("CircleShape2D_tt56r")
@@ -20,7 +22,11 @@ polygon = PackedVector2Array(-12, -12, 12, -12, 12, 12, -12, 12)
 
 [node name="FacingMarker" type="Polygon2D" parent="." unique_id=862123419]
 color = Color(1, 0.847059, 0.329412, 1)
-polygon = PackedVector2Array(0, -20, 8, -8, -8, -8)
+polygon = PackedVector2Array(20, 0, 8, -8, 8, 8)
+position = Vector2(2, 0)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=64135875]
 enabled = true
+
+[node name="Muzzle" type="Marker2D" parent="." unique_id=442603313]
+position = Vector2(22, 0)
