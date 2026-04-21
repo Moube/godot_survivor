@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://c45q6dk6y8s0x"]
+[gd_scene load_steps=8 format=3 uid="uid://c45q6dk6y8s0x"]
 
 [ext_resource type="Script" uid="uid://cs8a5btntudxi" path="res://scene/level/Level01.cs" id="1_l9v2o"]
 [ext_resource type="PackedScene" uid="uid://2drw8henhjlg" path="res://scene/player/Player.tscn" id="2_a4a8r"]
 [ext_resource type="PackedScene" uid="uid://cdlrr0sqbofmc" path="res://scene/enemy/Enemy.tscn" id="3_2el3g"]
+[ext_resource type="PackedScene" path="res://scene/level/WallBlock.tscn" id="4_pti1w"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_horizontal"]
 size = Vector2(960, 32)
@@ -30,74 +31,74 @@ wait_time = 1.75
 
 [node name="Walls" type="Node2D" parent="." unique_id=1926392941]
 
-[node name="TopWall" type="StaticBody2D" parent="Walls" unique_id=29339910]
+[node name="TopWall" parent="Walls" instance=ExtResource("4_pti1w")]
 position = Vector2(0, -320)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/TopWall" unique_id=986448949]
+[node name="CollisionShape2D" parent="Walls/TopWall" index="0"]
 shape = SubResource("RectangleShape2D_wall_horizontal")
 
-[node name="Polygon2D" type="Polygon2D" parent="Walls/TopWall" unique_id=1294360436]
+[node name="Polygon2D" parent="Walls/TopWall" index="1"]
 color = Color(0.239216, 0.290196, 0.356863, 1)
 polygon = PackedVector2Array(-480, -16, 480, -16, 480, 16, -480, 16)
 
-[node name="BottomWall" type="StaticBody2D" parent="Walls" unique_id=1375082619]
+[node name="BottomWall" parent="Walls" instance=ExtResource("4_pti1w")]
 position = Vector2(0, 320)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/BottomWall" unique_id=10659435]
+[node name="CollisionShape2D" parent="Walls/BottomWall" index="0"]
 shape = SubResource("RectangleShape2D_wall_horizontal")
 
-[node name="Polygon2D" type="Polygon2D" parent="Walls/BottomWall" unique_id=2104744180]
+[node name="Polygon2D" parent="Walls/BottomWall" index="1"]
 color = Color(0.239216, 0.290196, 0.356863, 1)
 polygon = PackedVector2Array(-480, -16, 480, -16, 480, 16, -480, 16)
 
-[node name="LeftWall" type="StaticBody2D" parent="Walls" unique_id=1215336095]
+[node name="LeftWall" parent="Walls" instance=ExtResource("4_pti1w")]
 position = Vector2(-480, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/LeftWall" unique_id=540822679]
+[node name="CollisionShape2D" parent="Walls/LeftWall" index="0"]
 shape = SubResource("RectangleShape2D_wall_vertical")
 
-[node name="Polygon2D" type="Polygon2D" parent="Walls/LeftWall" unique_id=1545972454]
+[node name="Polygon2D" parent="Walls/LeftWall" index="1"]
 color = Color(0.239216, 0.290196, 0.356863, 1)
 polygon = PackedVector2Array(-16, -320, 16, -320, 16, 320, -16, 320)
 
-[node name="RightWall" type="StaticBody2D" parent="Walls" unique_id=353979653]
+[node name="RightWall" parent="Walls" instance=ExtResource("4_pti1w")]
 position = Vector2(480, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/RightWall" unique_id=719174894]
+[node name="CollisionShape2D" parent="Walls/RightWall" index="0"]
 shape = SubResource("RectangleShape2D_wall_vertical")
 
-[node name="Polygon2D" type="Polygon2D" parent="Walls/RightWall" unique_id=431100040]
+[node name="Polygon2D" parent="Walls/RightWall" index="1"]
 color = Color(0.239216, 0.290196, 0.356863, 1)
 polygon = PackedVector2Array(-16, -320, 16, -320, 16, 320, -16, 320)
 
 [node name="Obstacles" type="Node2D" parent="." unique_id=1924163805]
 
-[node name="CenterBlock" type="StaticBody2D" parent="Obstacles" unique_id=1353314529]
+[node name="CenterBlock" parent="Obstacles" instance=ExtResource("4_pti1w")]
 position = Vector2(0, -96)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Obstacles/CenterBlock" unique_id=64248630]
+[node name="CollisionShape2D" parent="Obstacles/CenterBlock" index="0"]
 shape = SubResource("RectangleShape2D_obstacle_large")
 
-[node name="Polygon2D" type="Polygon2D" parent="Obstacles/CenterBlock" unique_id=885826011]
+[node name="Polygon2D" parent="Obstacles/CenterBlock" index="1"]
 color = Color(0.780392, 0.333333, 0.266667, 1)
 polygon = PackedVector2Array(-48, -48, 48, -48, 48, 48, -48, 48)
 
-[node name="WideBlockLeft" type="StaticBody2D" parent="Obstacles" unique_id=1287632456]
+[node name="WideBlockLeft" parent="Obstacles" instance=ExtResource("4_pti1w")]
 position = Vector2(-180, 140)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Obstacles/WideBlockLeft" unique_id=913463328]
+[node name="CollisionShape2D" parent="Obstacles/WideBlockLeft" index="0"]
 shape = SubResource("RectangleShape2D_obstacle_wide")
 
-[node name="Polygon2D" type="Polygon2D" parent="Obstacles/WideBlockLeft" unique_id=1381854906]
+[node name="Polygon2D" parent="Obstacles/WideBlockLeft" index="1"]
 color = Color(0.627451, 0.411765, 0.2, 1)
 polygon = PackedVector2Array(-80, -24, 80, -24, 80, 24, -80, 24)
 
-[node name="WideBlockRight" type="StaticBody2D" parent="Obstacles" unique_id=633128622]
+[node name="WideBlockRight" parent="Obstacles" instance=ExtResource("4_pti1w")]
 position = Vector2(180, 140)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Obstacles/WideBlockRight" unique_id=1166442410]
+[node name="CollisionShape2D" parent="Obstacles/WideBlockRight" index="0"]
 shape = SubResource("RectangleShape2D_obstacle_wide")
 
-[node name="Polygon2D" type="Polygon2D" parent="Obstacles/WideBlockRight" unique_id=713479929]
+[node name="Polygon2D" parent="Obstacles/WideBlockRight" index="1"]
 color = Color(0.627451, 0.411765, 0.2, 1)
 polygon = PackedVector2Array(-80, -24, 80, -24, 80, 24, -80, 24)

@@ -8,6 +8,9 @@ public partial class Bullet : Area2D
 	[Export]
 	public float LifetimeSeconds { get; set; } = 1.5f;
 
+	[Export]
+	public int Damage { get; set; } = 1;
+
 	public Vector2 Direction { get; private set; } = Vector2.Right;
 
 	private double _remainingLifetime;
@@ -42,6 +45,8 @@ public partial class Bullet : Area2D
 			return;
 		}
 
+		CombatComponent targetCombat = body.GetNodeOrNull<CombatComponent>("CombatComponent");
+		targetCombat?.ApplyDamage(Damage);
 		QueueFree();
 	}
 }

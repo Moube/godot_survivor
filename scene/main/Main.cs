@@ -12,6 +12,7 @@ public partial class Main : Control
 
 	private void OnStartButtonPressed()
 	{
+		GameSession.Instance?.StartNewRun();
 		GetTree().ChangeSceneToFile(FirstLevelScenePath);
 	}
 }

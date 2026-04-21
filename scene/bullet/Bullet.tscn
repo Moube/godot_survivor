@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bdkj03kvhgalx"]
+[gd_scene format=3 uid="uid://bdkj03kvhgalx"]
 
 [ext_resource type="Script" uid="uid://bpswcj3hhq2xv" path="res://scene/bullet/Bullet.cs" id="1_878pn"]
 
@@ -6,13 +6,13 @@
 radius = 4.0
 
 [node name="Bullet" type="Area2D" unique_id=1145736759]
+collision_layer = 8
+collision_mask = 5
 script = ExtResource("1_878pn")
-monitoring = true
-monitorable = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=664351438]
 shape = SubResource("CircleShape2D_bullet")
 
-[node name="Visual" type="Polygon2D" parent="."]
+[node name="Visual" type="Polygon2D" parent="." unique_id=990362727]
 color = Color(1, 0.87451, 0.380392, 1)
 polygon = PackedVector2Array(10, 0, -2, -3, -6, 0, -2, 3)

@@ -2,6 +2,9 @@ using Godot;
 
 public partial class Player : CharacterBody2D
 {
+	[Signal]
+	public delegate void DiedEventHandler();
+
 	[Export]
 	public float MoveSpeed { get; set; } = 240.0f;
 
@@ -12,16 +15,26 @@ public partial class Player : CharacterBody2D
 	public float FireCooldownSeconds { get; set; } = 0.15f;
 
 	private Marker2D _muzzle;
+	private CombatComponent _combat;
 	private double _fireCooldownRemaining;
+	private bool _isDead;
 
 	public override void _Ready()
 	{
 		AddToGroup("player");
 		_muzzle = GetNode<Marker2D>("Muzzle");
+		_combat = GetNode<CombatComponent>("CombatComponent");
+		_combat.Died += OnDied;
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (_isDead)
+		{
+			Velocity = Vector2.Zero;
+			return;
+		}
+
 		Vector2 inputDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
 		Velocity = inputDirection * MoveSpeed;
 		MoveAndSlide();
@@ -83,5 +96,11 @@ public partial class Player : CharacterBody2D
 	{
 		Vector2 direction = GetGlobalMousePosition() - GlobalPosition;
 		return direction == Vector2.Zero ? Vector2.Right.Rotated(Rotation) : direction.Normalized();
+	}
+
+	private void OnDied()
+	{
+		_isDead = true;
+		EmitSignal(SignalName.Died);
 	}
 }

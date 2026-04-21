@@ -65,6 +65,11 @@ public partial class Level01 : Node2D
 		player.GlobalPosition = spawnPoint.GlobalPosition;
 		AddChild(player);
 		_player = player;
+
+		if (player is Player playerNode)
+		{
+			playerNode.Died += OnPlayerDied;
+		}
 	}
 
 	private void ConfigureSpawnTimer()
@@ -88,7 +93,7 @@ public partial class Level01 : Node2D
 
 	private void SpawnEnemy()
 	{
-		if (_player is null || !IsInstanceValid(_player))
+		if (GameSession.Instance?.IsGameOver == true || _player is null || !IsInstanceValid(_player))
 		{
 			return;
 		}
@@ -140,6 +145,17 @@ public partial class Level01 : Node2D
 			2 => new Vector2(-SpawnAreaHalfExtents.X, verticalY),
 			_ => new Vector2(SpawnAreaHalfExtents.X, verticalY),
 		};
+	}
+
+	private void OnPlayerDied()
+	{
+		if (GameSession.Instance?.IsGameOver == true)
+		{
+			return;
+		}
+
+		_spawnTimer.Stop();
+		GameSession.Instance?.TriggerGameOver();
 	}
 
 	public override void _Draw()
