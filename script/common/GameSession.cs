@@ -6,6 +6,9 @@ public partial class GameSession : Node
 	public delegate void ScoreChangedEventHandler(int score);
 
 	[Signal]
+	public delegate void PlayerHealthChangedEventHandler(int currentHealth, int maxHealth);
+
+	[Signal]
 	public delegate void GameOverEventHandler(int finalScore);
 
 	public static GameSession Instance { get; private set; }
@@ -13,6 +16,10 @@ public partial class GameSession : Node
 	public int Score { get; private set; }
 
 	public bool IsGameOver { get; private set; }
+
+	public int CurrentPlayerHealth { get; private set; }
+
+	public int MaxPlayerHealth { get; private set; }
 
 	public override void _EnterTree()
 	{
@@ -31,6 +38,7 @@ public partial class GameSession : Node
 	{
 		Score = 0;
 		IsGameOver = false;
+		ClearPlayerHealth();
 		GetTree().Paused = false;
 		EmitSignal(SignalName.ScoreChanged, Score);
 	}
@@ -58,5 +66,19 @@ public partial class GameSession : Node
 		EmitSignal(SignalName.GameOver, Score);
 		GetTree().Paused = true;
 		GD.Print($"Game Over. Final Score: {Score}");
+	}
+
+	public void SetPlayerHealth(int currentHealth, int maxHealth)
+	{
+		MaxPlayerHealth = Mathf.Max(1, maxHealth);
+		CurrentPlayerHealth = Mathf.Clamp(currentHealth, 0, MaxPlayerHealth);
+		EmitSignal(SignalName.PlayerHealthChanged, CurrentPlayerHealth, MaxPlayerHealth);
+	}
+
+	public void ClearPlayerHealth()
+	{
+		CurrentPlayerHealth = 0;
+		MaxPlayerHealth = 0;
+		EmitSignal(SignalName.PlayerHealthChanged, CurrentPlayerHealth, MaxPlayerHealth);
 	}
 }

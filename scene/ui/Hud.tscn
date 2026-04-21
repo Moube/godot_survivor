@@ -1,0 +1,116 @@
+[gd_scene format=3 uid="uid://cqr7jtyubp4p6"]
+
+[ext_resource type="Script" uid="uid://jlpa6r0dhhmf" path="res://scene/ui/Hud.cs" id="1_qfa3s"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_background"]
+bg_color = Color(0.137255, 0.0980392, 0.109804, 0.85)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill"]
+bg_color = Color(0.87451, 0.180392, 0.180392, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="Hud" type="CanvasLayer" unique_id=1687969968]
+process_mode = 3
+layer = 10
+script = ExtResource("1_qfa3s")
+
+[node name="TopRight" type="MarginContainer" parent="." unique_id=983369180]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -151.5
+offset_right = -36.5
+offset_bottom = 72.0
+grow_horizontal = 2
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+
+[node name="ScorePanel" type="PanelContainer" parent="TopRight" unique_id=2103433174]
+layout_mode = 2
+
+[node name="ScoreMargin" type="MarginContainer" parent="TopRight/ScorePanel" unique_id=914672544]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="ScoreRow" type="HBoxContainer" parent="TopRight/ScorePanel/ScoreMargin" unique_id=12642241]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ScoreLabel" type="Label" parent="TopRight/ScorePanel/ScoreMargin/ScoreRow" unique_id=355420664]
+layout_mode = 2
+text = "Score"
+
+[node name="ScoreValue" type="Label" parent="TopRight/ScorePanel/ScoreMargin/ScoreRow" unique_id=1663419938]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "0"
+
+[node name="BottomCenter" type="CenterContainer" parent="." unique_id=43457491]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="HealthBar" type="ProgressBar" parent="BottomCenter" unique_id=690979595]
+custom_minimum_size = Vector2(320, 22)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_background")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fill")
+max_value = 5.0
+value = 5.0
+show_percentage = false
+
+[node name="GameOverCenter" type="CenterContainer" parent="." unique_id=2027087495]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="GameOverCenter" unique_id=602488008]
+visible = false
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameOverCenter/PanelContainer" unique_id=11597252]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="GameOverMargin" type="MarginContainer" parent="GameOverCenter/PanelContainer/VBoxContainer" unique_id=33663304]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="Content" type="VBoxContainer" parent="GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin" unique_id=580046285]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content" unique_id=1312312226]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Game Over"
+horizontal_alignment = 1
+
+[node name="FinalScoreLabel" type="Label" parent="GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content" unique_id=1624027174]
+layout_mode = 2
+text = "Final Score: 0"
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content" unique_id=1215819195]
+layout_mode = 2
+text = "Restart"

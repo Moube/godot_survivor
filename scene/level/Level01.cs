@@ -29,6 +29,7 @@ public partial class Level01 : Node2D
 	private readonly RandomNumberGenerator _random = new();
 
 	private CharacterBody2D _player;
+	private CombatComponent _playerCombat;
 	private Node2D _enemiesRoot;
 	private Timer _spawnTimer;
 
@@ -70,6 +71,16 @@ public partial class Level01 : Node2D
 		{
 			playerNode.Died += OnPlayerDied;
 		}
+
+		_playerCombat = player.GetNodeOrNull<CombatComponent>("CombatComponent");
+		if (_playerCombat is null)
+		{
+			GD.PushError("Player is missing CombatComponent.");
+			return;
+		}
+
+		_playerCombat.Damaged += OnPlayerDamaged;
+		GameSession.Instance?.SetPlayerHealth(_playerCombat.CurrentHealth, _playerCombat.MaxHealth);
 	}
 
 	private void ConfigureSpawnTimer()
@@ -156,6 +167,11 @@ public partial class Level01 : Node2D
 
 		_spawnTimer.Stop();
 		GameSession.Instance?.TriggerGameOver();
+	}
+
+	private void OnPlayerDamaged(int amount, int currentHealth, int maxHealth)
+	{
+		GameSession.Instance?.SetPlayerHealth(currentHealth, maxHealth);
 	}
 
 	public override void _Draw()
