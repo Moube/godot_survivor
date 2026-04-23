@@ -1,10 +1,13 @@
-[gd_scene load_steps=9 format=3 uid="uid://c45q6dk6y8s0x"]
+[gd_scene load_steps=12 format=3 uid="uid://c45q6dk6y8s0x"]
 
 [ext_resource type="Script" uid="uid://cs8a5btntudxi" path="res://scene/level/Level01.cs" id="1_l9v2o"]
 [ext_resource type="PackedScene" uid="uid://2drw8henhjlg" path="res://scene/player/Player.tscn" id="2_a4a8r"]
 [ext_resource type="PackedScene" uid="uid://cdlrr0sqbofmc" path="res://scene/enemy/Enemy.tscn" id="3_2el3g"]
 [ext_resource type="PackedScene" path="res://scene/level/WallBlock.tscn" id="4_pti1w"]
 [ext_resource type="PackedScene" path="res://scene/ui/Hud.tscn" id="5_r7m8l"]
+[ext_resource type="Texture2D" path="res://asset/art/level/floor_tile_01.png" id="6_1k0gr"]
+[ext_resource type="Texture2D" path="res://asset/art/level/wall_border_horizontal.png" id="7_hbg8v"]
+[ext_resource type="Texture2D" path="res://asset/art/level/wall_border_vertical.png" id="8_v1e5n"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_horizontal"]
 size = Vector2(960, 32)
@@ -22,6 +25,14 @@ size = Vector2(160, 48)
 script = ExtResource("1_l9v2o")
 PlayerScene = ExtResource("2_a4a8r")
 EnemyScene = ExtResource("3_2el3g")
+
+[node name="Floor" type="Polygon2D" parent="."]
+z_index = -10
+texture_repeat = 2
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(-512, -352, 512, -352, 512, 352, -512, 352)
+uv = PackedVector2Array(0, 0, 1024, 0, 1024, 704, 0, 704)
+texture = ExtResource("6_1k0gr")
 
 [node name="PlayerSpawn" type="Marker2D" parent="." unique_id=674187226]
 
@@ -41,8 +52,11 @@ position = Vector2(0, -320)
 shape = SubResource("RectangleShape2D_wall_horizontal")
 
 [node name="Polygon2D" parent="Walls/TopWall" index="1"]
-color = Color(0.239216, 0.290196, 0.356863, 1)
+texture_repeat = 2
+color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(-480, -16, 480, -16, 480, 16, -480, 16)
+uv = PackedVector2Array(0, 0, 960, 0, 960, 32, 0, 32)
+texture = ExtResource("7_hbg8v")
 
 [node name="BottomWall" parent="Walls" instance=ExtResource("4_pti1w")]
 position = Vector2(0, 320)
@@ -51,8 +65,11 @@ position = Vector2(0, 320)
 shape = SubResource("RectangleShape2D_wall_horizontal")
 
 [node name="Polygon2D" parent="Walls/BottomWall" index="1"]
-color = Color(0.239216, 0.290196, 0.356863, 1)
+texture_repeat = 2
+color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(-480, -16, 480, -16, 480, 16, -480, 16)
+uv = PackedVector2Array(0, 0, 960, 0, 960, 32, 0, 32)
+texture = ExtResource("7_hbg8v")
 
 [node name="LeftWall" parent="Walls" instance=ExtResource("4_pti1w")]
 position = Vector2(-480, 0)
@@ -61,8 +78,11 @@ position = Vector2(-480, 0)
 shape = SubResource("RectangleShape2D_wall_vertical")
 
 [node name="Polygon2D" parent="Walls/LeftWall" index="1"]
-color = Color(0.239216, 0.290196, 0.356863, 1)
+texture_repeat = 2
+color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(-16, -320, 16, -320, 16, 320, -16, 320)
+uv = PackedVector2Array(0, 0, 32, 0, 32, 640, 0, 640)
+texture = ExtResource("8_v1e5n")
 
 [node name="RightWall" parent="Walls" instance=ExtResource("4_pti1w")]
 position = Vector2(480, 0)
@@ -71,8 +91,11 @@ position = Vector2(480, 0)
 shape = SubResource("RectangleShape2D_wall_vertical")
 
 [node name="Polygon2D" parent="Walls/RightWall" index="1"]
-color = Color(0.239216, 0.290196, 0.356863, 1)
+texture_repeat = 2
+color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(-16, -320, 16, -320, 16, 320, -16, 320)
+uv = PackedVector2Array(0, 0, 32, 0, 32, 640, 0, 640)
+texture = ExtResource("8_v1e5n")
 
 [node name="Obstacles" type="Node2D" parent="." unique_id=1924163805]
 
@@ -83,8 +106,9 @@ position = Vector2(0, -96)
 shape = SubResource("RectangleShape2D_obstacle_large")
 
 [node name="Polygon2D" parent="Obstacles/CenterBlock" index="1"]
-color = Color(0.780392, 0.333333, 0.266667, 1)
+color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(-48, -48, 48, -48, 48, 48, -48, 48)
+uv = PackedVector2Array(0, 0, 620, 0, 620, 580, 0, 580)
 
 [node name="WideBlockLeft" parent="Obstacles" instance=ExtResource("4_pti1w")]
 position = Vector2(-180, 140)
@@ -93,8 +117,9 @@ position = Vector2(-180, 140)
 shape = SubResource("RectangleShape2D_obstacle_wide")
 
 [node name="Polygon2D" parent="Obstacles/WideBlockLeft" index="1"]
-color = Color(0.627451, 0.411765, 0.2, 1)
+color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(-80, -24, 80, -24, 80, 24, -80, 24)
+uv = PackedVector2Array(0, 0, 620, 0, 620, 580, 0, 580)
 
 [node name="WideBlockRight" parent="Obstacles" instance=ExtResource("4_pti1w")]
 position = Vector2(180, 140)
@@ -103,5 +128,6 @@ position = Vector2(180, 140)
 shape = SubResource("RectangleShape2D_obstacle_wide")
 
 [node name="Polygon2D" parent="Obstacles/WideBlockRight" index="1"]
-color = Color(0.627451, 0.411765, 0.2, 1)
+color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(-80, -24, 80, -24, 80, 24, -80, 24)
+uv = PackedVector2Array(0, 0, 620, 0, 620, 580, 0, 580)

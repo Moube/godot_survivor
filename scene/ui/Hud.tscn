@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://cqr7jtyubp4p6"]
 
 [ext_resource type="Script" uid="uid://jlpa6r0dhhmf" path="res://scene/ui/Hud.cs" id="1_qfa3s"]
+[ext_resource type="Texture2D" uid="uid://d4fpuavq05j6d" path="res://asset/art/ui/ui_panel_basic.png" id="2_4d2qj"]
+[ext_resource type="Texture2D" uid="uid://buetf1wh35ahl" path="res://asset/art/ui/ui_panel_score.png" id="3_17jov"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_background"]
 bg_color = Color(0.137255, 0.0980392, 0.109804, 0.85)
@@ -16,6 +18,13 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_panel"]
+texture = ExtResource("2_4d2qj")
+texture_margin_left = 80.0
+texture_margin_top = 80.0
+texture_margin_right = 80.0
+texture_margin_bottom = 80.0
+
 [node name="Hud" type="CanvasLayer" unique_id=1687969968]
 process_mode = 3
 layer = 10
@@ -25,22 +34,26 @@ script = ExtResource("1_qfa3s")
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -151.5
-offset_right = -36.5
-offset_bottom = 72.0
-grow_horizontal = 2
+offset_left = -344.0
+offset_bottom = 152.0
+grow_horizontal = 0
 theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 24
 
-[node name="ScorePanel" type="PanelContainer" parent="TopRight" unique_id=2103433174]
+[node name="ScorePanel" type="TextureRect" parent="TopRight" unique_id=2103433174]
+custom_minimum_size = Vector2(320, 128)
 layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_17jov")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="ScoreMargin" type="MarginContainer" parent="TopRight/ScorePanel" unique_id=914672544]
-layout_mode = 2
-theme_override_constants/margin_left = 14
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 14
-theme_override_constants/margin_bottom = 10
+[node name="ScoreMargin" type="CenterContainer" parent="TopRight/ScorePanel" unique_id=914672544]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="ScoreRow" type="HBoxContainer" parent="TopRight/ScorePanel/ScoreMargin" unique_id=12642241]
 layout_mode = 2
@@ -48,11 +61,12 @@ theme_override_constants/separation = 8
 
 [node name="ScoreLabel" type="Label" parent="TopRight/ScorePanel/ScoreMargin/ScoreRow" unique_id=355420664]
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
 text = "Score"
 
 [node name="ScoreValue" type="Label" parent="TopRight/ScorePanel/ScoreMargin/ScoreRow" unique_id=1663419938]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 22
 text = "0"
 
 [node name="BottomCenter" type="CenterContainer" parent="." unique_id=43457491]
@@ -84,6 +98,7 @@ grow_vertical = 2
 visible = false
 custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_panel")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="GameOverCenter/PanelContainer" unique_id=11597252]
 layout_mode = 2

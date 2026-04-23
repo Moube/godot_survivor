@@ -1,8 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://2drw8henhjlg"]
+[gd_scene load_steps=4 format=3 uid="uid://2drw8henhjlg"]
 
 [ext_resource type="Script" uid="uid://ef1nsxf0aail" path="res://scene/player/Player.cs" id="1_tt56r"]
 [ext_resource type="PackedScene" uid="uid://bdkj03kvhgalx" path="res://scene/bullet/Bullet.tscn" id="2_q2vlq"]
 [ext_resource type="Script" path="res://script/common/CombatComponent.cs" id="3_xtmux"]
+[ext_resource type="Texture2D" path="res://asset/art/player/player_idle.png" id="4_b0y7m"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_tt56r"]
 radius = 12.0
@@ -17,13 +18,17 @@ BulletScene = ExtResource("2_q2vlq")
 shape = SubResource("CircleShape2D_tt56r")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=2131304136]
-visible = false
+position = Vector2(0, -4)
+scale = Vector2(0.075, 0.075)
+texture = ExtResource("4_b0y7m")
 
 [node name="Body" type="Polygon2D" parent="." unique_id=785894133]
+visible = false
 color = Color(0.333333, 0.815686, 0.545098, 1)
 polygon = PackedVector2Array(-12, -12, 12, -12, 12, 12, -12, 12)
 
 [node name="FacingMarker" type="Polygon2D" parent="." unique_id=862123419]
+visible = false
 position = Vector2(2, 0)
 color = Color(1, 0.847059, 0.329412, 1)
 polygon = PackedVector2Array(20, 0, 8, -8, 8, 8)

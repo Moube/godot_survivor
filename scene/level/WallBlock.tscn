@@ -1,4 +1,6 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Texture2D" path="res://asset/art/level/wall_tile_01.png" id="1_kr6s8"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wallblock"]
 size = Vector2(64, 64)
@@ -11,5 +13,7 @@ collision_mask = 14
 shape = SubResource("RectangleShape2D_wallblock")
 
 [node name="Polygon2D" type="Polygon2D" parent="."]
-color = Color(0.239216, 0.290196, 0.356863, 1)
+color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
+uv = PackedVector2Array(0, 0, 620, 0, 620, 580, 0, 580)
+texture = ExtResource("1_kr6s8")

@@ -61,7 +61,6 @@ public partial class Enemy : CharacterBody2D
 		else
 		{
 			Velocity = toTarget.Normalized() * MoveSpeed;
-			Rotation = toTarget.Angle();
 		}
 
 		MoveAndSlide();

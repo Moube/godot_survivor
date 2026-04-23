@@ -18,6 +18,7 @@ public partial class Player : CharacterBody2D
 	private CombatComponent _combat;
 	private double _fireCooldownRemaining;
 	private bool _isDead;
+	private const float MuzzleDistance = 22.0f;
 
 	public override void _Ready()
 	{
@@ -52,7 +53,7 @@ public partial class Player : CharacterBody2D
 			return;
 		}
 
-		Rotation = aimDirection.Angle();
+		_muzzle.Position = aimDirection.Normalized() * MuzzleDistance;
 	}
 
 	private void UpdateFireCooldown(double delta)
@@ -95,7 +96,7 @@ public partial class Player : CharacterBody2D
 	private Vector2 GetAimDirection()
 	{
 		Vector2 direction = GetGlobalMousePosition() - GlobalPosition;
-		return direction == Vector2.Zero ? Vector2.Right.Rotated(Rotation) : direction.Normalized();
+		return direction == Vector2.Zero ? Vector2.Right : direction.Normalized();
 	}
 
 	private void OnDied()

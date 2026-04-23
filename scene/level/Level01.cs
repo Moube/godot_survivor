@@ -176,20 +176,5 @@ public partial class Level01 : Node2D
 
 	public override void _Draw()
 	{
-		Color minorLineColor = new(0.18f, 0.22f, 0.28f, 1.0f);
-		Color majorLineColor = new(0.25f, 0.31f, 0.39f, 1.0f);
-		Color axisColor = new(0.88f, 0.45f, 0.29f, 1.0f);
-
-		for (int x = -GridExtent; x <= GridExtent; x += GridSize)
-		{
-			Color lineColor = x == 0 ? axisColor : (x % (GridSize * 4) == 0 ? majorLineColor : minorLineColor);
-			DrawLine(new Vector2(x, -GridExtent), new Vector2(x, GridExtent), lineColor, 2.0f);
-		}
-
-		for (int y = -GridExtent; y <= GridExtent; y += GridSize)
-		{
-			Color lineColor = y == 0 ? axisColor : (y % (GridSize * 4) == 0 ? majorLineColor : minorLineColor);
-			DrawLine(new Vector2(-GridExtent, y), new Vector2(GridExtent, y), lineColor, 2.0f);
-		}
 	}
 }

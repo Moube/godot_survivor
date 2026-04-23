@@ -1,6 +1,7 @@
-[gd_scene format=3 uid="uid://bdkj03kvhgalx"]
+[gd_scene load_steps=2 format=3 uid="uid://bdkj03kvhgalx"]
 
 [ext_resource type="Script" uid="uid://bpswcj3hhq2xv" path="res://scene/bullet/Bullet.cs" id="1_878pn"]
+[ext_resource type="Texture2D" path="res://asset/art/bullet/bullet_basic.png" id="2_s77tm"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bullet"]
 radius = 4.0
@@ -14,5 +15,10 @@ script = ExtResource("1_878pn")
 shape = SubResource("CircleShape2D_bullet")
 
 [node name="Visual" type="Polygon2D" parent="." unique_id=990362727]
+visible = false
 color = Color(1, 0.87451, 0.380392, 1)
 polygon = PackedVector2Array(10, 0, -2, -3, -6, 0, -2, 3)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("2_s77tm")
