@@ -31,9 +31,9 @@
 
 这部分资源直接影响阶段 6 的演示效果，建议优先完成。
 
-1. 玩家主体贴图
+1. 玩家主体与浮游魔法短杖贴图
 2. 敌人主体贴图
-3. 子弹贴图
+3. 魔法能量弹贴图
 4. 命中闪光特效贴图
 5. 敌人死亡消散特效贴图
 6. 地面平铺贴图
@@ -46,7 +46,7 @@
 
 1. 玩家受击反馈贴图
 2. 敌人受击反馈贴图
-3. 枪口火焰贴图
+3. 短杖发射闪光贴图
 4. 屏幕受伤边缘贴图
 5. 按钮状态贴图
 6. HUD 装饰图标
@@ -63,29 +63,67 @@
 
 - 替换 `scene/player/Player.tscn` 中当前的方块占位外观
 - 作为玩家在关卡中的主要视觉主体
+- 玩家主体不负责表达武器握持关系，攻击方向由浮游武器、枪口点和魔法弹表达
 
 最低需求：
 
-- 1 张静态玩家贴图
+- 1 张静态玩家主体贴图
 
 推荐需求：
 
-- 1 套四方向或八方向角色贴图
-- 如做简单动画，可补充待机/移动帧
+- 传统小法师形象，保留明显脸部五官
+- 玩家不握持武器，手部可以简化、藏在袖口或斗篷中
+- 1 张待机贴图
+- 1 组 4 帧移动动画，表现轻快小跑，并带有斗篷 / 帽檐轻微摆动
+- 不做四方向或八方向角色贴图，身体朝向不参与 360 度瞄准表现
 
 建议规格：
 
-- 俯视角 2D 风格
-- 单张尺寸可从 `32x32` 或 `48x48` 起步
+- 轻微斜俯视、带一点 3/4 感的 2D 卡通风格
+- 单帧游戏显示尺寸以 `48x48` 左右为基准
 - 轮廓要和敌人明显区分
-- 朝向应便于表现鼠标瞄准
+- 主色继续使用蓝色系，辅助色使用白色 / 浅灰
+- 玩家身体不做 360 度旋转，最多允许左右镜像
+- 动画优先采用透明背景横向 strip 单文件；如果生成或接入效果不好，再改用每帧独立 PNG
 
 建议命名：
 
-- `player_idle.png`
-- `player_move_strip.png`
+- `player_mage_idle.png`
+- `player_mage_move_strip_4f.png`
 
-### 1.2 玩家受击反馈贴图
+### 1.2 浮游魔法短杖贴图
+
+用途：
+
+- 作为玩家的独立攻击载体
+- 围绕玩家中心以固定半径 360 度环绕，位置跟随鼠标瞄准角度
+- 武器自身朝向跟随鼠标方向，用于表达当前攻击方向
+
+最低需求：
+
+- 1 张浮游魔法短杖待机贴图
+
+推荐需求：
+
+- 1 组 4 帧射击动画
+- 射击动画重点表现发光蓄能、轻微后坐和枪口闪光
+- 武器与玩家主体弱绑定，不要求贴合手部或握持动作
+- 武器造型必须能独立成立为浮游法器，而不是必须被手握住的枪械
+
+建议规格：
+
+- 默认朝向本地 `+X`，也就是贴图中枪口 / 杖尖朝右
+- 杖尖或发射点要明确，方便在 Godot 中放置 `Muzzle`
+- 单帧建议尺寸可从 `32x32` 或 `40x40` 起步，画布需要给旋转留出空白，避免裁切
+- 武器旋转时不能因为上下结构过强而显得倒置违和
+- 动画优先采用透明背景横向 strip 单文件；如果生成或接入效果不好，再改用每帧独立 PNG
+
+建议命名：
+
+- `weapon_magic_wand_idle.png`
+- `weapon_magic_wand_fire_strip_4f.png`
+
+### 1.3 玩家受击反馈贴图
 
 用途：
 
@@ -174,33 +212,35 @@
 
 ---
 
-## 3. 子弹与战斗特效资源
+## 3. 魔法弹与战斗特效资源
 
-### 3.1 子弹贴图
+### 3.1 魔法能量弹贴图
 
 用途：
 
 - 替换 `scene/bullet/Bullet.tscn` 中当前的简易多边形
+- 作为浮游魔法短杖发射出的主要飞行物
 
 最低需求：
 
-- 1 张小尺寸子弹贴图
+- 1 张小尺寸魔法能量弹贴图
 
 建议规格：
 
-- 细长、方向性明确
+- 明亮、方向性明确，优先表现为魔法弹 / 能量弹，而不是物理弹丸
 - 推荐尺寸 `8x8`、`12x12` 或 `16x16`
 - 需要适配旋转朝向
+- 可以使用小型发光核心和短拖尾，但不能复杂到压过玩家和敌人
 
 建议命名：
 
-- `bullet_basic.png`
+- `magic_projectile_basic.png`
 
 ### 3.2 命中闪光贴图
 
 用途：
 
-- 子弹命中敌人或墙体时显示 hit spark
+- 魔法能量弹命中敌人或墙体时显示 hit spark
 
 最低需求：
 
@@ -221,11 +261,11 @@
 - `hit_spark_strip.png`
 - `hit_wall_spark_strip.png`
 
-### 3.3 枪口火焰贴图
+### 3.3 短杖发射闪光贴图
 
 用途：
 
-- 玩家射击时在 `Muzzle` 附近显示短促火焰特效
+- 玩家射击时在浮游短杖的 `Muzzle` 附近显示短促发射闪光
 
 最低需求：
 
@@ -233,11 +273,12 @@
 
 推荐需求：
 
-- 1 组 2 到 4 帧枪口火焰
+- 1 组 2 到 4 帧魔法发射闪光
+- 第一轮可先由 `weapon_magic_wand_fire_strip_4f.png` 中的枪口闪光表达，不强制单独制作
 
 建议命名：
 
-- `muzzle_flash_strip.png`
+- `wand_muzzle_flash_strip.png`
 
 ---
 
@@ -390,20 +431,23 @@
 
 ## 最小可演示资源包建议
 
-如果当前目标只是让阶段 6 达到“可演示”而不是“正式美术完成”，建议先补齐以下 8 类：
+如果当前目标只是让阶段 6 达到“可演示”而不是“正式美术完成”，建议先补齐以下资源：
 
-1. `player_idle.png`
-2. `enemy_basic_idle.png`
-3. `bullet_basic.png`
-4. `hit_spark_strip.png`
-5. `enemy_death_strip.png`
-6. `floor_tile.png`
-7. `wall_tile_01.png`
-8. `ui_panel_basic.png`
+1. `player_mage_idle.png`
+2. `player_mage_move_strip_4f.png`
+3. `weapon_magic_wand_idle.png`
+4. `weapon_magic_wand_fire_strip_4f.png`
+5. `enemy_basic_idle.png`
+6. `magic_projectile_basic.png`
+7. `hit_spark_strip.png`
+8. `enemy_death_strip.png`
+9. `floor_tile.png`
+10. `wall_tile_01.png`
+11. `ui_panel_basic.png`
 
 这套资源已经足够支撑：
 
-1. 玩家、敌人、子弹不再是纯几何占位
+1. 玩家、浮游短杖、敌人和魔法能量弹不再是纯几何占位
 2. 命中与死亡有最基础的视觉反馈
 3. 场景背景和障碍不再过于简陋
 4. HUD 与 Game Over 界面具备基本统一风格
@@ -428,9 +472,12 @@ res://asset/
 对应示例：
 
 ```text
-res://asset/art/player/player_idle.png
+res://asset/art/player/player_mage_idle.png
+res://asset/art/player/player_mage_move_strip_4f.png
+res://asset/art/player/weapon_magic_wand_idle.png
+res://asset/art/player/weapon_magic_wand_fire_strip_4f.png
 res://asset/art/enemy/enemy_basic_idle.png
-res://asset/art/bullet/bullet_basic.png
+res://asset/art/bullet/magic_projectile_basic.png
 res://asset/art/effects/hit_spark_strip.png
 res://asset/art/effects/enemy_death_strip.png
 res://asset/art/level/floor_tile.png
@@ -444,11 +491,11 @@ res://asset/art/ui/ui_panel_basic.png
 
 推荐按下面顺序补资源：
 
-1. 玩家、敌人、子弹主体贴图
+1. 玩家主体、浮游魔法短杖、敌人和魔法能量弹主体贴图
 2. 命中闪光与敌人死亡特效
 3. 地面与墙体贴图
 4. HUD 面板与血条资源
-5. 枪口火焰、按钮状态、装饰图标等补强内容
+5. 短杖发射闪光、按钮状态、装饰图标等补强内容
 
 如果后续准备使用 AI 生成素材，建议先统一一条美术方向，再批量出图。对于本项目，更适合以下风格之一：
 
@@ -460,9 +507,9 @@ res://asset/art/ui/ui_panel_basic.png
 
 为保证后续 codex 批量生成稳定，补充以下约束：
 
-- 第一轮资源优先静态单张，不依赖多方向动画
-- 角色、敌人、子弹优先大色块和简化轮廓，少做复杂服装与小挂件
+- 第一轮玩家不做多方向动画，但玩家移动与武器射击优先尝试 4 帧横向 strip 单文件
+- 角色、敌人、魔法弹优先大色块和简化轮廓，少做复杂服装与小挂件
 - 地面、墙体、障碍物细节从简，避免过强纹理和平铺接缝风险
-- 命中、死亡、枪口等特效保持卡通化与高辨识度，不混入写实能量风格
+- 命中、死亡、短杖发射闪光等特效保持卡通化与高辨识度，不混入写实能量风格
 
 避免不同资源来源风格差异过大，否则即使功能完整，演示观感也会比较散。

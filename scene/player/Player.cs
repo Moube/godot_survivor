@@ -14,15 +14,26 @@ public partial class Player : CharacterBody2D
 	[Export]
 	public float FireCooldownSeconds { get; set; } = 0.15f;
 
+	[Export]
+	public float WalkAnimationFps { get; set; } = 5.0f;
+
+	private Sprite2D _sprite;
 	private Marker2D _muzzle;
 	private CombatComponent _combat;
 	private double _fireCooldownRemaining;
+	private double _walkAnimationTime;
 	private bool _isDead;
 	private const float MuzzleDistance = 22.0f;
+	private const int IdleFrame = 0;
+	private const int SpriteSheetFrameCount = 3;
+	private static readonly int[] WalkFrameSequence = { 1, 0, 2, 0 };
 
 	public override void _Ready()
 	{
 		AddToGroup("player");
+		_sprite = GetNode<Sprite2D>("Sprite2D");
+		_sprite.Hframes = SpriteSheetFrameCount;
+		_sprite.Frame = IdleFrame;
 		_muzzle = GetNode<Marker2D>("Muzzle");
 		_combat = GetNode<CombatComponent>("CombatComponent");
 		_combat.Died += OnDied;
@@ -39,10 +50,30 @@ public partial class Player : CharacterBody2D
 		Vector2 inputDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
 		Velocity = inputDirection * MoveSpeed;
 		MoveAndSlide();
+		UpdateWalkAnimation(delta, inputDirection);
 
 		AimTowardMouse();
 		UpdateFireCooldown(delta);
 		TryShoot();
+	}
+
+	private void UpdateWalkAnimation(double delta, Vector2 inputDirection)
+	{
+		if (inputDirection == Vector2.Zero)
+		{
+			_walkAnimationTime = 0.0;
+			_sprite.Frame = IdleFrame;
+			return;
+		}
+
+		_walkAnimationTime += delta;
+		int sequenceIndex = (int)(_walkAnimationTime * WalkAnimationFps) % WalkFrameSequence.Length;
+		_sprite.Frame = WalkFrameSequence[sequenceIndex];
+
+		if (!Mathf.IsZeroApprox(inputDirection.X))
+		{
+			_sprite.FlipH = inputDirection.X > 0.0f;
+		}
 	}
 
 	private void AimTowardMouse()
