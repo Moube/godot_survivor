@@ -267,7 +267,7 @@
 
 建议命名：
 
-- `floor_tile_01.png`
+- `floor_tile_stage2.png`
 
 ### 4.2 墙体贴图
 
@@ -397,7 +397,7 @@
 3. `bullet_basic.png`
 4. `hit_spark_strip.png`
 5. `enemy_death_strip.png`
-6. `floor_tile_01.png`
+6. `floor_tile_stage2.png`
 7. `wall_tile_01.png`
 8. `ui_panel_basic.png`
 
@@ -433,7 +433,7 @@ res://asset/art/enemy/enemy_basic_idle.png
 res://asset/art/bullet/bullet_basic.png
 res://asset/art/effects/hit_spark_strip.png
 res://asset/art/effects/enemy_death_strip.png
-res://asset/art/level/floor_tile_01.png
+res://asset/art/level/floor_tile_stage2.png
 res://asset/art/level/wall_tile_01.png
 res://asset/art/ui/ui_panel_basic.png
 ```

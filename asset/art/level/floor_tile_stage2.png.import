@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b4w1jvvfxjpam"
-path="res://.godot/imported/wall_border_horizontal.png-9d57784c7c894be286c568fc6787d05b.ctex"
+uid="uid://b0t6o7vehycaf"
+path="res://.godot/imported/floor_tile_stage2.png-5018cd1f0891eadd1aefce736b1594c6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://asset/art/level/wall_border_horizontal.png"
-dest_files=["res://.godot/imported/wall_border_horizontal.png-9d57784c7c894be286c568fc6787d05b.ctex"]
+source_file="res://asset/art/level/floor_tile_stage2.png"
+dest_files=["res://.godot/imported/floor_tile_stage2.png-5018cd1f0891eadd1aefce736b1594c6.ctex"]
 
 [params]
 

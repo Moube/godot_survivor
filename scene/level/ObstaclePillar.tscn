@@ -1,0 +1,36 @@
+[gd_scene load_steps=4 format=3 uid="uid://coxegq1q85ncc"]
+
+[ext_resource type="Texture2D" uid="uid://bpet2tfeemgec" path="res://asset/art/level/obstacle_pillar_stage2.png" id="1_pillar"]
+[ext_resource type="PackedScene" path="res://scene/common/DropShadow2D.tscn" id="2_shadow"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pillar"]
+size = Vector2(28, 36)
+
+[node name="ObstaclePillar" type="StaticBody2D" unique_id=78245813]
+collision_mask = 14
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1574600807]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_pillar")
+
+[node name="DropShadow2D" parent="." unique_id=1570864953 instance=ExtResource("2_shadow")]
+GroundOffset = Vector2(34, 15)
+ScaleMultiplier = Vector2(1, 1)
+FollowSourceScale = false
+ShadowCanvasSize = Vector2i(130, 46)
+SkewAmount = 0.0
+ShadowColor = Color(0.101961, 0.129412, 0.0627451, 0.42)
+ContactCenter = Vector2(0.28, 0.58)
+ContactRadius = Vector2(0.2, 0.19)
+ContactStrength = 0.95
+CastCenter = Vector2(0.52, 0.64)
+CastRadius = Vector2(0.54, 0.24)
+CastAngleDegrees = 22.0
+CastStrength = 0.86
+ProceduralSoftness = 0.86
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=987962109]
+position = Vector2(-20, -160)
+scale = Vector2(2, 2)
+texture = ExtResource("1_pillar")
+centered = false

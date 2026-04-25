@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://script/common/DropShadow2D.cs" id="1_script"]
+[ext_resource type="Shader" path="res://asset/art/effects/drop_shadow_2d.gdshader" id="2_shader"]
+
+[sub_resource type="ShaderMaterial" id="1_material"]
+shader = ExtResource("2_shader")
+
+[node name="DropShadow2D" type="Sprite2D"]
+script = ExtResource("1_script")
+material = SubResource("1_material")
+centered = false
+z_as_relative = true
+z_index = -1

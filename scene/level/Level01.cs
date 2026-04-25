@@ -28,15 +28,15 @@ public partial class Level01 : Node2D
 
 	private readonly RandomNumberGenerator _random = new();
 
+	private Node2D _worldRoot;
 	private CharacterBody2D _player;
 	private CombatComponent _playerCombat;
-	private Node2D _enemiesRoot;
 	private Timer _spawnTimer;
 
 	public override void _Ready()
 	{
 		_random.Randomize();
-		_enemiesRoot = GetNode<Node2D>("Enemies");
+		_worldRoot = GetNode<Node2D>("World");
 		_spawnTimer = GetNode<Timer>("SpawnTimer");
 		_spawnTimer.Timeout += OnSpawnTimerTimeout;
 
@@ -63,8 +63,8 @@ public partial class Level01 : Node2D
 			return;
 		}
 
+		_worldRoot.AddChild(player);
 		player.GlobalPosition = spawnPoint.GlobalPosition;
-		AddChild(player);
 		_player = player;
 
 		if (player is Player playerNode)
@@ -109,7 +109,7 @@ public partial class Level01 : Node2D
 			return;
 		}
 
-		if (_enemiesRoot.GetChildCount() >= MaxEnemyCount)
+		if (GetTree().GetNodesInGroup("enemy").Count >= MaxEnemyCount)
 		{
 			return;
 		}
@@ -123,7 +123,7 @@ public partial class Level01 : Node2D
 		}
 
 		enemy.GlobalPosition = FindEnemySpawnPosition();
-		_enemiesRoot.AddChild(enemy);
+		_worldRoot.AddChild(enemy);
 	}
 
 	private Vector2 FindEnemySpawnPosition()

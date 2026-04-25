@@ -26,6 +26,7 @@ public partial class Enemy : CharacterBody2D
 
 	public override void _Ready()
 	{
+		AddToGroup("enemy");
 		_combat = GetNode<CombatComponent>("CombatComponent");
 		_combat.Died += OnDied;
 	}
