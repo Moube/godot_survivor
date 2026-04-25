@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bpet2tfeemgec"
-path="res://.godot/imported/obstacle_pillar_stage2.png-8de91e27e97e53ba9d4671240f8cf932.ctex"
+uid="uid://dbxniuhw5b3e7"
+path="res://.godot/imported/wall_border_line.png-3d208db17c7ad4550fbf12a280898618.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://asset/art/level/obstacle_pillar_stage2.png"
-dest_files=["res://.godot/imported/obstacle_pillar_stage2.png-8de91e27e97e53ba9d4671240f8cf932.ctex"]
+source_file="res://asset/art/level/wall_border_line.png"
+dest_files=["res://.godot/imported/wall_border_line.png-3d208db17c7ad4550fbf12a280898618.ctex"]
 
 [params]
 

@@ -5,8 +5,8 @@
 [ext_resource type="PackedScene" uid="uid://cdlrr0sqbofmc" path="res://scene/enemy/Enemy.tscn" id="3_2el3g"]
 [ext_resource type="PackedScene" path="res://scene/level/WallBlock.tscn" id="4_pti1w"]
 [ext_resource type="PackedScene" path="res://scene/ui/Hud.tscn" id="5_r7m8l"]
-[ext_resource type="Texture2D" path="res://asset/art/level/floor_tile_stage2.png" id="6_1k0gr"]
-[ext_resource type="Texture2D" path="res://asset/art/level/wall_border_line_stage2.png" id="7_hbg8v"]
+[ext_resource type="Texture2D" path="res://asset/art/level/floor_tile.png" id="6_1k0gr"]
+[ext_resource type="Texture2D" path="res://asset/art/level/wall_border_line.png" id="7_hbg8v"]
 [ext_resource type="PackedScene" path="res://scene/level/ObstaclePillar.tscn" id="9_pillar"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_horizontal"]
