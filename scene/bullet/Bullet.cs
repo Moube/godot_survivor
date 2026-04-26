@@ -11,6 +11,9 @@ public partial class Bullet : Area2D
 	[Export]
 	public int Damage { get; set; } = 1;
 
+	[Export]
+	public PackedScene HitSparkScene { get; set; }
+
 	public Vector2 Direction { get; private set; } = Vector2.Right;
 
 	private double _remainingLifetime;
@@ -47,6 +50,27 @@ public partial class Bullet : Area2D
 
 		CombatComponent targetCombat = body.GetNodeOrNull<CombatComponent>("CombatComponent");
 		targetCombat?.ApplyDamage(Damage);
+		SpawnHitSpark();
 		QueueFree();
+	}
+
+	private void SpawnHitSpark()
+	{
+		if (HitSparkScene is null)
+		{
+			return;
+		}
+
+		Node instance = HitSparkScene.Instantiate();
+		if (instance is not Node2D hitSpark)
+		{
+			GD.PushWarning("HitSparkScene must instantiate a Node2D.");
+			instance.QueueFree();
+			return;
+		}
+
+		GetParent()?.AddChild(hitSpark);
+		hitSpark.GlobalPosition = GlobalPosition;
+		hitSpark.GlobalRotation = GlobalRotation;
 	}
 }

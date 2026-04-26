@@ -115,9 +115,9 @@ public partial class Level01 : Node2D
 		}
 
 		Node enemyInstance = EnemyScene.Instantiate();
-		if (enemyInstance is not Enemy enemy)
+		if (enemyInstance is not EnemyBase enemy)
 		{
-			GD.PushError("EnemyScene must instantiate an Enemy.");
+			GD.PushError("EnemyScene must instantiate an EnemyBase.");
 			enemyInstance.QueueFree();
 			return;
 		}

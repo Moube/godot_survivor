@@ -1,123 +1,28 @@
 using Godot;
 
-public partial class Enemy : CharacterBody2D
+public partial class Enemy : EnemyBase
 {
-	[Export]
-	public float MoveSpeed { get; set; } = 120.0f;
-
-	[Export]
-	public string TargetGroupName { get; set; } = "player";
-
-	[Export]
-	public float StopDistance { get; set; } = 12.0f;
-
-	[Export]
-	public int ContactDamage { get; set; } = 1;
-
-	[Export]
-	public float ContactDamageCooldownSeconds { get; set; } = 0.75f;
-
-	[Export]
-	public int ScoreReward { get; set; } = 100;
-
-	private CharacterBody2D _target;
-	private CombatComponent _combat;
-	private double _contactDamageCooldownRemaining;
-
-	public override void _Ready()
+	protected override void ConfigureEnemyDefaults()
 	{
-		AddToGroup("enemy");
-		_combat = GetNode<CombatComponent>("CombatComponent");
-		_combat.Died += OnDied;
+		MoveSpeed = 50.0f;
+		MoveAnimationFps = 2.0f;
 	}
 
-	public override void _PhysicsProcess(double delta)
+	protected override void ConfigureDropShadow(DropShadow2D dropShadow)
 	{
-		if (_combat.IsDead)
-		{
-			Velocity = Vector2.Zero;
-			return;
-		}
-
-		UpdateContactDamageCooldown(delta);
-		_target ??= FindTarget();
-
-		if (!IsInstanceValid(_target))
-		{
-			_target = FindTarget();
-		}
-
-		if (_target is null)
-		{
-			Velocity = Vector2.Zero;
-			MoveAndSlide();
-			return;
-		}
-
-		Vector2 toTarget = _target.GlobalPosition - GlobalPosition;
-		if (toTarget.LengthSquared() <= StopDistance * StopDistance)
-		{
-			Velocity = Vector2.Zero;
-		}
-		else
-		{
-			Velocity = toTarget.Normalized() * MoveSpeed;
-		}
-
-		MoveAndSlide();
-		TryApplyContactDamage();
-	}
-
-	private void UpdateContactDamageCooldown(double delta)
-	{
-		if (_contactDamageCooldownRemaining > 0.0)
-		{
-			_contactDamageCooldownRemaining -= delta;
-		}
-	}
-
-	private void TryApplyContactDamage()
-	{
-		if (_contactDamageCooldownRemaining > 0.0)
-		{
-			return;
-		}
-
-		for (int i = 0; i < GetSlideCollisionCount(); i++)
-		{
-			KinematicCollision2D collision = GetSlideCollision(i);
-			if (collision.GetCollider() is not Node collider)
-			{
-				continue;
-			}
-
-			CombatComponent targetCombat = collider.GetNodeOrNull<CombatComponent>("CombatComponent");
-			if (targetCombat is null || targetCombat.IsDead)
-			{
-				continue;
-			}
-
-			if (!collider.IsInGroup(TargetGroupName))
-			{
-				continue;
-			}
-
-			if (targetCombat.ApplyDamage(ContactDamage))
-			{
-				_contactDamageCooldownRemaining = ContactDamageCooldownSeconds;
-				return;
-			}
-		}
-	}
-
-	private CharacterBody2D FindTarget()
-	{
-		return GetTree().GetFirstNodeInGroup(TargetGroupName) as CharacterBody2D;
-	}
-
-	private void OnDied()
-	{
-		GameSession.Instance?.AddScore(ScoreReward);
-		QueueFree();
+		dropShadow.GroundOffset = new Vector2(7.0f, 19.0f);
+		dropShadow.ScaleMultiplier = Vector2.One;
+		dropShadow.FollowSourceScale = false;
+		dropShadow.ShadowCanvasSize = new Vector2I(50, 20);
+		dropShadow.SkewAmount = 0.0f;
+		dropShadow.ShadowColor = new Color(0.0705882f, 0.0862745f, 0.0431373f, 0.44f);
+		dropShadow.ContactCenter = new Vector2(0.36f, 0.58f);
+		dropShadow.ContactRadius = new Vector2(0.34f, 0.21f);
+		dropShadow.ContactStrength = 0.95f;
+		dropShadow.CastCenter = new Vector2(0.58f, 0.58f);
+		dropShadow.CastRadius = new Vector2(0.5f, 0.28f);
+		dropShadow.CastAngleDegrees = 14.0f;
+		dropShadow.CastStrength = 0.7f;
+		dropShadow.ProceduralSoftness = 0.6f;
 	}
 }
