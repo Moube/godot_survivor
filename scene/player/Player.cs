@@ -9,21 +9,13 @@ public partial class Player : CharacterBody2D
 	public float MoveSpeed { get; set; } = 240.0f;
 
 	[Export]
-	public PackedScene BulletScene { get; set; }
-
-	[Export]
-	public float FireCooldownSeconds { get; set; } = 0.15f;
-
-	[Export]
 	public float WalkAnimationFps { get; set; } = 5.0f;
 
 	private Sprite2D _sprite;
-	private Marker2D _muzzle;
+	private Weapon2D _weapon;
 	private CombatComponent _combat;
-	private double _fireCooldownRemaining;
 	private double _walkAnimationTime;
 	private bool _isDead;
-	private const float MuzzleDistance = 22.0f;
 	private const int IdleFrame = 0;
 	private const int SpriteSheetFrameCount = 3;
 	private static readonly int[] WalkFrameSequence = { 1, 0, 2, 0 };
@@ -34,7 +26,7 @@ public partial class Player : CharacterBody2D
 		_sprite = GetNode<Sprite2D>("Sprite2D");
 		_sprite.Hframes = SpriteSheetFrameCount;
 		_sprite.Frame = IdleFrame;
-		_muzzle = GetNode<Marker2D>("Muzzle");
+		_weapon = GetNodeOrNull<Weapon2D>("MagicWandWeapon");
 		_combat = GetNode<CombatComponent>("CombatComponent");
 		_combat.Died += OnDied;
 	}
@@ -44,6 +36,7 @@ public partial class Player : CharacterBody2D
 		if (_isDead)
 		{
 			Velocity = Vector2.Zero;
+			_weapon?.SetFireRequested(false);
 			return;
 		}
 
@@ -51,10 +44,7 @@ public partial class Player : CharacterBody2D
 		Velocity = inputDirection * MoveSpeed;
 		MoveAndSlide();
 		UpdateWalkAnimation(delta, inputDirection);
-
-		AimTowardMouse();
-		UpdateFireCooldown(delta);
-		TryShoot();
+		UpdateWeaponInput();
 	}
 
 	private void UpdateWalkAnimation(double delta, Vector2 inputDirection)
@@ -76,63 +66,15 @@ public partial class Player : CharacterBody2D
 		}
 	}
 
-	private void AimTowardMouse()
+	private void UpdateWeaponInput()
 	{
-		Vector2 aimDirection = GetGlobalMousePosition() - GlobalPosition;
-		if (aimDirection == Vector2.Zero)
-		{
-			return;
-		}
-
-		_muzzle.Position = aimDirection.Normalized() * MuzzleDistance;
-	}
-
-	private void UpdateFireCooldown(double delta)
-	{
-		if (_fireCooldownRemaining > 0.0)
-		{
-			_fireCooldownRemaining -= delta;
-		}
-	}
-
-	private void TryShoot()
-	{
-		if (!Input.IsActionPressed("shoot") || _fireCooldownRemaining > 0.0)
-		{
-			return;
-		}
-
-		if (BulletScene is null)
-		{
-			GD.PushWarning("BulletScene is not assigned on Player.");
-			return;
-		}
-
-		Node bulletInstance = BulletScene.Instantiate();
-		if (bulletInstance is not Bullet bullet)
-		{
-			GD.PushError("BulletScene must instantiate a Bullet.");
-			bulletInstance.QueueFree();
-			return;
-		}
-
-		Vector2 direction = GetAimDirection();
-		bullet.GlobalPosition = _muzzle.GlobalPosition;
-		bullet.Initialize(direction);
-		GetTree().CurrentScene.AddChild(bullet);
-
-		_fireCooldownRemaining = FireCooldownSeconds;
-	}
-
-	private Vector2 GetAimDirection()
-	{
-		Vector2 direction = GetGlobalMousePosition() - GlobalPosition;
-		return direction == Vector2.Zero ? Vector2.Right : direction.Normalized();
+		_weapon?.SetFireRequested(Input.IsActionPressed("shoot"));
 	}
 
 	private void OnDied()
 	{
 		_isDead = true;
+		_weapon?.SetFireRequested(false);
 		EmitSignal(SignalName.Died);
 	}
 }

@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://2drw8henhjlg"]
 
 [ext_resource type="Script" uid="uid://ef1nsxf0aail" path="res://scene/player/Player.cs" id="1_tt56r"]
-[ext_resource type="PackedScene" uid="uid://bdkj03kvhgalx" path="res://scene/bullet/Bullet.tscn" id="2_q2vlq"]
 [ext_resource type="Script" uid="uid://ckijs5hfoliq6" path="res://script/common/CombatComponent.cs" id="3_xtmux"]
+[ext_resource type="PackedScene" path="res://scene/common/DropShadow2D.tscn" id="4_shadow"]
+[ext_resource type="PackedScene" path="res://scene/weapon/MagicWandWeapon.tscn" id="5_wand"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_tt56r"]
 radius = 12.0
@@ -14,16 +15,33 @@ load_path = "res://.godot/imported/player_mage_idle_walk_selected_3f.png-2f59128
 collision_layer = 2
 collision_mask = 5
 script = ExtResource("1_tt56r")
-BulletScene = ExtResource("2_q2vlq")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1725065643]
 shape = SubResource("CircleShape2D_tt56r")
+
+[node name="DropShadow2D" parent="." unique_id=1361140690 instance=ExtResource("4_shadow")]
+GroundOffset = Vector2(10, 32)
+ScaleMultiplier = Vector2(1, 1)
+FollowSourceScale = false
+ShadowCanvasSize = Vector2i(58, 24)
+SkewAmount = 0.0
+ShadowColor = Color(0.101961, 0.129412, 0.0627451, 0.32)
+ContactCenter = Vector2(0.37, 0.6)
+ContactRadius = Vector2(0.23, 0.17)
+ContactStrength = 0.9
+CastCenter = Vector2(0.6, 0.61)
+CastRadius = Vector2(0.44, 0.23)
+CastAngleDegrees = 16.0
+CastStrength = 0.62
+ProceduralSoftness = 0.58
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=2131304136]
 position = Vector2(0, -4)
 scale = Vector2(0.5, 0.5)
 texture = SubResource("CompressedTexture2D_qt1gw")
 hframes = 3
+
+[node name="MagicWandWeapon" parent="." unique_id=733216908 instance=ExtResource("5_wand")]
 
 [node name="Body" type="Polygon2D" parent="." unique_id=785894133]
 visible = false
@@ -37,9 +55,6 @@ color = Color(1, 0.847059, 0.329412, 1)
 polygon = PackedVector2Array(20, 0, 8, -8, 8, 8)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=64135875]
-
-[node name="Muzzle" type="Marker2D" parent="." unique_id=442603313]
-position = Vector2(22, 0)
 
 [node name="CombatComponent" type="Node" parent="." unique_id=718246994]
 script = ExtResource("3_xtmux")

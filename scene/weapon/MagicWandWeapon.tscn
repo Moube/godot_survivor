@@ -1,0 +1,43 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scene/weapon/MagicWandWeapon.cs" id="1_script"]
+[ext_resource type="Texture2D" path="res://asset/art/player/weapon_wand_wood_straight_wide_fire_strip_4f.png" id="2_wand"]
+[ext_resource type="PackedScene" uid="uid://bdkj03kvhgalx" path="res://scene/bullet/Bullet.tscn" id="3_bullet"]
+
+[node name="MagicWandWeapon" type="Node2D"]
+z_index = 2
+script = ExtResource("1_script")
+BulletScene = ExtResource("3_bullet")
+FireCooldownSeconds = 0.15
+FireAnimationFps = 12.0
+FireAnimationFrameCount = 4
+ProjectileSpawnFrame = 2
+EnableDropShadow = true
+DropShadowGroundOffset = Vector2(0, 20)
+DropShadowScaleMultiplier = Vector2(1, 1)
+DropShadowFollowSourceScale = false
+DropShadowCanvasSize = Vector2i(20, 14)
+DropShadowSkewAmount = 0.0
+DropShadowColor = Color(0.101961, 0.129412, 0.0627451, 0.36)
+DropShadowContactCenter = Vector2(0.5, 0.5)
+DropShadowContactRadius = Vector2(0.34, 0.29)
+DropShadowContactStrength = 1.0
+DropShadowCastCenter = Vector2(0.5, 0.5)
+DropShadowCastRadius = Vector2(0.28, 0.24)
+DropShadowCastAngleDegrees = 0.0
+DropShadowRotateWithWeapon = false
+DropShadowCastStrength = 0.5
+DropShadowProceduralSoftness = 0.64
+DropShadowZAsRelative = false
+DropShadowZIndex = -1
+OrbitRadius = 42.0
+OrbitAngularSpeedDegrees = 115.0
+OrbitStartAngleDegrees = -35.0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("2_wand")
+hframes = 4
+
+[node name="Muzzle" type="Marker2D" parent="."]
+position = Vector2(15, 0)

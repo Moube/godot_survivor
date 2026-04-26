@@ -96,7 +96,7 @@
 用途：
 
 - 作为玩家的独立攻击载体
-- 围绕玩家中心以固定半径 360 度环绕，位置跟随鼠标瞄准角度
+- 围绕玩家中心以固定半径持续自动环绕，位置不跟随鼠标瞄准角度
 - 武器自身朝向跟随鼠标方向，用于表达当前攻击方向
 
 最低需求：
@@ -120,8 +120,8 @@
 
 建议命名：
 
-- `weapon_magic_wand_idle.png`
-- `weapon_magic_wand_fire_strip_4f.png`
+- `weapon_wand_wood_straight_wide_idle.png`
+- `weapon_wand_wood_straight_wide_fire_strip_4f.png`
 
 ### 1.3 玩家受击反馈贴图
 
@@ -274,7 +274,7 @@
 推荐需求：
 
 - 1 组 2 到 4 帧魔法发射闪光
-- 第一轮可先由 `weapon_magic_wand_fire_strip_4f.png` 中的枪口闪光表达，不强制单独制作
+- 第一轮可先由 `weapon_wand_wood_straight_wide_fire_strip_4f.png` 中的枪口闪光表达，不强制单独制作
 
 建议命名：
 
@@ -435,8 +435,8 @@
 
 1. `player_mage_idle.png`
 2. `player_mage_move_strip_4f.png`
-3. `weapon_magic_wand_idle.png`
-4. `weapon_magic_wand_fire_strip_4f.png`
+3. `weapon_wand_wood_straight_wide_idle.png`
+4. `weapon_wand_wood_straight_wide_fire_strip_4f.png`
 5. `enemy_basic_idle.png`
 6. `magic_projectile_basic.png`
 7. `hit_spark_strip.png`
@@ -474,8 +474,8 @@ res://asset/
 ```text
 res://asset/art/player/player_mage_idle.png
 res://asset/art/player/player_mage_move_strip_4f.png
-res://asset/art/player/weapon_magic_wand_idle.png
-res://asset/art/player/weapon_magic_wand_fire_strip_4f.png
+res://asset/art/player/weapon_wand_wood_straight_wide_idle.png
+res://asset/art/player/weapon_wand_wood_straight_wide_fire_strip_4f.png
 res://asset/art/enemy/enemy_basic_idle.png
 res://asset/art/bullet/magic_projectile_basic.png
 res://asset/art/effects/hit_spark_strip.png
