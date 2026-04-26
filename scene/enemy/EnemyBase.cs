@@ -3,6 +3,7 @@ using Godot;
 public partial class EnemyBase : CharacterBody2D
 {
 	private const string DropShadowScenePath = "res://scene/common/DropShadow2D.tscn";
+	private const string DeathDissolveShaderPath = "res://asset/art/effects/sprite_death_dissolve.gdshader";
 	private const string HitFlashShaderPath = "res://asset/art/effects/sprite_solid_flash.gdshader";
 
 	[Export]
@@ -50,17 +51,40 @@ public partial class EnemyBase : CharacterBody2D
 	[Export]
 	public float HitStunDurationSeconds { get; set; } = 0.18f;
 
+	[Export]
+	public NodePath DeathDissolveSpritePath { get; set; } = new("Sprite2D");
+
+	[Export]
+	public float DeathDissolveDurationSeconds { get; set; } = 0.65f;
+
+	[Export]
+	public Color DeathDissolveEdgeColor { get; set; } = new(1.0f, 0.92f, 0.28f, 1.0f);
+
+	[Export]
+	public Color DeathDissolveBurnColor { get; set; } = new(1.0f, 0.22f, 0.02f, 1.0f);
+
+	[Export]
+	public float DeathDissolveNoiseScale { get; set; } = 28.0f;
+
+	[Export]
+	public float DeathDissolveEdgeWidth { get; set; } = 0.12f;
+
 	private CharacterBody2D _target;
 	private CombatComponent _combat;
 	private Sprite2D _moveAnimationSprite;
 	private Sprite2D _hitFlashSprite;
+	private Sprite2D _deathDissolveSprite;
 	private Material _hitFlashOriginalMaterial;
 	private ShaderMaterial _hitFlashMaterial;
+	private Material _deathDissolveOriginalMaterial;
+	private ShaderMaterial _deathDissolveMaterial;
 	private DropShadow2D _dropShadow;
 	private double _contactDamageCooldownRemaining;
 	private double _moveAnimationTime;
 	private double _hitFlashRemaining;
 	private double _hitStunRemaining;
+	private double _deathDissolveElapsed;
+	private bool _isDeathDissolving;
 
 	public override void _Ready()
 	{
@@ -86,6 +110,7 @@ public partial class EnemyBase : CharacterBody2D
 	public override void _Process(double delta)
 	{
 		UpdateHitFlash(delta);
+		UpdateDeathDissolve(delta);
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -93,7 +118,6 @@ public partial class EnemyBase : CharacterBody2D
 		if (_combat.IsDead)
 		{
 			Velocity = Vector2.Zero;
-			UpdateMoveAnimation(delta, false);
 			return;
 		}
 
@@ -257,6 +281,26 @@ public partial class EnemyBase : CharacterBody2D
 		return _hitFlashSprite;
 	}
 
+	private Sprite2D ResolveDeathDissolveSprite()
+	{
+		if (!GodotObject.IsInstanceValid(_deathDissolveSprite))
+		{
+			_deathDissolveSprite = null;
+		}
+
+		if (_deathDissolveSprite != null)
+		{
+			return _deathDissolveSprite;
+		}
+
+		if (!DeathDissolveSpritePath.IsEmpty)
+		{
+			_deathDissolveSprite = GetNodeOrNull<Sprite2D>(DeathDissolveSpritePath);
+		}
+
+		return _deathDissolveSprite;
+	}
+
 	private void StartHitFlash()
 	{
 		_hitFlashSprite ??= ResolveHitFlashSprite();
@@ -271,6 +315,11 @@ public partial class EnemyBase : CharacterBody2D
 
 	private void UpdateHitFlash(double delta)
 	{
+		if (_isDeathDissolving)
+		{
+			return;
+		}
+
 		_hitFlashSprite ??= ResolveHitFlashSprite();
 		if (_hitFlashSprite is null || _hitFlashRemaining <= 0.0)
 		{
@@ -306,6 +355,27 @@ public partial class EnemyBase : CharacterBody2D
 		};
 		material.SetShaderParameter("flash_color", HitFlashColor);
 		material.SetShaderParameter("flash_enabled", false);
+		return material;
+	}
+
+	private ShaderMaterial CreateDeathDissolveMaterial()
+	{
+		Shader shader = GD.Load<Shader>(DeathDissolveShaderPath);
+		if (shader is null)
+		{
+			GD.PushWarning($"Unable to load enemy death dissolve shader: {DeathDissolveShaderPath}");
+			return null;
+		}
+
+		ShaderMaterial material = new()
+		{
+			Shader = shader,
+		};
+		material.SetShaderParameter("progress", 0.0f);
+		material.SetShaderParameter("edge_color", DeathDissolveEdgeColor);
+		material.SetShaderParameter("burn_color", DeathDissolveBurnColor);
+		material.SetShaderParameter("noise_scale", DeathDissolveNoiseScale);
+		material.SetShaderParameter("edge_width", DeathDissolveEdgeWidth);
 		return material;
 	}
 
@@ -375,6 +445,57 @@ public partial class EnemyBase : CharacterBody2D
 	private void OnDied()
 	{
 		GameSession.Instance?.AddScore(ScoreReward);
-		QueueFree();
+		StartDeathDissolve();
+	}
+
+	private void StartDeathDissolve()
+	{
+		_isDeathDissolving = true;
+		_deathDissolveElapsed = 0.0;
+		_hitFlashRemaining = 0.0;
+		ApplyHitFlash(false);
+		CollisionLayer = 0;
+		CollisionMask = 0;
+
+		if (_dropShadow != null)
+		{
+			_dropShadow.Visible = false;
+		}
+
+		_deathDissolveSprite ??= ResolveDeathDissolveSprite();
+		if (_deathDissolveSprite is null)
+		{
+			QueueFree();
+			return;
+		}
+
+		_deathDissolveOriginalMaterial = _deathDissolveSprite.Material;
+		_deathDissolveMaterial = CreateDeathDissolveMaterial();
+		if (_deathDissolveMaterial is null)
+		{
+			_deathDissolveSprite.Material = _deathDissolveOriginalMaterial;
+			QueueFree();
+			return;
+		}
+
+		_deathDissolveSprite.Material = _deathDissolveMaterial;
+	}
+
+	private void UpdateDeathDissolve(double delta)
+	{
+		if (!_isDeathDissolving)
+		{
+			return;
+		}
+
+		_deathDissolveElapsed += delta;
+		float duration = Mathf.Max(0.05f, DeathDissolveDurationSeconds);
+		float progress = Mathf.Clamp((float)(_deathDissolveElapsed / duration), 0.0f, 1.0f);
+		_deathDissolveMaterial?.SetShaderParameter("progress", progress);
+
+		if (progress >= 1.0f)
+		{
+			QueueFree();
+		}
 	}
 }
