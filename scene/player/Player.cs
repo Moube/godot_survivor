@@ -12,7 +12,7 @@ public partial class Player : CharacterBody2D
 	public float WalkAnimationFps { get; set; } = 5.0f;
 
 	private Sprite2D _sprite;
-	private Weapon2D _weapon;
+	private WeaponInventory _weaponInventory;
 	private CombatComponent _combat;
 	private double _walkAnimationTime;
 	private bool _isDead;
@@ -26,9 +26,32 @@ public partial class Player : CharacterBody2D
 		_sprite = GetNode<Sprite2D>("Sprite2D");
 		_sprite.Hframes = SpriteSheetFrameCount;
 		_sprite.Frame = IdleFrame;
-		_weapon = GetNodeOrNull<Weapon2D>("MagicWandWeapon");
+		_weaponInventory = GetNode<WeaponInventory>("WeaponInventory");
 		_combat = GetNode<CombatComponent>("CombatComponent");
 		_combat.Died += OnDied;
+	}
+
+	public void InitializeFromLevelConfig(LevelConfig levelConfig)
+	{
+		if (levelConfig is null)
+		{
+			GD.PushWarning("Player cannot initialize from a null level config.");
+			return;
+		}
+
+		MoveSpeed = Mathf.Max(1.0f, levelConfig.InitialPlayerMoveSpeed);
+		if (_combat != null)
+		{
+			_combat.MaxHealth = Mathf.Max(1, levelConfig.InitialPlayerMaxHealth);
+			_combat.ResetHealth();
+			_isDead = false;
+		}
+
+		_weaponInventory?.ClearWeapons();
+		if (!string.IsNullOrWhiteSpace(levelConfig.InitialWeaponId))
+		{
+			_weaponInventory?.AddWeapon(levelConfig.InitialWeaponId);
+		}
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -36,7 +59,7 @@ public partial class Player : CharacterBody2D
 		if (_isDead)
 		{
 			Velocity = Vector2.Zero;
-			_weapon?.SetFireRequested(false);
+			_weaponInventory?.SetWeaponsEnabled(false);
 			return;
 		}
 
@@ -44,7 +67,6 @@ public partial class Player : CharacterBody2D
 		Velocity = inputDirection * MoveSpeed;
 		MoveAndSlide();
 		UpdateWalkAnimation(delta, inputDirection);
-		UpdateWeaponInput();
 	}
 
 	private void UpdateWalkAnimation(double delta, Vector2 inputDirection)
@@ -66,15 +88,10 @@ public partial class Player : CharacterBody2D
 		}
 	}
 
-	private void UpdateWeaponInput()
-	{
-		_weapon?.SetFireRequested(Input.IsActionPressed("shoot"));
-	}
-
 	private void OnDied()
 	{
 		_isDead = true;
-		_weapon?.SetFireRequested(false);
+		_weaponInventory?.SetWeaponsEnabled(false);
 		EmitSignal(SignalName.Died);
 	}
 }

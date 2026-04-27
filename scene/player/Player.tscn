@@ -1,9 +1,9 @@
-[gd_scene format=3 uid="uid://2drw8henhjlg"]
+[gd_scene load_steps=7 format=3 uid="uid://2drw8henhjlg"]
 
 [ext_resource type="Script" uid="uid://ef1nsxf0aail" path="res://scene/player/Player.cs" id="1_tt56r"]
+[ext_resource type="Script" path="res://script/gameplay/WeaponInventory.cs" id="2_weapon_inventory"]
 [ext_resource type="Script" uid="uid://ckijs5hfoliq6" path="res://script/common/CombatComponent.cs" id="3_xtmux"]
 [ext_resource type="PackedScene" path="res://scene/common/DropShadow2D.tscn" id="4_shadow"]
-[ext_resource type="PackedScene" path="res://scene/weapon/MagicWandWeapon.tscn" id="5_wand"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_tt56r"]
 radius = 12.0
@@ -41,7 +41,8 @@ scale = Vector2(0.5, 0.5)
 texture = SubResource("CompressedTexture2D_qt1gw")
 hframes = 3
 
-[node name="MagicWandWeapon" parent="." unique_id=733216908 instance=ExtResource("5_wand")]
+[node name="WeaponInventory" type="Node2D" parent="." unique_id=733216908]
+script = ExtResource("2_weapon_inventory")
 
 [node name="Body" type="Polygon2D" parent="." unique_id=785894133]
 visible = false

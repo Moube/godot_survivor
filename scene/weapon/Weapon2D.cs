@@ -5,6 +5,7 @@ public partial class Weapon2D : Node2D
 	private const string DefaultDropShadowScenePath = "res://scene/common/DropShadow2D.tscn";
 	private const string DropShadowAnchorNodeName = "DropShadowAnchor";
 	private const int IdleFrame = 0;
+	private const float AimEpsilonSquared = 0.0001f;
 
 	[Export]
 	public PackedScene BulletScene { get; set; }
@@ -17,6 +18,21 @@ public partial class Weapon2D : Node2D
 
 	[Export]
 	public float FireCooldownSeconds { get; set; } = 0.15f;
+
+	[Export]
+	public WeaponAimMode AimMode { get; set; } = WeaponAimMode.MouseDirection;
+
+	[Export]
+	public bool AutoFireEnabled { get; set; } = true;
+
+	[Export]
+	public int Damage { get; set; } = 1;
+
+	[Export]
+	public int ProjectileCount { get; set; } = 1;
+
+	[Export]
+	public float ProjectileSpreadDegrees { get; set; } = 12.0f;
 
 	[Export]
 	public float FireAnimationFps { get; set; } = 20.0f;
@@ -98,15 +114,21 @@ public partial class Weapon2D : Node2D
 	protected Marker2D Muzzle { get; private set; }
 	protected DropShadow2D DropShadow { get; private set; }
 
+	public string WeaponId { get; private set; } = string.Empty;
+
+	public int WeaponLevel { get; private set; } = 1;
+
+	private readonly RandomNumberGenerator _random = new();
 	private Node2D _dropShadowAnchor;
-	private bool _fireRequested;
 	private bool _isPlayingFireAnimation;
 	private bool _projectileSpawnedThisCycle;
 	private double _fireCooldownRemaining;
 	private double _fireAnimationTime;
+	private Vector2 _currentFireDirection = Vector2.Right;
 
 	public override void _Ready()
 	{
+		_random.Randomize();
 		Sprite = GetNodeOrNull<Sprite2D>(SpritePath);
 		Muzzle = GetNodeOrNull<Marker2D>(MuzzlePath);
 
@@ -122,6 +144,7 @@ public partial class Weapon2D : Node2D
 	public override void _PhysicsProcess(double delta)
 	{
 		UpdateWeapon(delta);
+		UpdateVisualAim();
 		UpdateDropShadowAnchor();
 		UpdateFireCooldown(delta);
 		UpdateFireAnimation(delta);
@@ -129,7 +152,36 @@ public partial class Weapon2D : Node2D
 
 	public void SetFireRequested(bool requested)
 	{
-		_fireRequested = requested;
+		AutoFireEnabled = requested;
+	}
+
+	public void InitializeFromConfig(WeaponConfig config, int level = 1)
+	{
+		if (config is null)
+		{
+			GD.PushError($"{Name} cannot initialize from a null weapon config.");
+			return;
+		}
+
+		WeaponId = config.Id;
+		WeaponLevel = Mathf.Clamp(level, 1, Mathf.Max(1, config.MaxLevel));
+		AimMode = config.AimMode;
+		FireCooldownSeconds = Mathf.Max(0.01f, config.FireCooldownSeconds);
+		Damage = Mathf.Max(1, config.Damage);
+		ProjectileCount = Mathf.Max(1, config.ProjectileCount);
+
+		if (!string.IsNullOrWhiteSpace(config.BulletScenePath))
+		{
+			PackedScene bulletScene = ResourceLoader.Load<PackedScene>(config.BulletScenePath);
+			if (bulletScene is null)
+			{
+				GD.PushError($"Weapon '{config.Id}' cannot load bullet scene: {config.BulletScenePath}");
+			}
+			else
+			{
+				BulletScene = bulletScene;
+			}
+		}
 	}
 
 	protected virtual void UpdateWeapon(double delta)
@@ -138,7 +190,12 @@ public partial class Weapon2D : Node2D
 
 	protected virtual Vector2 GetProjectileDirection()
 	{
-		return Vector2.Right.Rotated(GlobalRotation);
+		return _currentFireDirection;
+	}
+
+	protected virtual Vector2 GetAimOrigin()
+	{
+		return Muzzle?.GlobalPosition ?? GlobalPosition;
 	}
 
 	private void SetupDropShadow()
@@ -259,8 +316,9 @@ public partial class Weapon2D : Node2D
 	{
 		if (!_isPlayingFireAnimation)
 		{
-			if (_fireRequested && _fireCooldownRemaining <= 0.0)
+			if (AutoFireEnabled && _fireCooldownRemaining <= 0.0 && TryResolveAimDirection(out Vector2 aimDirection))
 			{
+				_currentFireDirection = aimDirection;
 				StartFireAnimation();
 			}
 			else if (Sprite != null)
@@ -282,7 +340,7 @@ public partial class Weapon2D : Node2D
 
 		if (!_projectileSpawnedThisCycle && frame >= ProjectileSpawnFrame)
 		{
-			SpawnProjectile();
+			SpawnProjectiles();
 			_projectileSpawnedThisCycle = true;
 			_fireCooldownRemaining = FireCooldownSeconds;
 		}
@@ -312,7 +370,121 @@ public partial class Weapon2D : Node2D
 		}
 	}
 
-	private void SpawnProjectile()
+	private void UpdateVisualAim()
+	{
+		if (_isPlayingFireAnimation)
+		{
+			return;
+		}
+
+		if (AimMode == WeaponAimMode.RandomDirection)
+		{
+			return;
+		}
+
+		if (TryResolveAimDirection(out Vector2 aimDirection))
+		{
+			GlobalRotation = aimDirection.Angle();
+		}
+	}
+
+	private bool TryResolveAimDirection(out Vector2 direction)
+	{
+		return AimMode switch
+		{
+			WeaponAimMode.MouseDirection => TryGetMouseDirection(out direction),
+			WeaponAimMode.NearestEnemy => TryGetNearestEnemyDirection(out direction),
+			WeaponAimMode.RandomDirection => TryGetRandomDirection(out direction),
+			_ => TryGetMouseDirection(out direction),
+		};
+	}
+
+	private bool TryGetMouseDirection(out Vector2 direction)
+	{
+		Vector2 origin = GetAimOrigin();
+		Vector2 toMouse = GetGlobalMousePosition() - origin;
+		if (toMouse.LengthSquared() <= AimEpsilonSquared)
+		{
+			direction = Vector2.Right.Rotated(GlobalRotation);
+			return direction.LengthSquared() > AimEpsilonSquared;
+		}
+
+		direction = toMouse.Normalized();
+		return true;
+	}
+
+	private bool TryGetNearestEnemyDirection(out Vector2 direction)
+	{
+		direction = Vector2.Zero;
+
+		SceneTree tree = GetTree();
+		if (tree is null)
+		{
+			return false;
+		}
+
+		Vector2 origin = GetAimOrigin();
+		Node2D nearestEnemy = null;
+		float nearestDistanceSquared = float.MaxValue;
+
+		foreach (Node node in tree.GetNodesInGroup("enemy"))
+		{
+			if (node is not Node2D enemy || !IsInstanceValid(enemy))
+			{
+				continue;
+			}
+
+			CombatComponent combat = enemy.GetNodeOrNull<CombatComponent>("CombatComponent");
+			if (combat?.IsDead == true)
+			{
+				continue;
+			}
+
+			float distanceSquared = origin.DistanceSquaredTo(enemy.GlobalPosition);
+			if (distanceSquared <= AimEpsilonSquared || distanceSquared >= nearestDistanceSquared)
+			{
+				continue;
+			}
+
+			nearestEnemy = enemy;
+			nearestDistanceSquared = distanceSquared;
+		}
+
+		if (nearestEnemy is null)
+		{
+			return false;
+		}
+
+		direction = (nearestEnemy.GlobalPosition - origin).Normalized();
+		return true;
+	}
+
+	private bool TryGetRandomDirection(out Vector2 direction)
+	{
+		float angle = _random.RandfRange(0.0f, Mathf.Pi * 2.0f);
+		direction = Vector2.Right.Rotated(angle);
+		return true;
+	}
+
+	private void SpawnProjectiles()
+	{
+		Vector2 baseDirection = GetProjectileDirection();
+		int projectileCount = Mathf.Max(1, ProjectileCount);
+		if (projectileCount == 1)
+		{
+			SpawnProjectile(baseDirection);
+			return;
+		}
+
+		float spreadRadians = Mathf.DegToRad(ProjectileSpreadDegrees);
+		float firstOffset = -spreadRadians * (projectileCount - 1) * 0.5f;
+		for (int i = 0; i < projectileCount; i++)
+		{
+			SpawnProjectile(baseDirection.Rotated(firstOffset + spreadRadians * i));
+		}
+	}
+
+	private void SpawnProjectile(Vector2 direction)
 	{
 		if (BulletScene == null)
 		{
@@ -337,8 +509,8 @@ public partial class Weapon2D : Node2D
 		Node parent = GetTree().CurrentScene ?? GetTree().Root;
 		parent.AddChild(bullet);
 
-		Vector2 direction = GetProjectileDirection();
 		bullet.GlobalPosition = Muzzle.GlobalPosition;
+		bullet.Damage = Damage;
 		bullet.Initialize(direction);
 	}
 }

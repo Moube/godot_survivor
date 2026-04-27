@@ -9,6 +9,9 @@ public partial class Level01 : Node2D
 	public PackedScene EnemyScene { get; set; }
 
 	[Export]
+	public string LevelConfigId { get; set; } = "level_01";
+
+	[Export]
 	public int GridSize { get; set; } = 64;
 
 	[Export]
@@ -32,6 +35,7 @@ public partial class Level01 : Node2D
 	private CharacterBody2D _player;
 	private CombatComponent _playerCombat;
 	private Timer _spawnTimer;
+	private LevelConfig _levelConfig;
 
 	public override void _Ready()
 	{
@@ -39,6 +43,7 @@ public partial class Level01 : Node2D
 		_worldRoot = GetNode<Node2D>("World");
 		_spawnTimer = GetNode<Timer>("SpawnTimer");
 		_spawnTimer.Timeout += OnSpawnTimerTimeout;
+		_levelConfig = GameConfigManager.Instance?.GetLevelConfig(LevelConfigId);
 
 		GameSession.Instance?.StartNewRun();
 		SpawnPlayer();
@@ -75,6 +80,7 @@ public partial class Level01 : Node2D
 
 		if (player is Player playerNode)
 		{
+			playerNode.InitializeFromLevelConfig(_levelConfig);
 			playerNode.Died += OnPlayerDied;
 		}
 
