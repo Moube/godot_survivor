@@ -11,6 +11,11 @@ public partial class Player : CharacterBody2D
 	[Export]
 	public float WalkAnimationFps { get; set; } = 5.0f;
 
+	[Export]
+	public float PickupRange { get; set; } = 48.0f;
+
+	public bool IsDead => _isDead;
+
 	private Sprite2D _sprite;
 	private WeaponInventory _weaponInventory;
 	private CombatComponent _combat;
@@ -40,6 +45,7 @@ public partial class Player : CharacterBody2D
 		}
 
 		MoveSpeed = Mathf.Max(1.0f, levelConfig.InitialPlayerMoveSpeed);
+		PickupRange = Mathf.Max(1.0f, levelConfig.InitialPickupRange);
 		if (_combat != null)
 		{
 			_combat.MaxHealth = Mathf.Max(1, levelConfig.InitialPlayerMaxHealth);

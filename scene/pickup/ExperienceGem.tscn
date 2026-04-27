@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scene/pickup/ExperienceGem.cs" id="1_script"]
+
+[node name="ExperienceGem" type="Node2D"]
+z_index = 1
+script = ExtResource("1_script")
+
+[node name="VisualRoot" type="Node2D" parent="."]
+
+[node name="TextureSlot" type="Sprite2D" parent="VisualRoot"]
+visible = false
+
+[node name="PolygonVisual" type="Polygon2D" parent="VisualRoot"]
+color = Color(0.16, 0.75, 1, 1)
+polygon = PackedVector2Array(0, -8, 7, -2, 5, 7, -5, 7, -7, -2)

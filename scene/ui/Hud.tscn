@@ -18,6 +18,13 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_experience_fill"]
+bg_color = Color(0.16, 0.62, 1, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_panel"]
 texture = ExtResource("2_4d2qj")
 texture_margin_left = 80.0
@@ -65,11 +72,24 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_bottom = -28.0
+offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="HealthBar" type="ProgressBar" parent="BottomCenter" unique_id=690979595]
+[node name="VitalsStack" type="VBoxContainer" parent="BottomCenter"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="ExperienceBar" type="ProgressBar" parent="BottomCenter/VitalsStack"]
+custom_minimum_size = Vector2(320, 14)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_background")
+theme_override_styles/fill = SubResource("StyleBoxFlat_experience_fill")
+max_value = 5.0
+show_percentage = false
+
+[node name="HealthBar" type="ProgressBar" parent="BottomCenter/VitalsStack" unique_id=690979595]
 custom_minimum_size = Vector2(320, 22)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_background")

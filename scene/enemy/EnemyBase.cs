@@ -5,6 +5,7 @@ public partial class EnemyBase : CharacterBody2D
 	private const string DropShadowScenePath = "res://scene/common/DropShadow2D.tscn";
 	private const string DeathDissolveShaderPath = "res://asset/art/effects/sprite_death_dissolve.gdshader";
 	private const string HitFlashShaderPath = "res://asset/art/effects/sprite_solid_flash.gdshader";
+	private const string DefaultExperienceGemScenePath = "res://scene/pickup/ExperienceGem.tscn";
 
 	[Export]
 	public float MoveSpeed { get; set; } = 120.0f;
@@ -21,8 +22,8 @@ public partial class EnemyBase : CharacterBody2D
 	[Export]
 	public float ContactDamageCooldownSeconds { get; set; } = 0.75f;
 
-	[Export]
-	public int ScoreReward { get; set; } = 100;
+	[Export(PropertyHint.File, "*.tscn")]
+	public string ExperienceGemScenePath { get; set; } = DefaultExperienceGemScenePath;
 
 	public string EnemyId { get; private set; } = string.Empty;
 
@@ -89,6 +90,7 @@ public partial class EnemyBase : CharacterBody2D
 	private double _hitStunRemaining;
 	private double _deathDissolveElapsed;
 	private bool _isDeathDissolving;
+	private PackedScene _experienceGemScene;
 
 	public override void _Ready()
 	{
@@ -124,7 +126,6 @@ public partial class EnemyBase : CharacterBody2D
 		ContactDamage = Mathf.Max(1, config.ContactDamage);
 		ContactDamageCooldownSeconds = Mathf.Max(0.01f, config.ContactDamageCooldownSeconds);
 		ExperienceValue = Mathf.Max(1, config.ExperienceValue);
-		ScoreReward = ExperienceValue;
 		Scale = Vector2.One * Mathf.Max(0.1f, config.VisualScale);
 
 		_combat ??= GetNodeOrNull<CombatComponent>("CombatComponent");
@@ -478,8 +479,36 @@ public partial class EnemyBase : CharacterBody2D
 
 	private void OnDied()
 	{
-		GameSession.Instance?.AddScore(ScoreReward);
+		DropExperience();
 		StartDeathDissolve();
+	}
+
+	private void DropExperience()
+	{
+		if (ExperienceValue <= 0)
+		{
+			return;
+		}
+
+		_experienceGemScene ??= ResourceLoader.Load<PackedScene>(ExperienceGemScenePath);
+		if (_experienceGemScene is null)
+		{
+			GD.PushWarning($"{Name} cannot drop experience because the gem scene is missing: {ExperienceGemScenePath}");
+			return;
+		}
+
+		Node instance = _experienceGemScene.Instantiate();
+		if (instance is not ExperienceGem experienceGem)
+		{
+			GD.PushWarning("ExperienceGemScene must instantiate an ExperienceGem.");
+			instance.QueueFree();
+			return;
+		}
+
+		Node parent = GetParent() ?? GetTree().CurrentScene ?? GetTree().Root;
+		parent.AddChild(experienceGem);
+		experienceGem.GlobalPosition = GlobalPosition;
+		experienceGem.Initialize(ExperienceValue);
 	}
 
 	private void StartDeathDissolve()

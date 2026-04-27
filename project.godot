@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 GameSession="*res://script/common/GameSession.cs"
 GameConfigManager="*res://script/config/GameConfigManager.cs"
+ExperienceController="*res://script/gameplay/ExperienceController.cs"
 
 [display]
 

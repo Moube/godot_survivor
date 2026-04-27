@@ -6,6 +6,7 @@ public partial class Hud : CanvasLayer
 	private const string LevelScenePath = "res://scene/level/Level01.tscn";
 
 	private ProgressBar _healthBar;
+	private ProgressBar _experienceBar;
 	private Label _runTimeLabel;
 	private Control _gameOverPanel;
 	private Label _finalSurvivalTimeLabel;
@@ -13,7 +14,8 @@ public partial class Hud : CanvasLayer
 
 	public override void _Ready()
 	{
-		_healthBar = GetNode<ProgressBar>("BottomCenter/HealthBar");
+		_healthBar = GetNode<ProgressBar>("BottomCenter/VitalsStack/HealthBar");
+		_experienceBar = GetNode<ProgressBar>("BottomCenter/VitalsStack/ExperienceBar");
 		_runTimeLabel = GetNode<Label>("TopCenter/RunTimePanel/RunTimeMargin/RunTimeLabel");
 		_gameOverPanel = GetNode<Control>("GameOverCenter/PanelContainer");
 		_finalSurvivalTimeLabel = GetNode<Label>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/FinalSurvivalTimeLabel");
@@ -30,6 +32,15 @@ public partial class Hud : CanvasLayer
 		GameSession.Instance.PlayerHealthChanged += OnPlayerHealthChanged;
 		GameSession.Instance.GameOver += OnGameOver;
 
+		if (ExperienceController.Instance != null)
+		{
+			ExperienceController.Instance.ExperienceChanged += OnExperienceChanged;
+			OnExperienceChanged(
+				ExperienceController.Instance.CurrentExperience,
+				ExperienceController.Instance.RequiredExperience,
+				ExperienceController.Instance.Level);
+		}
+
 		OnRunTimeChanged(GameSession.Instance.ElapsedRunTime);
 		OnPlayerHealthChanged(GameSession.Instance.CurrentPlayerHealth, GameSession.Instance.MaxPlayerHealth);
 		SetGameOverVisible(GameSession.Instance.IsGameOver, GameSession.Instance.FinalSurvivalTime);
@@ -37,14 +48,17 @@ public partial class Hud : CanvasLayer
 
 	public override void _ExitTree()
 	{
-		if (GameSession.Instance is null)
+		if (GameSession.Instance != null)
 		{
-			return;
+			GameSession.Instance.RunTimeChanged -= OnRunTimeChanged;
+			GameSession.Instance.PlayerHealthChanged -= OnPlayerHealthChanged;
+			GameSession.Instance.GameOver -= OnGameOver;
 		}
 
-		GameSession.Instance.RunTimeChanged -= OnRunTimeChanged;
-		GameSession.Instance.PlayerHealthChanged -= OnPlayerHealthChanged;
-		GameSession.Instance.GameOver -= OnGameOver;
+		if (ExperienceController.Instance != null)
+		{
+			ExperienceController.Instance.ExperienceChanged -= OnExperienceChanged;
+		}
 	}
 
 	private void OnRunTimeChanged(double elapsedRunTime)
@@ -63,6 +77,12 @@ public partial class Hud : CanvasLayer
 
 		_healthBar.MaxValue = maxHealth;
 		_healthBar.Value = currentHealth;
+	}
+
+	private void OnExperienceChanged(int currentExperience, int requiredExperience, int level)
+	{
+		_experienceBar.MaxValue = Mathf.Max(1, requiredExperience);
+		_experienceBar.Value = Mathf.Clamp(currentExperience, 0, requiredExperience);
 	}
 
 	private void OnGameOver(double finalSurvivalTime)

@@ -32,6 +32,7 @@ public partial class Level01 : Node2D
 		_levelConfig = GameConfigManager.Instance?.GetLevelConfig(LevelConfigId);
 
 		GameSession.Instance?.StartNewRun();
+		ExperienceController.Instance?.StartNewRun(_levelConfig?.ExperienceCurveId ?? string.Empty);
 		SpawnPlayer();
 		StartSpawnDirector();
 		QueueRedraw();
