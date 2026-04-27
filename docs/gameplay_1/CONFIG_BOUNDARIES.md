@@ -6,10 +6,10 @@
 
 - `weapons.tsv`：武器 ID、名称、瞄准模式、冷却、伤害、弹体数量、场景路径。
 - `passives.tsv`：被动 ID、名称、影响的玩家属性、每级数值、最大等级。
-- `enemies.tsv`：敌人 ID、名称、场景路径、生命、速度、接触伤害、经验掉落值。
+- `enemies.tsv`：敌人 ID、名称、场景路径、生命、速度、接触伤害、经验掉落值、视觉缩放。
 - `levels.tsv`：关卡入口、初始玩家属性、初始武器、刷怪表、升级池、经验曲线。
 - `spawn_schedules.tsv`：刷怪表元信息。
-- `spawn_schedule_entries.tsv`：按存活时间切换的刷怪阶段、生成间隔、生成数量、场上上限。
+- `spawn_schedule_entries.tsv`：按存活时间切换的刷怪阶段、生成间隔、生成数量、场上上限。时间单位为秒，每一行从 `start_time_seconds` 开始生效，直到下一行开始。
 - `spawn_enemy_weights.tsv`：每个刷怪阶段对应的敌人权重。
 - `upgrade_pools.tsv`：升级池元信息。
 - `upgrade_rewards.tsv`：升级候选奖励，包括新武器、武器升级、新被动、被动升级。

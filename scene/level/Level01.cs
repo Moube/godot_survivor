@@ -6,9 +6,6 @@ public partial class Level01 : Node2D
 	public PackedScene PlayerScene { get; set; }
 
 	[Export]
-	public PackedScene EnemyScene { get; set; }
-
-	[Export]
 	public string LevelConfigId { get; set; } = "level_01";
 
 	[Export]
@@ -18,36 +15,25 @@ public partial class Level01 : Node2D
 	public int GridExtent { get; set; } = 2048;
 
 	[Export]
-	public float EnemySpawnIntervalSeconds { get; set; } = 1.75f;
-
-	[Export]
-	public int MaxEnemyCount { get; set; } = 6;
-
-	[Export]
 	public float MinSpawnDistanceFromPlayer { get; set; } = 180.0f;
 
 	[Export]
 	public Vector2 SpawnAreaHalfExtents { get; set; } = new(420.0f, 260.0f);
 
-	private readonly RandomNumberGenerator _random = new();
-
 	private Node2D _worldRoot;
 	private CharacterBody2D _player;
 	private CombatComponent _playerCombat;
-	private Timer _spawnTimer;
+	private SpawnDirector _spawnDirector;
 	private LevelConfig _levelConfig;
 
 	public override void _Ready()
 	{
-		_random.Randomize();
 		_worldRoot = GetNode<Node2D>("World");
-		_spawnTimer = GetNode<Timer>("SpawnTimer");
-		_spawnTimer.Timeout += OnSpawnTimerTimeout;
 		_levelConfig = GameConfigManager.Instance?.GetLevelConfig(LevelConfigId);
 
 		GameSession.Instance?.StartNewRun();
 		SpawnPlayer();
-		ConfigureSpawnTimer();
+		StartSpawnDirector();
 		QueueRedraw();
 	}
 
@@ -95,79 +81,39 @@ public partial class Level01 : Node2D
 		GameSession.Instance?.SetPlayerHealth(_playerCombat.CurrentHealth, _playerCombat.MaxHealth);
 	}
 
-	private void ConfigureSpawnTimer()
+	private void StartSpawnDirector()
 	{
-		if (EnemyScene is null)
+		if (_player is null || !IsInstanceValid(_player))
 		{
-			GD.PushWarning("EnemyScene is not assigned on Level01.");
-			_spawnTimer.Stop();
+			GD.PushError("Level01 cannot start SpawnDirector because player is missing.");
 			return;
 		}
 
-		_spawnTimer.WaitTime = EnemySpawnIntervalSeconds;
-		_spawnTimer.Start();
-		SpawnEnemy();
-	}
-
-	private void OnSpawnTimerTimeout()
-	{
-		SpawnEnemy();
-	}
-
-	private void SpawnEnemy()
-	{
-		if (GameSession.Instance?.IsGameOver == true || _player is null || !IsInstanceValid(_player))
+		if (_levelConfig is null)
 		{
+			GD.PushError("Level01 cannot start SpawnDirector because level config is missing.");
 			return;
 		}
 
-		if (GetTree().GetNodesInGroup("enemy").Count >= MaxEnemyCount)
+		SpawnScheduleConfig spawnSchedule = GameConfigManager.Instance?.GetSpawnScheduleConfig(_levelConfig.SpawnScheduleId);
+		if (spawnSchedule is null)
 		{
+			GD.PushError($"Level01 cannot find spawn schedule '{_levelConfig.SpawnScheduleId}'.");
 			return;
 		}
 
-		Node enemyInstance = EnemyScene.Instantiate();
-		if (enemyInstance is not EnemyBase enemy)
+		_spawnDirector = new SpawnDirector
 		{
-			GD.PushError("EnemyScene must instantiate an EnemyBase.");
-			enemyInstance.QueueFree();
-			return;
-		}
-
-		enemy.GlobalPosition = FindEnemySpawnPosition();
-		_worldRoot.AddChild(enemy);
-	}
-
-	private Vector2 FindEnemySpawnPosition()
-	{
-		Vector2 fallback = GlobalPosition + new Vector2(SpawnAreaHalfExtents.X, 0.0f);
-
-		for (int attempt = 0; attempt < 12; attempt++)
-		{
-			Vector2 candidate = GlobalPosition + GetPerimeterSpawnOffset();
-			if (candidate.DistanceTo(_player.GlobalPosition) >= MinSpawnDistanceFromPlayer)
-			{
-				return candidate;
-			}
-
-			fallback = candidate;
-		}
-
-		return fallback;
-	}
-
-	private Vector2 GetPerimeterSpawnOffset()
-	{
-		float horizontalX = _random.RandfRange(-SpawnAreaHalfExtents.X, SpawnAreaHalfExtents.X);
-		float verticalY = _random.RandfRange(-SpawnAreaHalfExtents.Y, SpawnAreaHalfExtents.Y);
-
-		return _random.RandiRange(0, 3) switch
-		{
-			0 => new Vector2(horizontalX, -SpawnAreaHalfExtents.Y),
-			1 => new Vector2(horizontalX, SpawnAreaHalfExtents.Y),
-			2 => new Vector2(-SpawnAreaHalfExtents.X, verticalY),
-			_ => new Vector2(SpawnAreaHalfExtents.X, verticalY),
+			Name = "SpawnDirector",
 		};
+		AddChild(_spawnDirector);
+		_spawnDirector.Initialize(
+			spawnSchedule,
+			_worldRoot,
+			_player,
+			GlobalPosition,
+			SpawnAreaHalfExtents,
+			MinSpawnDistanceFromPlayer);
 	}
 
 	private void OnPlayerDied()
@@ -177,7 +123,7 @@ public partial class Level01 : Node2D
 			return;
 		}
 
-		_spawnTimer.Stop();
+		_spawnDirector?.Stop();
 		GameSession.Instance?.TriggerGameOver();
 	}
 

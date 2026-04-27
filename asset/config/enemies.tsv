@@ -1,4 +1,4 @@
-"id"	"display_name"	"description"	"scene_path"	"max_health"	"move_speed"	"contact_damage"	"contact_damage_cooldown_seconds"	"experience_value"
-"slime_basic"	"Slime"	"Basic chasing enemy."	"res://scene/enemy/Enemy.tscn"	"3"	"50.0"	"1"	"0.75"	"1"
-"slime_fast"	"Swift Slime"	"Lower health enemy with higher movement speed."	"res://scene/enemy/Enemy.tscn"	"2"	"85.0"	"1"	"0.65"	"1"
-"slime_big"	"Big Slime"	"Higher health enemy used to create space pressure."	"res://scene/enemy/Enemy.tscn"	"8"	"35.0"	"2"	"0.85"	"3"
+"id"	"display_name"	"description"	"scene_path"	"max_health"	"move_speed"	"contact_damage"	"contact_damage_cooldown_seconds"	"experience_value"	"visual_scale"
+"slime_small"	"Small Slime"	"Basic low-pressure chasing slime."	"res://scene/enemy/SlimeEnemy.tscn"	"3"	"50.0"	"1"	"0.75"	"1"	"1.0"
+"slime_medium"	"Medium Slime"	"Sturdier slime used once the run pressure rises."	"res://scene/enemy/SlimeEnemy.tscn"	"7"	"44.0"	"1"	"0.75"	"2"	"1.25"
+"slime_large"	"Large Slime"	"Large high-health slime reserved for later pressure spikes."	"res://scene/enemy/SlimeEnemy.tscn"	"16"	"32.0"	"2"	"0.9"	"5"	"1.6"

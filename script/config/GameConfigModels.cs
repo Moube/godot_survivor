@@ -43,6 +43,7 @@ public sealed class EnemyConfig : IGameConfig
 	public int ContactDamage { get; set; } = 1;
 	public float ContactDamageCooldownSeconds { get; set; } = 0.75f;
 	public int ExperienceValue { get; set; } = 1;
+	public float VisualScale { get; set; } = 1.0f;
 }
 
 public sealed class LevelConfig : IGameConfig

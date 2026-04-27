@@ -1,6 +1,6 @@
 using Godot;
 
-public partial class Enemy : EnemyBase
+public partial class SlimeEnemy : EnemyBase
 {
 	protected override void ConfigureEnemyDefaults()
 	{

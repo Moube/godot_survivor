@@ -24,6 +24,10 @@ public partial class EnemyBase : CharacterBody2D
 	[Export]
 	public int ScoreReward { get; set; } = 100;
 
+	public string EnemyId { get; private set; } = string.Empty;
+
+	public int ExperienceValue { get; private set; } = 1;
+
 	[Export]
 	public NodePath MoveAnimationSpritePath { get; set; } = new("Sprite2D");
 
@@ -105,6 +109,36 @@ public partial class EnemyBase : CharacterBody2D
 		{
 			ConfigureDropShadow(_dropShadow);
 		}
+	}
+
+	public void ApplyConfig(EnemyConfig config)
+	{
+		if (config is null)
+		{
+			GD.PushError($"{Name} cannot apply a null enemy config.");
+			return;
+		}
+
+		EnemyId = config.Id;
+		MoveSpeed = Mathf.Max(0.1f, config.MoveSpeed);
+		ContactDamage = Mathf.Max(1, config.ContactDamage);
+		ContactDamageCooldownSeconds = Mathf.Max(0.01f, config.ContactDamageCooldownSeconds);
+		ExperienceValue = Mathf.Max(1, config.ExperienceValue);
+		ScoreReward = ExperienceValue;
+		Scale = Vector2.One * Mathf.Max(0.1f, config.VisualScale);
+
+		_combat ??= GetNodeOrNull<CombatComponent>("CombatComponent");
+		if (_combat != null)
+		{
+			_combat.MaxHealth = Mathf.Max(1, config.MaxHealth);
+			_combat.ResetHealth();
+		}
+		else
+		{
+			GD.PushWarning($"{Name} is missing CombatComponent while applying enemy config '{config.Id}'.");
+		}
+
+		Name = config.Id;
 	}
 
 	public override void _Process(double delta)

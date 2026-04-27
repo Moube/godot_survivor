@@ -182,6 +182,7 @@ public partial class GameConfigManager : Node
 				ContactDamage = GetInt(row, "contact_damage", 1, context),
 				ContactDamageCooldownSeconds = GetFloat(row, "contact_damage_cooldown_seconds", 0.75f, context),
 				ExperienceValue = GetInt(row, "experience_value", 1, context),
+				VisualScale = GetFloat(row, "visual_scale", 1.0f, context),
 			});
 		}
 
@@ -724,6 +725,7 @@ public partial class GameConfigManager : Node
 		ValidatePositive(enemy.ContactDamage, $"enemy '{enemy.Id}' contact damage");
 		ValidatePositive(enemy.ContactDamageCooldownSeconds, $"enemy '{enemy.Id}' contact damage cooldown");
 		ValidatePositive(enemy.ExperienceValue, $"enemy '{enemy.Id}' experience value");
+		ValidatePositive(enemy.VisualScale, $"enemy '{enemy.Id}' visual scale");
 	}
 
 	private static void ValidateExperienceCurveConfig(ExperienceCurveConfig curve)

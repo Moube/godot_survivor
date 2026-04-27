@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://cs8a5btntudxi" path="res://scene/level/Level01.cs" id="1_l9v2o"]
 [ext_resource type="PackedScene" uid="uid://2drw8henhjlg" path="res://scene/player/Player.tscn" id="2_a4a8r"]
-[ext_resource type="PackedScene" uid="uid://cdlrr0sqbofmc" path="res://scene/enemy/Enemy.tscn" id="3_2el3g"]
 [ext_resource type="PackedScene" path="res://scene/level/WallBlock.tscn" id="4_pti1w"]
 [ext_resource type="PackedScene" path="res://scene/ui/Hud.tscn" id="5_r7m8l"]
 [ext_resource type="Texture2D" path="res://asset/art/level/floor_tile.png" id="6_1k0gr"]
@@ -18,7 +17,6 @@ size = Vector2(32, 640)
 [node name="Level01" type="Node2D" unique_id=618390061]
 script = ExtResource("1_l9v2o")
 PlayerScene = ExtResource("2_a4a8r")
-EnemyScene = ExtResource("3_2el3g")
 
 [node name="Floor" type="Polygon2D" parent="."]
 z_index = -10
@@ -32,9 +30,6 @@ texture = ExtResource("6_1k0gr")
 y_sort_enabled = true
 
 [node name="PlayerSpawn" type="Marker2D" parent="." unique_id=674187226]
-
-[node name="SpawnTimer" type="Timer" parent="."]
-wait_time = 1.75
 
 [node name="Hud" parent="." instance=ExtResource("5_r7m8l")]
 
