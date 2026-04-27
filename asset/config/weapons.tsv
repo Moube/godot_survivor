@@ -1,0 +1,4 @@
+"id"	"display_name"	"description"	"scene_path"	"bullet_scene_path"	"aim_mode"	"fire_cooldown_seconds"	"damage"	"projectile_count"	"max_level"
+"magic_wand"	"Floating Magic Wand"	"Fires a magic bolt toward the mouse cursor."	"res://scene/weapon/MagicWandWeapon.tscn"	"res://scene/bullet/Bullet.tscn"	"MouseDirection"	"0.55"	"1"	"1"	"5"
+"spark_orb"	"Spark Orb"	"Fires toward the nearest enemy."	"res://scene/weapon/MagicWandWeapon.tscn"	"res://scene/bullet/Bullet.tscn"	"NearestEnemy"	"0.8"	"1"	"1"	"5"
+"chaos_missile"	"Chaos Missile"	"Fires in a random direction."	"res://scene/weapon/MagicWandWeapon.tscn"	"res://scene/bullet/Bullet.tscn"	"RandomDirection"	"0.45"	"1"	"1"	"5"

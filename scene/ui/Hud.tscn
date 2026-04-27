@@ -30,44 +30,35 @@ process_mode = 3
 layer = 10
 script = ExtResource("1_qfa3s")
 
-[node name="TopRight" type="MarginContainer" parent="." unique_id=983369180]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -344.0
-offset_bottom = 152.0
-grow_horizontal = 0
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 24
+[node name="TopCenter" type="CenterContainer" parent="." unique_id=983369180]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -160.0
+offset_top = 24.0
+offset_right = 160.0
+offset_bottom = 104.0
+grow_horizontal = 2
 
-[node name="ScorePanel" type="TextureRect" parent="TopRight" unique_id=2103433174]
-custom_minimum_size = Vector2(320, 128)
+[node name="RunTimePanel" type="TextureRect" parent="TopCenter" unique_id=2103433174]
+custom_minimum_size = Vector2(320, 80)
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("3_17jov")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ScoreMargin" type="CenterContainer" parent="TopRight/ScorePanel" unique_id=914672544]
+[node name="RunTimeMargin" type="CenterContainer" parent="TopCenter/RunTimePanel" unique_id=914672544]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ScoreRow" type="HBoxContainer" parent="TopRight/ScorePanel/ScoreMargin" unique_id=12642241]
+[node name="RunTimeLabel" type="Label" parent="TopCenter/RunTimePanel/RunTimeMargin" unique_id=1663419938]
 layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="ScoreLabel" type="Label" parent="TopRight/ScorePanel/ScoreMargin/ScoreRow" unique_id=355420664]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Score"
-
-[node name="ScoreValue" type="Label" parent="TopRight/ScorePanel/ScoreMargin/ScoreRow" unique_id=1663419938]
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "0"
+theme_override_font_sizes/font_size = 30
+text = "00:00"
+horizontal_alignment = 1
 
 [node name="BottomCenter" type="CenterContainer" parent="." unique_id=43457491]
 anchors_preset = 12
@@ -121,9 +112,9 @@ theme_override_font_sizes/font_size = 28
 text = "Game Over"
 horizontal_alignment = 1
 
-[node name="FinalScoreLabel" type="Label" parent="GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content" unique_id=1624027174]
+[node name="FinalSurvivalTimeLabel" type="Label" parent="GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content" unique_id=1624027174]
 layout_mode = 2
-text = "Final Score: 0"
+text = "Survived 00:00"
 horizontal_alignment = 1
 
 [node name="RestartButton" type="Button" parent="GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content" unique_id=1215819195]

@@ -9,13 +9,20 @@ public partial class GameSession : Node
 	public delegate void PlayerHealthChangedEventHandler(int currentHealth, int maxHealth);
 
 	[Signal]
-	public delegate void GameOverEventHandler(int finalScore);
+	public delegate void RunTimeChangedEventHandler(double elapsedRunTime);
+
+	[Signal]
+	public delegate void GameOverEventHandler(double finalSurvivalTime);
 
 	public static GameSession Instance { get; private set; }
 
 	public int Score { get; private set; }
 
 	public bool IsGameOver { get; private set; }
+
+	public double ElapsedRunTime { get; private set; }
+
+	public double FinalSurvivalTime { get; private set; }
 
 	public int CurrentPlayerHealth { get; private set; }
 
@@ -38,9 +45,23 @@ public partial class GameSession : Node
 	{
 		Score = 0;
 		IsGameOver = false;
+		ElapsedRunTime = 0.0;
+		FinalSurvivalTime = 0.0;
 		ClearPlayerHealth();
 		GetTree().Paused = false;
 		EmitSignal(SignalName.ScoreChanged, Score);
+		EmitSignal(SignalName.RunTimeChanged, ElapsedRunTime);
+	}
+
+	public void AdvanceRunTime(double deltaSeconds)
+	{
+		if (IsGameOver || deltaSeconds <= 0.0)
+		{
+			return;
+		}
+
+		ElapsedRunTime += deltaSeconds;
+		EmitSignal(SignalName.RunTimeChanged, ElapsedRunTime);
 	}
 
 	public void AddScore(int amount)
@@ -63,9 +84,10 @@ public partial class GameSession : Node
 		}
 
 		IsGameOver = true;
-		EmitSignal(SignalName.GameOver, Score);
+		FinalSurvivalTime = ElapsedRunTime;
+		EmitSignal(SignalName.GameOver, FinalSurvivalTime);
 		GetTree().Paused = true;
-		GD.Print($"Game Over. Final Score: {Score}");
+		GD.Print($"Game Over. Final Survival Time: {FinalSurvivalTime:0.00}s");
 	}
 
 	public void SetPlayerHealth(int currentHealth, int maxHealth)

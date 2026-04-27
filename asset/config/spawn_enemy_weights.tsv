@@ -1,0 +1,8 @@
+"spawn_schedule_entry_id"	"enemy_id"	"weight"
+"level_01_00"	"slime_basic"	"1"
+"level_01_01"	"slime_basic"	"1"
+"level_01_02"	"slime_basic"	"3"
+"level_01_02"	"slime_fast"	"1"
+"level_01_03"	"slime_basic"	"4"
+"level_01_03"	"slime_fast"	"2"
+"level_01_03"	"slime_big"	"1"

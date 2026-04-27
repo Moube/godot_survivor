@@ -1,0 +1,2 @@
+"id"	"display_name"	"description"	"scene_path"	"sort_order"	"initial_player_max_health"	"initial_player_move_speed"	"initial_pickup_range"	"initial_weapon_id"	"spawn_schedule_id"	"upgrade_pool_id"	"experience_curve_id"
+"level_01"	"Training Grounds"	"First survival test arena."	"res://scene/level/Level01.tscn"	"0"	"5"	"240.0"	"48.0"	"magic_wand"	"level_01_schedule"	"level_01_upgrade_pool"	"default_experience_curve"

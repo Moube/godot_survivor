@@ -1,0 +1,5 @@
+"id"	"spawn_schedule_id"	"start_time_seconds"	"spawn_interval_seconds"	"spawn_count"	"max_enemy_count"
+"level_01_00"	"level_01_schedule"	"0.0"	"1.75"	"1"	"6"
+"level_01_01"	"level_01_schedule"	"60.0"	"1.35"	"2"	"12"
+"level_01_02"	"level_01_schedule"	"120.0"	"1.1"	"2"	"18"
+"level_01_03"	"level_01_schedule"	"180.0"	"0.9"	"3"	"25"

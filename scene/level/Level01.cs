@@ -40,9 +40,15 @@ public partial class Level01 : Node2D
 		_spawnTimer = GetNode<Timer>("SpawnTimer");
 		_spawnTimer.Timeout += OnSpawnTimerTimeout;
 
+		GameSession.Instance?.StartNewRun();
 		SpawnPlayer();
 		ConfigureSpawnTimer();
 		QueueRedraw();
+	}
+
+	public override void _Process(double delta)
+	{
+		GameSession.Instance?.AdvanceRunTime(delta);
 	}
 
 	private void SpawnPlayer()

@@ -1,21 +1,22 @@
 using Godot;
+using System;
 
 public partial class Hud : CanvasLayer
 {
 	private const string LevelScenePath = "res://scene/level/Level01.tscn";
 
 	private ProgressBar _healthBar;
-	private Label _scoreValueLabel;
+	private Label _runTimeLabel;
 	private Control _gameOverPanel;
-	private Label _finalScoreLabel;
+	private Label _finalSurvivalTimeLabel;
 	private Button _restartButton;
 
 	public override void _Ready()
 	{
 		_healthBar = GetNode<ProgressBar>("BottomCenter/HealthBar");
-		_scoreValueLabel = GetNode<Label>("TopRight/ScorePanel/ScoreMargin/ScoreRow/ScoreValue");
+		_runTimeLabel = GetNode<Label>("TopCenter/RunTimePanel/RunTimeMargin/RunTimeLabel");
 		_gameOverPanel = GetNode<Control>("GameOverCenter/PanelContainer");
-		_finalScoreLabel = GetNode<Label>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/FinalScoreLabel");
+		_finalSurvivalTimeLabel = GetNode<Label>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/FinalSurvivalTimeLabel");
 		_restartButton = GetNode<Button>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/RestartButton");
 		_restartButton.Pressed += OnRestartButtonPressed;
 
@@ -25,13 +26,13 @@ public partial class Hud : CanvasLayer
 			return;
 		}
 
-		GameSession.Instance.ScoreChanged += OnScoreChanged;
+		GameSession.Instance.RunTimeChanged += OnRunTimeChanged;
 		GameSession.Instance.PlayerHealthChanged += OnPlayerHealthChanged;
 		GameSession.Instance.GameOver += OnGameOver;
 
-		OnScoreChanged(GameSession.Instance.Score);
+		OnRunTimeChanged(GameSession.Instance.ElapsedRunTime);
 		OnPlayerHealthChanged(GameSession.Instance.CurrentPlayerHealth, GameSession.Instance.MaxPlayerHealth);
-		SetGameOverVisible(GameSession.Instance.IsGameOver, GameSession.Instance.Score);
+		SetGameOverVisible(GameSession.Instance.IsGameOver, GameSession.Instance.FinalSurvivalTime);
 	}
 
 	public override void _ExitTree()
@@ -41,14 +42,14 @@ public partial class Hud : CanvasLayer
 			return;
 		}
 
-		GameSession.Instance.ScoreChanged -= OnScoreChanged;
+		GameSession.Instance.RunTimeChanged -= OnRunTimeChanged;
 		GameSession.Instance.PlayerHealthChanged -= OnPlayerHealthChanged;
 		GameSession.Instance.GameOver -= OnGameOver;
 	}
 
-	private void OnScoreChanged(int score)
+	private void OnRunTimeChanged(double elapsedRunTime)
 	{
-		_scoreValueLabel.Text = score.ToString();
+		_runTimeLabel.Text = FormatRunTime(elapsedRunTime);
 	}
 
 	private void OnPlayerHealthChanged(int currentHealth, int maxHealth)
@@ -64,20 +65,28 @@ public partial class Hud : CanvasLayer
 		_healthBar.Value = currentHealth;
 	}
 
-	private void OnGameOver(int finalScore)
+	private void OnGameOver(double finalSurvivalTime)
 	{
-		SetGameOverVisible(true, finalScore);
+		SetGameOverVisible(true, finalSurvivalTime);
 	}
 
-	private void SetGameOverVisible(bool isVisible, int finalScore)
+	private void SetGameOverVisible(bool isVisible, double finalSurvivalTime)
 	{
 		_gameOverPanel.Visible = isVisible;
-		_finalScoreLabel.Text = $"Final Score: {finalScore}";
+		_finalSurvivalTimeLabel.Text = $"Survived {FormatRunTime(finalSurvivalTime)}";
 	}
 
 	private void OnRestartButtonPressed()
 	{
 		GameSession.Instance?.StartNewRun();
 		GetTree().ChangeSceneToFile(LevelScenePath);
+	}
+
+	private static string FormatRunTime(double elapsedSeconds)
+	{
+		int totalSeconds = Math.Max(0, (int)Math.Floor(elapsedSeconds));
+		int minutes = totalSeconds / 60;
+		int seconds = totalSeconds % 60;
+		return $"{minutes:00}:{seconds:00}";
 	}
 }
