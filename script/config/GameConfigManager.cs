@@ -132,8 +132,9 @@ public partial class GameConfigManager : Node
 				DisplayName = GetString(row, "display_name", context),
 				Description = GetString(row, "description", context, required: false),
 				ScenePath = GetString(row, "scene_path", context),
+				BehaviorType = GetEnum(row, "behavior_type", WeaponBehaviorType.ProjectileEmitter, context),
 				BulletScenePath = GetString(row, "bullet_scene_path", context),
-				AimMode = GetEnum(row, "aim_mode", WeaponAimMode.MouseDirection, context),
+				ProjectileFireMode = GetEnum(row, "projectile_fire_mode", ProjectileFireMode.MouseDirection, context),
 				FireCooldownSeconds = GetFloat(row, "fire_cooldown_seconds", 0.5f, context),
 				Damage = GetInt(row, "damage", 1, context),
 				ProjectileCount = GetInt(row, "projectile_count", 1, context),
@@ -705,11 +706,15 @@ public partial class GameConfigManager : Node
 	private static void ValidateWeaponConfig(WeaponConfig weapon)
 	{
 		ValidateScenePath(weapon.ScenePath, $"weapon '{weapon.Id}' scene");
-		ValidateScenePath(weapon.BulletScenePath, $"weapon '{weapon.Id}' bullet scene");
 		ValidatePositive(weapon.FireCooldownSeconds, $"weapon '{weapon.Id}' fire cooldown");
 		ValidatePositive(weapon.Damage, $"weapon '{weapon.Id}' damage");
-		ValidatePositive(weapon.ProjectileCount, $"weapon '{weapon.Id}' projectile count");
 		ValidatePositive(weapon.MaxLevel, $"weapon '{weapon.Id}' max level");
+
+		if (weapon.BehaviorType == WeaponBehaviorType.ProjectileEmitter)
+		{
+			ValidateScenePath(weapon.BulletScenePath, $"weapon '{weapon.Id}' bullet scene");
+			ValidatePositive(weapon.ProjectileCount, $"weapon '{weapon.Id}' projectile count");
+		}
 	}
 
 	private static void ValidatePassiveConfig(PassiveConfig passive)

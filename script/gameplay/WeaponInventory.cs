@@ -50,7 +50,12 @@ public partial class WeaponInventory : Node2D
 			return false;
 		}
 
-		weapon.InitializeFromConfig(config, level);
+		if (!weapon.InitializeFromConfig(config, level))
+		{
+			weapon.QueueFree();
+			return false;
+		}
+
 		AddChild(weapon);
 		_weapons.Add(weapon);
 		return true;

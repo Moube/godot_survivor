@@ -1,6 +1,6 @@
 using Godot;
 
-public partial class MagicWandWeapon : Weapon2D
+public partial class MagicWandWeapon : ProjectileEmitterWeapon2D
 {
 	[Export]
 	public float OrbitRadius { get; set; } = 42.0f;
@@ -20,7 +20,7 @@ public partial class MagicWandWeapon : Weapon2D
 		UpdateOrbitPosition();
 	}
 
-	protected override void UpdateWeapon(double delta)
+	protected override void OnEmitterUpdate(double delta)
 	{
 		_orbitAngle += Mathf.DegToRad(OrbitAngularSpeedDegrees) * (float)delta;
 		UpdateOrbitPosition();

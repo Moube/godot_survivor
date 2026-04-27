@@ -13,8 +13,9 @@ public sealed class WeaponConfig : IGameConfig
 	public string DisplayName { get; set; } = string.Empty;
 	public string Description { get; set; } = string.Empty;
 	public string ScenePath { get; set; } = string.Empty;
+	public WeaponBehaviorType BehaviorType { get; set; } = WeaponBehaviorType.ProjectileEmitter;
 	public string BulletScenePath { get; set; } = string.Empty;
-	public WeaponAimMode AimMode { get; set; } = WeaponAimMode.MouseDirection;
+	public ProjectileFireMode ProjectileFireMode { get; set; } = ProjectileFireMode.MouseDirection;
 	public float FireCooldownSeconds { get; set; } = 0.5f;
 	public int Damage { get; set; } = 1;
 	public int ProjectileCount { get; set; } = 1;

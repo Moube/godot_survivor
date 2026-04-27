@@ -1,11 +1,21 @@
-public enum WeaponAimMode
+public enum WeaponBehaviorType
+{
+	ProjectileEmitter,
+	GroundArea,
+	PlayerAura,
+	OrbitingObject,
+	AreaPulse,
+	TargetedStrike,
+}
+
+public enum ProjectileFireMode
 {
 	MouseDirection,
 	NearestEnemy,
 	RandomDirection,
-	AroundPlayer,
-	AreaPulse,
 	ForwardSweep,
+	MultipleNearest,
+	FixedPattern,
 }
 
 public enum UpgradeRewardType
