@@ -1,0 +1,209 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scene/ui/upgrade/UpgradeChoicePanel.cs" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_overlay_panel"]
+bg_color = Color(0.0352941, 0.0431373, 0.0588235, 0.82)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.117647, 0.133333, 0.156863, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.72, 0.78, 0.84, 0.42)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="UpgradeChoicePanel" type="Control"]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+script = ExtResource("1_script")
+
+[node name="Overlay" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_overlay_panel")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(920, 300)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_overlay_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="Content" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Choose an Upgrade"
+horizontal_alignment = 1
+
+[node name="CardRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Card1" type="PanelContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow"]
+custom_minimum_size = Vector2(280, 190)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="CardMargin" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="CardContent" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconSlot" type="ColorRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin/CardContent"]
+custom_minimum_size = Vector2(40, 34)
+layout_mode = 2
+color = Color(0.44, 0.62, 0.8, 0.46)
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin/CardContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Reward"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TypeLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin/CardContent"]
+layout_mode = 2
+text = "Type"
+horizontal_alignment = 1
+
+[node name="DescriptionLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin/CardContent"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Description"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="SelectButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin/CardContent"]
+layout_mode = 2
+text = "Select"
+
+[node name="Card2" type="PanelContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow"]
+custom_minimum_size = Vector2(280, 190)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="CardMargin" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="CardContent" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconSlot" type="ColorRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin/CardContent"]
+custom_minimum_size = Vector2(40, 34)
+layout_mode = 2
+color = Color(0.44, 0.62, 0.8, 0.46)
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin/CardContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Reward"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TypeLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin/CardContent"]
+layout_mode = 2
+text = "Type"
+horizontal_alignment = 1
+
+[node name="DescriptionLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin/CardContent"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Description"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="SelectButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin/CardContent"]
+layout_mode = 2
+text = "Select"
+
+[node name="Card3" type="PanelContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow"]
+custom_minimum_size = Vector2(280, 190)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="CardMargin" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="CardContent" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconSlot" type="ColorRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin/CardContent"]
+custom_minimum_size = Vector2(40, 34)
+layout_mode = 2
+color = Color(0.44, 0.62, 0.8, 0.46)
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin/CardContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Reward"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TypeLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin/CardContent"]
+layout_mode = 2
+text = "Type"
+horizontal_alignment = 1
+
+[node name="DescriptionLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin/CardContent"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Description"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="SelectButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin/CardContent"]
+layout_mode = 2
+text = "Select"

@@ -118,10 +118,19 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 	private double _fireCooldownRemaining;
 	private double _fireAnimationTime;
 	private Vector2 _currentFireDirection = Vector2.Right;
+	private float _baseFireCooldownSeconds;
+	private int _baseDamage;
+	private int _baseProjectileCount;
 
 	public override void _Ready()
 	{
 		_random.Randomize();
+		if (Config is null)
+		{
+			_baseFireCooldownSeconds = Mathf.Max(0.01f, FireCooldownSeconds);
+			_baseDamage = Mathf.Max(1, Damage);
+			_baseProjectileCount = Mathf.Max(1, ProjectileCount);
+		}
 		Sprite = GetNodeOrNull<Sprite2D>(SpritePath);
 		Muzzle = GetNodeOrNull<Marker2D>(MuzzlePath);
 
@@ -142,9 +151,9 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 	protected override void ApplyConfig(WeaponConfig config)
 	{
 		FireMode = config.ProjectileFireMode;
-		FireCooldownSeconds = Mathf.Max(0.01f, config.FireCooldownSeconds);
-		Damage = Mathf.Max(1, config.Damage);
-		ProjectileCount = Mathf.Max(1, config.ProjectileCount);
+		_baseFireCooldownSeconds = Mathf.Max(0.01f, config.FireCooldownSeconds);
+		_baseDamage = Mathf.Max(1, config.Damage);
+		_baseProjectileCount = Mathf.Max(1, config.ProjectileCount);
 
 		if (!string.IsNullOrWhiteSpace(config.BulletScenePath))
 		{
@@ -158,6 +167,21 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 				BulletScene = bulletScene;
 			}
 		}
+
+		RefreshEffectiveStats();
+	}
+
+	protected override void RefreshEffectiveStats()
+	{
+		int levelIndex = Mathf.Max(0, WeaponLevel - 1);
+		float damageMultiplier = PlayerStats?.WeaponDamageMultiplier ?? 1.0f;
+		float cooldownMultiplier = PlayerStats?.WeaponCooldownMultiplier ?? 1.0f;
+
+		Damage = Mathf.Max(1, Mathf.RoundToInt((_baseDamage + levelIndex) * damageMultiplier));
+		ProjectileCount = Mathf.Max(1, _baseProjectileCount + (levelIndex / 2));
+		FireCooldownSeconds = Mathf.Max(
+			0.05f,
+			_baseFireCooldownSeconds * Mathf.Pow(0.9f, levelIndex) * cooldownMultiplier);
 	}
 
 	protected override void UpdateWeapon(double delta)

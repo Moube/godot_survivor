@@ -12,11 +12,27 @@ public partial class MagicWandWeapon : ProjectileEmitterWeapon2D
 	public float OrbitStartAngleDegrees { get; set; } = -35.0f;
 
 	private float _orbitAngle;
+	private float _orbitSlotOffsetRadians;
 
 	public override void _Ready()
 	{
 		base._Ready();
-		_orbitAngle = Mathf.DegToRad(OrbitStartAngleDegrees);
+		_orbitAngle = GetOrbitStartAngleRadians();
+		UpdateOrbitPosition();
+	}
+
+	public override void SetInventorySlot(int slotIndex, int totalSlots)
+	{
+		int safeTotalSlots = Mathf.Max(1, totalSlots);
+		int safeSlotIndex = Mathf.Clamp(slotIndex, 0, safeTotalSlots - 1);
+		_orbitSlotOffsetRadians = Mathf.Tau * safeSlotIndex / safeTotalSlots;
+
+		if (!IsNodeReady())
+		{
+			return;
+		}
+
+		_orbitAngle = GetOrbitStartAngleRadians();
 		UpdateOrbitPosition();
 	}
 
@@ -24,6 +40,11 @@ public partial class MagicWandWeapon : ProjectileEmitterWeapon2D
 	{
 		_orbitAngle += Mathf.DegToRad(OrbitAngularSpeedDegrees) * (float)delta;
 		UpdateOrbitPosition();
+	}
+
+	private float GetOrbitStartAngleRadians()
+	{
+		return Mathf.DegToRad(OrbitStartAngleDegrees) + _orbitSlotOffsetRadians;
 	}
 
 	private void UpdateOrbitPosition()

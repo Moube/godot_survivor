@@ -1,14 +1,52 @@
 using Godot;
 using System.Collections.Generic;
 
+public sealed class WeaponInventoryEntry
+{
+	public WeaponInventoryEntry(WeaponConfig config, Weapon2D runtimeInstance)
+	{
+		Config = config;
+		RuntimeInstance = runtimeInstance;
+		WeaponId = config?.Id ?? string.Empty;
+	}
+
+	public string WeaponId { get; }
+
+	public WeaponConfig Config { get; }
+
+	public Weapon2D RuntimeInstance { get; }
+
+	public int Level => RuntimeInstance?.WeaponLevel ?? 1;
+
+	public string DisplayName => string.IsNullOrWhiteSpace(Config?.DisplayName) ? WeaponId : Config.DisplayName;
+
+	public int MaxLevel => Mathf.Max(1, Config?.MaxLevel ?? Level);
+}
+
 public partial class WeaponInventory : Node2D
 {
+	[Signal]
+	public delegate void InventoryChangedEventHandler();
+
 	[Export]
 	public int MaxWeaponCount { get; set; } = 4;
 
-	private readonly List<Weapon2D> _weapons = new();
+	private readonly List<WeaponInventoryEntry> _weapons = new();
+	private readonly List<Weapon2D> _weaponInstances = new();
+	private PlayerStats _playerStats;
 
-	public IReadOnlyList<Weapon2D> Weapons => _weapons;
+	public IReadOnlyList<WeaponInventoryEntry> Weapons => _weapons;
+
+	public IReadOnlyList<Weapon2D> WeaponInstances => _weaponInstances;
+
+	public void Initialize(PlayerStats playerStats)
+	{
+		_playerStats = playerStats;
+		foreach (WeaponInventoryEntry weapon in _weapons)
+		{
+			weapon.RuntimeInstance?.BindPlayerStats(_playerStats);
+		}
+	}
 
 	public bool AddWeapon(string weaponId, int level = 1)
 	{
@@ -50,20 +88,23 @@ public partial class WeaponInventory : Node2D
 			return false;
 		}
 
-		if (!weapon.InitializeFromConfig(config, level))
+		if (!weapon.InitializeFromConfig(config, level, _playerStats))
 		{
 			weapon.QueueFree();
 			return false;
 		}
 
 		AddChild(weapon);
-		_weapons.Add(weapon);
+		_weapons.Add(new WeaponInventoryEntry(config, weapon));
+		_weaponInstances.Add(weapon);
+		RefreshWeaponInventorySlots();
+		EmitSignal(SignalName.InventoryChanged);
 		return true;
 	}
 
 	public void ClearWeapons()
 	{
-		foreach (Weapon2D weapon in _weapons)
+		foreach (Weapon2D weapon in _weaponInstances)
 		{
 			if (IsInstanceValid(weapon))
 			{
@@ -72,28 +113,79 @@ public partial class WeaponInventory : Node2D
 		}
 
 		_weapons.Clear();
+		_weaponInstances.Clear();
+		EmitSignal(SignalName.InventoryChanged);
 	}
 
 	public bool HasWeapon(string weaponId)
 	{
-		foreach (Weapon2D weapon in _weapons)
+		return FindWeapon(weaponId) != null;
+	}
+
+	public bool CanAddWeapon(string weaponId)
+	{
+		return !string.IsNullOrWhiteSpace(weaponId)
+			&& _weapons.Count < MaxWeaponCount
+			&& !HasWeapon(weaponId)
+			&& GameConfigManager.Instance?.GetWeaponConfig(weaponId) != null;
+	}
+
+	public bool CanUpgradeWeapon(string weaponId)
+	{
+		WeaponInventoryEntry weapon = FindWeapon(weaponId);
+		return weapon != null && weapon.Level < weapon.MaxLevel;
+	}
+
+	public bool UpgradeWeapon(string weaponId)
+	{
+		WeaponInventoryEntry weapon = FindWeapon(weaponId);
+		if (weapon?.RuntimeInstance is null || !IsInstanceValid(weapon.RuntimeInstance))
+		{
+			return false;
+		}
+
+		if (!weapon.RuntimeInstance.TryUpgrade())
+		{
+			return false;
+		}
+
+		EmitSignal(SignalName.InventoryChanged);
+		return true;
+	}
+
+	private WeaponInventoryEntry FindWeapon(string weaponId)
+	{
+		foreach (WeaponInventoryEntry weapon in _weapons)
 		{
 			if (weapon.WeaponId == weaponId)
 			{
-				return true;
+				return weapon;
 			}
 		}
 
-		return false;
+		return null;
 	}
 
 	public void SetWeaponsEnabled(bool enabled)
 	{
-		foreach (Weapon2D weapon in _weapons)
+		foreach (Weapon2D weapon in _weaponInstances)
 		{
 			if (IsInstanceValid(weapon))
 			{
 				weapon.AutoFireEnabled = enabled;
+			}
+		}
+	}
+
+	private void RefreshWeaponInventorySlots()
+	{
+		int totalSlots = _weaponInstances.Count;
+		for (int i = 0; i < _weaponInstances.Count; i++)
+		{
+			Weapon2D weapon = _weaponInstances[i];
+			if (IsInstanceValid(weapon))
+			{
+				weapon.SetInventorySlot(i, totalSlots);
 			}
 		}
 	}

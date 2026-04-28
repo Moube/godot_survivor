@@ -27,6 +27,22 @@ public partial class CombatComponent : Node
 		IsDead = false;
 	}
 
+	public void SetMaxHealth(int maxHealth, bool healAddedHealth)
+	{
+		int previousMaxHealth = MaxHealth;
+		int previousCurrentHealth = CurrentHealth;
+
+		MaxHealth = Mathf.Max(1, maxHealth);
+		if (IsDead)
+		{
+			CurrentHealth = 0;
+			return;
+		}
+
+		int healthDelta = healAddedHealth ? Mathf.Max(0, MaxHealth - previousMaxHealth) : 0;
+		CurrentHealth = Mathf.Clamp(previousCurrentHealth + healthDelta, 1, MaxHealth);
+	}
+
 	public bool ApplyDamage(int amount)
 	{
 		if (IsDead || amount <= 0)

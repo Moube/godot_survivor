@@ -24,17 +24,22 @@ public partial class Level01 : Node2D
 	private CharacterBody2D _player;
 	private CombatComponent _playerCombat;
 	private SpawnDirector _spawnDirector;
+	private UpgradeManager _upgradeManager;
 	private LevelConfig _levelConfig;
+	private Hud _hud;
+	private Player _playerNode;
 
 	public override void _Ready()
 	{
 		_worldRoot = GetNode<Node2D>("World");
+		_hud = GetNodeOrNull<Hud>("Hud");
 		_levelConfig = GameConfigManager.Instance?.GetLevelConfig(LevelConfigId);
 
 		GameSession.Instance?.StartNewRun();
 		ExperienceController.Instance?.StartNewRun(_levelConfig?.ExperienceCurveId ?? string.Empty);
 		SpawnPlayer();
 		StartSpawnDirector();
+		StartUpgradeManager();
 		QueueRedraw();
 	}
 
@@ -67,8 +72,10 @@ public partial class Level01 : Node2D
 
 		if (player is Player playerNode)
 		{
+			_playerNode = playerNode;
 			playerNode.InitializeFromLevelConfig(_levelConfig);
 			playerNode.Died += OnPlayerDied;
+			_hud?.BindPlayer(playerNode);
 		}
 
 		_playerCombat = player.GetNodeOrNull<CombatComponent>("CombatComponent");
@@ -115,6 +122,35 @@ public partial class Level01 : Node2D
 			GlobalPosition,
 			SpawnAreaHalfExtents,
 			MinSpawnDistanceFromPlayer);
+	}
+
+	private void StartUpgradeManager()
+	{
+		if (_playerNode is null || !IsInstanceValid(_playerNode))
+		{
+			GD.PushError("Level01 cannot start UpgradeManager because player is missing.");
+			return;
+		}
+
+		if (_levelConfig is null)
+		{
+			GD.PushError("Level01 cannot start UpgradeManager because level config is missing.");
+			return;
+		}
+
+		if (_hud is null)
+		{
+			GD.PushError("Level01 cannot start UpgradeManager because HUD is missing.");
+			return;
+		}
+
+		_upgradeManager = new UpgradeManager
+		{
+			Name = "UpgradeManager",
+			ProcessMode = ProcessModeEnum.Always,
+		};
+		AddChild(_upgradeManager);
+		_upgradeManager.Initialize(_levelConfig, _playerNode, _hud);
 	}
 
 	private void OnPlayerDied()

@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://cqr7jtyubp4p6"]
+[gd_scene load_steps=9 format=3 uid="uid://cqr7jtyubp4p6"]
 
 [ext_resource type="Script" uid="uid://jlpa6r0dhhmf" path="res://scene/ui/Hud.cs" id="1_qfa3s"]
 [ext_resource type="Texture2D" uid="uid://d4fpuavq05j6d" path="res://asset/art/ui/ui_panel_basic.png" id="2_4d2qj"]
@@ -31,6 +31,30 @@ texture_margin_left = 80.0
 texture_margin_top = 80.0
 texture_margin_right = 80.0
 texture_margin_bottom = 80.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inventory_panel"]
+bg_color = Color(0.0705882, 0.0862745, 0.12549, 0.72)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.52, 0.62, 0.55)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inventory_slot"]
+bg_color = Color(0.137255, 0.0980392, 0.109804, 0.72)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.78, 0.78, 0.72, 0.24)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [node name="Hud" type="CanvasLayer" unique_id=1687969968]
 process_mode = 3
@@ -97,6 +121,281 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_fill")
 max_value = 5.0
 value = 5.0
 show_percentage = false
+
+[node name="LeftInventoryPanel" type="PanelContainer" parent="."]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 256.0
+offset_bottom = 280.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="LeftInventoryPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Content" type="VBoxContainer" parent="LeftInventoryPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="LeftInventoryPanel/MarginContainer/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Weapons"
+horizontal_alignment = 1
+
+[node name="WeaponSlots" type="VBoxContainer" parent="LeftInventoryPanel/MarginContainer/Content"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="WeaponSlot1" type="PanelContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
+
+[node name="SlotMargin" type="MarginContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot1"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 4
+
+[node name="SlotContent" type="HBoxContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot1/SlotMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconSlot" type="ColorRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot1/SlotMargin/SlotContent"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+color = Color(0.55, 0.72, 0.92, 0.45)
+
+[node name="TextLabel" type="Label" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot1/SlotMargin/SlotContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Empty"
+vertical_alignment = 1
+
+[node name="WeaponSlot2" type="PanelContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
+
+[node name="SlotMargin" type="MarginContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot2"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 4
+
+[node name="SlotContent" type="HBoxContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot2/SlotMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconSlot" type="ColorRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot2/SlotMargin/SlotContent"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+color = Color(0.55, 0.72, 0.92, 0.45)
+
+[node name="TextLabel" type="Label" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot2/SlotMargin/SlotContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Empty"
+vertical_alignment = 1
+
+[node name="WeaponSlot3" type="PanelContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
+
+[node name="SlotMargin" type="MarginContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot3"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 4
+
+[node name="SlotContent" type="HBoxContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot3/SlotMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconSlot" type="ColorRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot3/SlotMargin/SlotContent"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+color = Color(0.55, 0.72, 0.92, 0.45)
+
+[node name="TextLabel" type="Label" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot3/SlotMargin/SlotContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Empty"
+vertical_alignment = 1
+
+[node name="WeaponSlot4" type="PanelContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
+
+[node name="SlotMargin" type="MarginContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot4"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 4
+
+[node name="SlotContent" type="HBoxContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot4/SlotMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconSlot" type="ColorRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot4/SlotMargin/SlotContent"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+color = Color(0.55, 0.72, 0.92, 0.45)
+
+[node name="TextLabel" type="Label" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot4/SlotMargin/SlotContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Empty"
+vertical_alignment = 1
+
+[node name="RightInventoryPanel" type="PanelContainer" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -256.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 280.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="RightInventoryPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Content" type="VBoxContainer" parent="RightInventoryPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="RightInventoryPanel/MarginContainer/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Passives"
+horizontal_alignment = 1
+
+[node name="PassiveSlots" type="VBoxContainer" parent="RightInventoryPanel/MarginContainer/Content"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PassiveSlot1" type="PanelContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
+
+[node name="SlotMargin" type="MarginContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot1"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 4
+
+[node name="SlotContent" type="HBoxContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot1/SlotMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconSlot" type="ColorRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot1/SlotMargin/SlotContent"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+color = Color(0.84, 0.74, 0.46, 0.48)
+
+[node name="TextLabel" type="Label" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot1/SlotMargin/SlotContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Empty"
+vertical_alignment = 1
+
+[node name="PassiveSlot2" type="PanelContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
+
+[node name="SlotMargin" type="MarginContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot2"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 4
+
+[node name="SlotContent" type="HBoxContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot2/SlotMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconSlot" type="ColorRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot2/SlotMargin/SlotContent"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+color = Color(0.84, 0.74, 0.46, 0.48)
+
+[node name="TextLabel" type="Label" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot2/SlotMargin/SlotContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Empty"
+vertical_alignment = 1
+
+[node name="PassiveSlot3" type="PanelContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
+
+[node name="SlotMargin" type="MarginContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot3"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 4
+
+[node name="SlotContent" type="HBoxContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot3/SlotMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconSlot" type="ColorRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot3/SlotMargin/SlotContent"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+color = Color(0.84, 0.74, 0.46, 0.48)
+
+[node name="TextLabel" type="Label" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot3/SlotMargin/SlotContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Empty"
+vertical_alignment = 1
+
+[node name="PassiveSlot4" type="PanelContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
+
+[node name="SlotMargin" type="MarginContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot4"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 4
+
+[node name="SlotContent" type="HBoxContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot4/SlotMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconSlot" type="ColorRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot4/SlotMargin/SlotContent"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+color = Color(0.84, 0.74, 0.46, 0.48)
+
+[node name="TextLabel" type="Label" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot4/SlotMargin/SlotContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Empty"
+vertical_alignment = 1
 
 [node name="GameOverCenter" type="CenterContainer" parent="." unique_id=2027087495]
 anchors_preset = 15

@@ -11,6 +11,10 @@ public partial class Hud : CanvasLayer
 	private Control _gameOverPanel;
 	private Label _finalSurvivalTimeLabel;
 	private Button _restartButton;
+	private Label[] _weaponSlotLabels;
+	private Label[] _passiveSlotLabels;
+	private WeaponInventory _boundWeaponInventory;
+	private PassiveInventory _boundPassiveInventory;
 
 	public override void _Ready()
 	{
@@ -20,6 +24,8 @@ public partial class Hud : CanvasLayer
 		_gameOverPanel = GetNode<Control>("GameOverCenter/PanelContainer");
 		_finalSurvivalTimeLabel = GetNode<Label>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/FinalSurvivalTimeLabel");
 		_restartButton = GetNode<Button>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/RestartButton");
+		_weaponSlotLabels = LoadSlotLabels("LeftInventoryPanel/MarginContainer/Content/WeaponSlots", "WeaponSlot");
+		_passiveSlotLabels = LoadSlotLabels("RightInventoryPanel/MarginContainer/Content/PassiveSlots", "PassiveSlot");
 		_restartButton.Pressed += OnRestartButtonPressed;
 
 		if (GameSession.Instance is null)
@@ -44,10 +50,13 @@ public partial class Hud : CanvasLayer
 		OnRunTimeChanged(GameSession.Instance.ElapsedRunTime);
 		OnPlayerHealthChanged(GameSession.Instance.CurrentPlayerHealth, GameSession.Instance.MaxPlayerHealth);
 		SetGameOverVisible(GameSession.Instance.IsGameOver, GameSession.Instance.FinalSurvivalTime);
+		RefreshInventoryHud();
 	}
 
 	public override void _ExitTree()
 	{
+		UnbindInventorySignals();
+
 		if (GameSession.Instance != null)
 		{
 			GameSession.Instance.RunTimeChanged -= OnRunTimeChanged;
@@ -59,6 +68,26 @@ public partial class Hud : CanvasLayer
 		{
 			ExperienceController.Instance.ExperienceChanged -= OnExperienceChanged;
 		}
+	}
+
+	public void BindPlayer(Player player)
+	{
+		UnbindInventorySignals();
+
+		_boundWeaponInventory = player?.WeaponInventory;
+		_boundPassiveInventory = player?.PassiveInventory;
+
+		if (_boundWeaponInventory != null)
+		{
+			_boundWeaponInventory.InventoryChanged += RefreshInventoryHud;
+		}
+
+		if (_boundPassiveInventory != null)
+		{
+			_boundPassiveInventory.InventoryChanged += RefreshInventoryHud;
+		}
+
+		RefreshInventoryHud();
 	}
 
 	private void OnRunTimeChanged(double elapsedRunTime)
@@ -100,6 +129,91 @@ public partial class Hud : CanvasLayer
 	{
 		GameSession.Instance?.StartNewRun();
 		GetTree().ChangeSceneToFile(LevelScenePath);
+	}
+
+	private void RefreshInventoryHud()
+	{
+		RefreshWeaponSlots();
+		RefreshPassiveSlots();
+	}
+
+	private void RefreshWeaponSlots()
+	{
+		if (_weaponSlotLabels is null)
+		{
+			return;
+		}
+
+		for (int i = 0; i < _weaponSlotLabels.Length; i++)
+		{
+			if (_weaponSlotLabels[i] is null)
+			{
+				continue;
+			}
+
+			if (_boundWeaponInventory != null && i < _boundWeaponInventory.Weapons.Count)
+			{
+				WeaponInventoryEntry weapon = _boundWeaponInventory.Weapons[i];
+				_weaponSlotLabels[i].Text = $"{weapon.DisplayName} Lv.{weapon.Level}";
+			}
+			else
+			{
+				_weaponSlotLabels[i].Text = "Empty";
+			}
+		}
+	}
+
+	private void RefreshPassiveSlots()
+	{
+		if (_passiveSlotLabels is null)
+		{
+			return;
+		}
+
+		for (int i = 0; i < _passiveSlotLabels.Length; i++)
+		{
+			if (_passiveSlotLabels[i] is null)
+			{
+				continue;
+			}
+
+			if (_boundPassiveInventory != null && i < _boundPassiveInventory.Passives.Count)
+			{
+				PassiveInventoryEntry passive = _boundPassiveInventory.Passives[i];
+				_passiveSlotLabels[i].Text = $"{passive.DisplayName} Lv.{passive.Level}";
+			}
+			else
+			{
+				_passiveSlotLabels[i].Text = "Empty";
+			}
+		}
+	}
+
+	private Label[] LoadSlotLabels(string rootPath, string slotNamePrefix)
+	{
+		Label[] labels = new Label[4];
+		for (int i = 0; i < labels.Length; i++)
+		{
+			string path = $"{rootPath}/{slotNamePrefix}{i + 1}/SlotMargin/SlotContent/TextLabel";
+			labels[i] = GetNodeOrNull<Label>(path);
+		}
+
+		return labels;
+	}
+
+	private void UnbindInventorySignals()
+	{
+		if (_boundWeaponInventory != null)
+		{
+			_boundWeaponInventory.InventoryChanged -= RefreshInventoryHud;
+			_boundWeaponInventory = null;
+		}
+
+		if (_boundPassiveInventory != null)
+		{
+			_boundPassiveInventory.InventoryChanged -= RefreshInventoryHud;
+			_boundPassiveInventory = null;
+		}
 	}
 
 	private static string FormatRunTime(double elapsedSeconds)
