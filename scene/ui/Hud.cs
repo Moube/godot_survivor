@@ -3,14 +3,14 @@ using System;
 
 public partial class Hud : CanvasLayer
 {
-	private const string LevelScenePath = "res://scene/level/Level01.tscn";
+	private const string MainScenePath = "res://scene/main/Main.tscn";
 
 	private ProgressBar _healthBar;
 	private ProgressBar _experienceBar;
 	private Label _runTimeLabel;
 	private Control _gameOverPanel;
 	private Label _finalSurvivalTimeLabel;
-	private Button _restartButton;
+	private Button _confirmButton;
 	private Label[] _weaponSlotLabels;
 	private Label[] _passiveSlotLabels;
 	private WeaponInventory _boundWeaponInventory;
@@ -23,10 +23,10 @@ public partial class Hud : CanvasLayer
 		_runTimeLabel = GetNode<Label>("TopCenter/RunTimePanel/RunTimeMargin/RunTimeLabel");
 		_gameOverPanel = GetNode<Control>("GameOverCenter/PanelContainer");
 		_finalSurvivalTimeLabel = GetNode<Label>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/FinalSurvivalTimeLabel");
-		_restartButton = GetNode<Button>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/RestartButton");
+		_confirmButton = GetNode<Button>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/ConfirmButton");
 		_weaponSlotLabels = LoadSlotLabels("LeftInventoryPanel/MarginContainer/Content/WeaponSlots", "WeaponSlot");
 		_passiveSlotLabels = LoadSlotLabels("RightInventoryPanel/MarginContainer/Content/PassiveSlots", "PassiveSlot");
-		_restartButton.Pressed += OnRestartButtonPressed;
+		_confirmButton.Pressed += OnConfirmButtonPressed;
 
 		if (GameSession.Instance is null)
 		{
@@ -125,10 +125,10 @@ public partial class Hud : CanvasLayer
 		_finalSurvivalTimeLabel.Text = $"Survived {FormatRunTime(finalSurvivalTime)}";
 	}
 
-	private void OnRestartButtonPressed()
+	private void OnConfirmButtonPressed()
 	{
-		GameSession.Instance?.StartNewRun();
-		GetTree().ChangeSceneToFile(LevelScenePath);
+		GetTree().Paused = false;
+		GetTree().ChangeSceneToFile(MainScenePath);
 	}
 
 	private void RefreshInventoryHud()

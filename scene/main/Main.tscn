@@ -1,6 +1,18 @@
-[gd_scene format=3 uid="uid://bmu70lgbcxdfx"]
+[gd_scene load_steps=3 format=3 uid="uid://bmu70lgbcxdfx"]
 
 [ext_resource type="Script" uid="uid://bhcyoymhtpk75" path="res://scene/main/Main.cs" id="1_8i281"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_panel"]
+bg_color = Color(0.095, 0.105, 0.125, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.58, 0.66, 0.72, 0.32)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [node name="Main" type="Control" unique_id=1738038492]
 layout_mode = 3
@@ -20,7 +32,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.0705882, 0.0862745, 0.12549, 1)
 
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=451438121]
+[node name="MainMenuPanel" type="CenterContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,25 +40,115 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=1359486035]
+[node name="PanelContainer" type="PanelContainer" parent="MainMenuPanel"]
+custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_menu_panel")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer" unique_id=2049302522]
+[node name="MarginContainer" type="MarginContainer" parent="MainMenuPanel/PanelContainer"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/VBoxContainer" unique_id=588011213]
+[node name="Content" type="VBoxContainer" parent="MainMenuPanel/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="MainMenuPanel/PanelContainer/MarginContainer/Content"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
-text = "Top-Down Shooter Demo"
+text = "Arcane Survivor"
 horizontal_alignment = 1
 
-[node name="HintLabel" type="Label" parent="CenterContainer/PanelContainer/VBoxContainer" unique_id=1865134852]
+[node name="StartGameButton" type="Button" parent="MainMenuPanel/PanelContainer/MarginContainer/Content"]
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-text = "Move: WASD
-Fire: Left Mouse (later phase)"
+text = "Start Game"
+
+[node name="SettingsButton" type="Button" parent="MainMenuPanel/PanelContainer/MarginContainer/Content"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Settings"
+
+[node name="QuitButton" type="Button" parent="MainMenuPanel/PanelContainer/MarginContainer/Content"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Quit"
+
+[node name="LevelSelectPanel" type="CenterContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="LevelSelectPanel"]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_menu_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="LevelSelectPanel/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="Content" type="VBoxContainer" parent="LevelSelectPanel/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="LevelSelectPanel/PanelContainer/MarginContainer/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Select Level"
 horizontal_alignment = 1
 
-[node name="StartButton" type="Button" parent="CenterContainer/PanelContainer/VBoxContainer" unique_id=1206648013]
+[node name="LevelButtonList" type="VBoxContainer" parent="LevelSelectPanel/PanelContainer/MarginContainer/Content"]
 layout_mode = 2
-text = "Start"
+theme_override_constants/separation = 8
+
+[node name="BackButton" type="Button" parent="LevelSelectPanel/PanelContainer/MarginContainer/Content"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "Back"
+
+[node name="SettingsPanel" type="CenterContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="SettingsPanel"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_menu_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="SettingsPanel/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="Content" type="VBoxContainer" parent="SettingsPanel/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="SettingsPanel/PanelContainer/MarginContainer/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="BackButton" type="Button" parent="SettingsPanel/PanelContainer/MarginContainer/Content"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "Back"

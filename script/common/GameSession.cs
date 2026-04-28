@@ -24,6 +24,8 @@ public partial class GameSession : Node
 
 	public double FinalSurvivalTime { get; private set; }
 
+	public string SelectedLevelConfigId { get; private set; } = string.Empty;
+
 	public int CurrentPlayerHealth { get; private set; }
 
 	public int MaxPlayerHealth { get; private set; }
@@ -51,6 +53,11 @@ public partial class GameSession : Node
 		GetTree().Paused = false;
 		EmitSignal(SignalName.ScoreChanged, Score);
 		EmitSignal(SignalName.RunTimeChanged, ElapsedRunTime);
+	}
+
+	public void SelectLevelConfig(string levelConfigId)
+	{
+		SelectedLevelConfigId = levelConfigId?.StripEdges() ?? string.Empty;
 	}
 
 	public void AdvanceRunTime(double deltaSeconds)

@@ -1,8 +1,6 @@
-[gd_scene load_steps=9 format=3 uid="uid://cqr7jtyubp4p6"]
+[gd_scene load_steps=7 format=3 uid="uid://cqr7jtyubp4p6"]
 
 [ext_resource type="Script" uid="uid://jlpa6r0dhhmf" path="res://scene/ui/Hud.cs" id="1_qfa3s"]
-[ext_resource type="Texture2D" uid="uid://d4fpuavq05j6d" path="res://asset/art/ui/ui_panel_basic.png" id="2_4d2qj"]
-[ext_resource type="Texture2D" uid="uid://buetf1wh35ahl" path="res://asset/art/ui/ui_panel_score.png" id="3_17jov"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_background"]
 bg_color = Color(0.137255, 0.0980392, 0.109804, 0.85)
@@ -24,13 +22,6 @@ corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_panel"]
-texture = ExtResource("2_4d2qj")
-texture_margin_left = 80.0
-texture_margin_top = 80.0
-texture_margin_right = 80.0
-texture_margin_bottom = 80.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inventory_panel"]
 bg_color = Color(0.0705882, 0.0862745, 0.12549, 0.72)
@@ -70,20 +61,14 @@ offset_right = 160.0
 offset_bottom = 104.0
 grow_horizontal = 2
 
-[node name="RunTimePanel" type="TextureRect" parent="TopCenter" unique_id=2103433174]
+[node name="RunTimePanel" type="PanelContainer" parent="TopCenter" unique_id=2103433174]
 custom_minimum_size = Vector2(320, 80)
 layout_mode = 2
 mouse_filter = 2
-texture = ExtResource("3_17jov")
-expand_mode = 1
-stretch_mode = 5
+theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_panel")
 
 [node name="RunTimeMargin" type="CenterContainer" parent="TopCenter/RunTimePanel" unique_id=914672544]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 
 [node name="RunTimeLabel" type="Label" parent="TopCenter/RunTimePanel/RunTimeMargin" unique_id=1663419938]
 layout_mode = 2
@@ -408,7 +393,7 @@ grow_vertical = 2
 visible = false
 custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxTexture_panel")
+theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_panel")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="GameOverCenter/PanelContainer" unique_id=11597252]
 layout_mode = 2
@@ -436,6 +421,6 @@ layout_mode = 2
 text = "Survived 00:00"
 horizontal_alignment = 1
 
-[node name="RestartButton" type="Button" parent="GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content" unique_id=1215819195]
+[node name="ConfirmButton" type="Button" parent="GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content" unique_id=1215819195]
 layout_mode = 2
-text = "Restart"
+text = "Confirm"

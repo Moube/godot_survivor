@@ -33,7 +33,9 @@ public partial class Level01 : Node2D
 	{
 		_worldRoot = GetNode<Node2D>("World");
 		_hud = GetNodeOrNull<Hud>("Hud");
-		_levelConfig = GameConfigManager.Instance?.GetLevelConfig(LevelConfigId);
+		string selectedLevelConfigId = GameSession.Instance?.SelectedLevelConfigId;
+		string levelConfigId = string.IsNullOrWhiteSpace(selectedLevelConfigId) ? LevelConfigId : selectedLevelConfigId;
+		_levelConfig = GameConfigManager.Instance?.GetLevelConfig(levelConfigId);
 
 		GameSession.Instance?.StartNewRun();
 		ExperienceController.Instance?.StartNewRun(_levelConfig?.ExperienceCurveId ?? string.Empty);
