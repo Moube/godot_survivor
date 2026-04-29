@@ -8,16 +8,27 @@ public partial class Main : Control
 	private const string ButtonHoverTexturePath = "res://asset/art/ui/ui_main_menu_button_hover.png";
 	private const string ButtonPressedTexturePath = "res://asset/art/ui/ui_main_menu_button_pressed.png";
 	private const string ButtonDisabledTexturePath = "res://asset/art/ui/ui_main_menu_button_disabled.png";
+	private const string LevelSelectPanelTexturePath = "res://asset/art/ui/ui_level_select_panel.png";
+	private const string LevelSelectButtonNormalTexturePath = "res://asset/art/ui/ui_level_select_button_normal.png";
+	private const string LevelSelectButtonHoverTexturePath = "res://asset/art/ui/ui_level_select_button_hover.png";
+	private const string LevelSelectButtonPressedTexturePath = "res://asset/art/ui/ui_level_select_button_pressed.png";
+	private const string LevelSelectButtonDisabledTexturePath = "res://asset/art/ui/ui_level_select_button_disabled.png";
 	private const float MainMenuPanelTextureMarginX = 24.0f;
 	private const float MainMenuPanelTextureMarginY = 24.0f;
 	private const float MenuButtonTextureMarginX = 36.0f;
 	private const float MenuButtonTextureMarginY = 12.0f;
+	private const float LevelSelectPanelTextureMarginX = 52.0f;
+	private const float LevelSelectPanelTextureMarginY = 52.0f;
+	private const float LevelSelectButtonTextureMarginX = 34.0f;
+	private const float LevelSelectButtonTextureMarginY = 14.0f;
+	private static readonly Vector2 LevelSelectButtonSize = new(220.0f, 52.0f);
 
 	private Control _mainMenuPanel;
 	private PanelContainer _mainMenuPanelContainer;
 	private Control _levelSelectPanel;
+	private PanelContainer _levelSelectPanelContainer;
 	private Control _settingsPanel;
-	private VBoxContainer _levelButtonList;
+	private GridContainer _levelButtonGrid;
 	private Button _startGameButton;
 	private Button _settingsButton;
 	private Button _quitButton;
@@ -27,6 +38,10 @@ public partial class Main : Control
 	private StyleBoxTexture _buttonHoverStyle;
 	private StyleBoxTexture _buttonPressedStyle;
 	private StyleBoxTexture _buttonDisabledStyle;
+	private StyleBoxTexture _levelButtonNormalStyle;
+	private StyleBoxTexture _levelButtonHoverStyle;
+	private StyleBoxTexture _levelButtonPressedStyle;
+	private StyleBoxTexture _levelButtonDisabledStyle;
 
 	public override void _Ready()
 	{
@@ -35,12 +50,13 @@ public partial class Main : Control
 		_mainMenuPanel = GetNode<Control>("MainMenuPanel");
 		_mainMenuPanelContainer = GetNode<PanelContainer>("MainMenuPanel/PanelContainer");
 		_levelSelectPanel = GetNode<Control>("LevelSelectPanel");
+		_levelSelectPanelContainer = GetNode<PanelContainer>("LevelSelectPanel/PanelContainer");
 		_settingsPanel = GetNode<Control>("SettingsPanel");
-		_levelButtonList = GetNode<VBoxContainer>("LevelSelectPanel/PanelContainer/MarginContainer/Content/LevelButtonList");
+		_levelButtonGrid = GetNode<GridContainer>("LevelSelectPanel/PanelContainer/MarginContainer/Content/LevelScrollContainer/LevelButtonGrid");
 		_startGameButton = GetNode<Button>("MainMenuPanel/PanelContainer/PanelLayout/ButtonList/StartGameButton");
 		_settingsButton = GetNode<Button>("MainMenuPanel/PanelContainer/PanelLayout/ButtonList/SettingsButton");
 		_quitButton = GetNode<Button>("MainMenuPanel/PanelContainer/PanelLayout/ButtonList/QuitButton");
-		_levelSelectBackButton = GetNode<Button>("LevelSelectPanel/PanelContainer/MarginContainer/Content/BackButton");
+		_levelSelectBackButton = GetNode<Button>("LevelSelectPanel/PanelContainer/MarginContainer/Content/BackButtonCenter/BackButton");
 		_settingsBackButton = GetNode<Button>("SettingsPanel/PanelContainer/MarginContainer/Content/BackButton");
 
 		_startGameButton.Pressed += OnStartGamePressed;
@@ -55,6 +71,9 @@ public partial class Main : Control
 		ApplyMenuButtonStyle(_settingsButton);
 		ApplyMenuButtonStyle(_quitButton);
 		ApplyMenuButtonStyle(_settingsBackButton);
+		ApplyLevelSelectPanelStyle();
+		LoadLevelSelectButtonStyles();
+		ApplyLevelSelectButtonStyle(_levelSelectBackButton);
 
 		PopulateLevelButtons();
 		ShowMainMenu();
@@ -62,9 +81,9 @@ public partial class Main : Control
 
 	private void PopulateLevelButtons()
 	{
-		foreach (Node child in _levelButtonList.GetChildren())
+		foreach (Node child in _levelButtonGrid.GetChildren())
 		{
-			_levelButtonList.RemoveChild(child);
+			_levelButtonGrid.RemoveChild(child);
 			child.QueueFree();
 		}
 
@@ -99,10 +118,11 @@ public partial class Main : Control
 		Button button = new()
 		{
 			Text = string.IsNullOrWhiteSpace(level.DisplayName) ? level.Id : level.DisplayName,
-			CustomMinimumSize = new Vector2(280.0f, 42.0f),
+			CustomMinimumSize = LevelSelectButtonSize,
 		};
+		ApplyLevelSelectButtonStyle(button);
 		button.Pressed += () => StartLevel(scenePath, levelConfigId);
-		_levelButtonList.AddChild(button);
+		_levelButtonGrid.AddChild(button);
 	}
 
 	private void AddFallbackLevelButton()
@@ -110,10 +130,11 @@ public partial class Main : Control
 		Button button = new()
 		{
 			Text = "Level 01",
-			CustomMinimumSize = new Vector2(280.0f, 42.0f),
+			CustomMinimumSize = LevelSelectButtonSize,
 		};
+		ApplyLevelSelectButtonStyle(button);
 		button.Pressed += () => StartLevel(FallbackLevelScenePath, "level_01");
-		_levelButtonList.AddChild(button);
+		_levelButtonGrid.AddChild(button);
 	}
 
 	private void OnStartGamePressed()
@@ -159,6 +180,14 @@ public partial class Main : Control
 		_buttonDisabledStyle = CreateMenuButtonStyle(ButtonDisabledTexturePath);
 	}
 
+	private void LoadLevelSelectButtonStyles()
+	{
+		_levelButtonNormalStyle = CreateLevelSelectButtonStyle(LevelSelectButtonNormalTexturePath);
+		_levelButtonHoverStyle = CreateLevelSelectButtonStyle(LevelSelectButtonHoverTexturePath);
+		_levelButtonPressedStyle = CreateLevelSelectButtonStyle(LevelSelectButtonPressedTexturePath);
+		_levelButtonDisabledStyle = CreateLevelSelectButtonStyle(LevelSelectButtonDisabledTexturePath);
+	}
+
 	private void ApplyMainMenuPanelStyle()
 	{
 		StyleBoxTexture panelStyle = CreateTextureStyle(MainMenuPanelTexturePath, MainMenuPanelTextureMarginX, MainMenuPanelTextureMarginY);
@@ -170,9 +199,25 @@ public partial class Main : Control
 		_mainMenuPanelContainer.AddThemeStyleboxOverride("panel", panelStyle);
 	}
 
+	private void ApplyLevelSelectPanelStyle()
+	{
+		StyleBoxTexture panelStyle = CreateTextureStyle(LevelSelectPanelTexturePath, LevelSelectPanelTextureMarginX, LevelSelectPanelTextureMarginY);
+		if (panelStyle is null)
+		{
+			return;
+		}
+
+		_levelSelectPanelContainer.AddThemeStyleboxOverride("panel", panelStyle);
+	}
+
 	private static StyleBoxTexture CreateMenuButtonStyle(string texturePath)
 	{
 		return CreateTextureStyle(texturePath, MenuButtonTextureMarginX, MenuButtonTextureMarginY);
+	}
+
+	private static StyleBoxTexture CreateLevelSelectButtonStyle(string texturePath)
+	{
+		return CreateTextureStyle(texturePath, LevelSelectButtonTextureMarginX, LevelSelectButtonTextureMarginY);
 	}
 
 	private static StyleBoxTexture CreateTextureStyle(string texturePath, float textureMarginX, float textureMarginY)
@@ -180,7 +225,7 @@ public partial class Main : Control
 		Texture2D texture = ResourceLoader.Load<Texture2D>(texturePath);
 		if (texture is null)
 		{
-			GD.PushWarning($"Unable to load main menu button texture: {texturePath}");
+			GD.PushWarning($"Unable to load UI texture: {texturePath}");
 			return null;
 		}
 
@@ -211,6 +256,25 @@ public partial class Main : Control
 		button.AddThemeColorOverride("font_hover_color", new Color(0.16f, 0.08f, 0.03f));
 		button.AddThemeColorOverride("font_pressed_color", new Color(0.11f, 0.06f, 0.02f));
 		button.AddThemeColorOverride("font_disabled_color", new Color(0.34f, 0.30f, 0.25f));
+		button.AddThemeConstantOverride("outline_size", 0);
+	}
+
+	private void ApplyLevelSelectButtonStyle(Button button)
+	{
+		if (button is null || _levelButtonNormalStyle is null)
+		{
+			return;
+		}
+
+		button.AddThemeStyleboxOverride("normal", _levelButtonNormalStyle);
+		button.AddThemeStyleboxOverride("hover", _levelButtonHoverStyle ?? _levelButtonNormalStyle);
+		button.AddThemeStyleboxOverride("pressed", _levelButtonPressedStyle ?? _levelButtonNormalStyle);
+		button.AddThemeStyleboxOverride("disabled", _levelButtonDisabledStyle ?? _levelButtonNormalStyle);
+		button.AddThemeStyleboxOverride("focus", _levelButtonHoverStyle ?? _levelButtonNormalStyle);
+		button.AddThemeColorOverride("font_color", new Color(0.18f, 0.09f, 0.035f));
+		button.AddThemeColorOverride("font_hover_color", new Color(0.13f, 0.065f, 0.025f));
+		button.AddThemeColorOverride("font_pressed_color", new Color(0.09f, 0.045f, 0.015f));
+		button.AddThemeColorOverride("font_disabled_color", new Color(0.36f, 0.31f, 0.25f));
 		button.AddThemeConstantOverride("outline_size", 0);
 	}
 }
