@@ -18,6 +18,8 @@ public sealed class WeaponConfig : IGameConfig
 	public string WeaponTexturePath { get; set; } = string.Empty;
 	public string BulletTexturePath { get; set; } = string.Empty;
 	public string IconTexturePath { get; set; } = string.Empty;
+	public float MuzzleLocalPositionX { get; set; } = 15.0f;
+	public float MuzzleLocalPositionY { get; set; }
 	public ProjectileFireMode ProjectileFireMode { get; set; } = ProjectileFireMode.MouseDirection;
 	public float FireCooldownSeconds { get; set; } = 0.5f;
 	public int Damage { get; set; } = 1;

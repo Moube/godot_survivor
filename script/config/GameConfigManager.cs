@@ -137,6 +137,8 @@ public partial class GameConfigManager : Node
 				WeaponTexturePath = GetString(row, "weapon_texture_path", context, required: false),
 				BulletTexturePath = GetString(row, "bullet_texture_path", context, required: false),
 				IconTexturePath = GetString(row, "icon_texture_path", context, required: false),
+				MuzzleLocalPositionX = GetFloat(row, "muzzle_local_position_x", 15.0f, context),
+				MuzzleLocalPositionY = GetFloat(row, "muzzle_local_position_y", 0.0f, context),
 				ProjectileFireMode = GetEnum(row, "projectile_fire_mode", ProjectileFireMode.MouseDirection, context),
 				FireCooldownSeconds = GetFloat(row, "fire_cooldown_seconds", 0.5f, context),
 				Damage = GetInt(row, "damage", 1, context),

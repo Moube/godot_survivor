@@ -114,6 +114,7 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 	private readonly RandomNumberGenerator _random = new();
 	private Node2D _dropShadowAnchor;
 	private Texture2D _bulletTextureOverride;
+	private Vector2 _configuredMuzzleLocalPosition = new(15.0f, 0.0f);
 	private bool _isPlayingFireAnimation;
 	private bool _projectileSpawnedThisCycle;
 	private double _fireCooldownRemaining;
@@ -142,6 +143,7 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 		}
 
 		ApplyConfiguredVisuals();
+		ApplyConfiguredMuzzlePosition();
 		SetupDropShadow();
 	}
 
@@ -156,6 +158,7 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 		_baseFireCooldownSeconds = Mathf.Max(0.01f, config.FireCooldownSeconds);
 		_baseDamage = Mathf.Max(1, config.Damage);
 		_baseProjectileCount = Mathf.Max(1, config.ProjectileCount);
+		_configuredMuzzleLocalPosition = new Vector2(config.MuzzleLocalPositionX, config.MuzzleLocalPositionY);
 
 		if (!string.IsNullOrWhiteSpace(config.BulletScenePath))
 		{
@@ -172,6 +175,7 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 
 		_bulletTextureOverride = LoadTexture(config.BulletTexturePath, $"weapon '{config.Id}' bullet texture");
 		ApplyConfiguredVisuals();
+		ApplyConfiguredMuzzlePosition();
 		RefreshEffectiveStats();
 	}
 
@@ -208,7 +212,7 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 
 	protected virtual Vector2 GetAimOrigin()
 	{
-		return Muzzle?.GlobalPosition ?? GlobalPosition;
+		return GetConfiguredMuzzleGlobalPosition();
 	}
 
 	private void SetupDropShadow()
@@ -505,12 +509,6 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 			return;
 		}
 
-		if (Muzzle == null)
-		{
-			GD.PushWarning($"{Name} cannot fire because Muzzle is missing.");
-			return;
-		}
-
 		Node bulletInstance = BulletScene.Instantiate();
 		if (bulletInstance is not Bullet bullet)
 		{
@@ -527,7 +525,7 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 		Node parent = GetTree().CurrentScene ?? GetTree().Root;
 		parent.AddChild(bullet);
 
-		bullet.GlobalPosition = Muzzle.GlobalPosition;
+		bullet.GlobalPosition = GetConfiguredMuzzleGlobalPosition();
 		bullet.Damage = Damage;
 		bullet.Initialize(direction);
 	}
@@ -547,6 +545,19 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 
 		Sprite.Hframes = Mathf.Max(1, FireAnimationFrameCount);
 		Sprite.Frame = IdleFrame;
+	}
+
+	private void ApplyConfiguredMuzzlePosition()
+	{
+		if (Muzzle != null)
+		{
+			Muzzle.Position = _configuredMuzzleLocalPosition;
+		}
+	}
+
+	private Vector2 GetConfiguredMuzzleGlobalPosition()
+	{
+		return ToGlobal(_configuredMuzzleLocalPosition);
 	}
 
 	private static Texture2D LoadTexture(string path, string context)
