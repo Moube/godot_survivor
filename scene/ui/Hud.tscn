@@ -110,8 +110,8 @@ show_percentage = false
 [node name="LeftInventoryPanel" type="PanelContainer" parent="."]
 offset_left = 24.0
 offset_top = 24.0
-offset_right = 256.0
-offset_bottom = 280.0
+offset_right = 254.0
+offset_bottom = 126.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_panel")
 
 [node name="MarginContainer" type="MarginContainer" parent="LeftInventoryPanel"]
@@ -131,117 +131,123 @@ theme_override_font_sizes/font_size = 16
 text = "Weapons"
 horizontal_alignment = 1
 
-[node name="WeaponSlots" type="VBoxContainer" parent="LeftInventoryPanel/MarginContainer/Content"]
+[node name="WeaponSlots" type="GridContainer" parent="LeftInventoryPanel/MarginContainer/Content"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 4
 
 [node name="WeaponSlot1" type="PanelContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots"]
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
 
 [node name="SlotMargin" type="MarginContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot1"]
 layout_mode = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
 
 [node name="SlotContent" type="HBoxContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot1/SlotMargin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 0
 
 [node name="IconSlot" type="TextureRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot1/SlotMargin/SlotContent"]
-custom_minimum_size = Vector2(24, 24)
+custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot1/SlotMargin/SlotContent"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Empty"
 vertical_alignment = 1
 
 [node name="WeaponSlot2" type="PanelContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots"]
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
 
 [node name="SlotMargin" type="MarginContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot2"]
 layout_mode = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
 
 [node name="SlotContent" type="HBoxContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot2/SlotMargin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 0
 
 [node name="IconSlot" type="TextureRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot2/SlotMargin/SlotContent"]
-custom_minimum_size = Vector2(24, 24)
+custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot2/SlotMargin/SlotContent"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Empty"
 vertical_alignment = 1
 
 [node name="WeaponSlot3" type="PanelContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots"]
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
 
 [node name="SlotMargin" type="MarginContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot3"]
 layout_mode = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
 
 [node name="SlotContent" type="HBoxContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot3/SlotMargin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 0
 
 [node name="IconSlot" type="TextureRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot3/SlotMargin/SlotContent"]
-custom_minimum_size = Vector2(24, 24)
+custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot3/SlotMargin/SlotContent"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Empty"
 vertical_alignment = 1
 
 [node name="WeaponSlot4" type="PanelContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots"]
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
 
 [node name="SlotMargin" type="MarginContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot4"]
 layout_mode = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
 
 [node name="SlotContent" type="HBoxContainer" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot4/SlotMargin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 0
 
 [node name="IconSlot" type="TextureRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot4/SlotMargin/SlotContent"]
-custom_minimum_size = Vector2(24, 24)
+custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot4/SlotMargin/SlotContent"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Empty"
@@ -250,10 +256,10 @@ vertical_alignment = 1
 [node name="RightInventoryPanel" type="PanelContainer" parent="."]
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -256.0
+offset_left = -254.0
 offset_top = 24.0
 offset_right = -24.0
-offset_bottom = 280.0
+offset_bottom = 126.0
 grow_horizontal = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_panel")
 
@@ -274,117 +280,123 @@ theme_override_font_sizes/font_size = 16
 text = "Passives"
 horizontal_alignment = 1
 
-[node name="PassiveSlots" type="VBoxContainer" parent="RightInventoryPanel/MarginContainer/Content"]
+[node name="PassiveSlots" type="GridContainer" parent="RightInventoryPanel/MarginContainer/Content"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 4
 
 [node name="PassiveSlot1" type="PanelContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots"]
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
 
 [node name="SlotMargin" type="MarginContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot1"]
 layout_mode = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
 
 [node name="SlotContent" type="HBoxContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot1/SlotMargin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 0
 
 [node name="IconSlot" type="TextureRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot1/SlotMargin/SlotContent"]
-custom_minimum_size = Vector2(24, 24)
+custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot1/SlotMargin/SlotContent"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Empty"
 vertical_alignment = 1
 
 [node name="PassiveSlot2" type="PanelContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots"]
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
 
 [node name="SlotMargin" type="MarginContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot2"]
 layout_mode = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
 
 [node name="SlotContent" type="HBoxContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot2/SlotMargin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 0
 
 [node name="IconSlot" type="TextureRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot2/SlotMargin/SlotContent"]
-custom_minimum_size = Vector2(24, 24)
+custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot2/SlotMargin/SlotContent"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Empty"
 vertical_alignment = 1
 
 [node name="PassiveSlot3" type="PanelContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots"]
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
 
 [node name="SlotMargin" type="MarginContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot3"]
 layout_mode = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
 
 [node name="SlotContent" type="HBoxContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot3/SlotMargin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 0
 
 [node name="IconSlot" type="TextureRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot3/SlotMargin/SlotContent"]
-custom_minimum_size = Vector2(24, 24)
+custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot3/SlotMargin/SlotContent"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Empty"
 vertical_alignment = 1
 
 [node name="PassiveSlot4" type="PanelContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots"]
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inventory_slot")
 
 [node name="SlotMargin" type="MarginContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot4"]
 layout_mode = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
 
 [node name="SlotContent" type="HBoxContainer" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot4/SlotMargin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 0
 
 [node name="IconSlot" type="TextureRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot4/SlotMargin/SlotContent"]
-custom_minimum_size = Vector2(24, 24)
+custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot4/SlotMargin/SlotContent"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Empty"

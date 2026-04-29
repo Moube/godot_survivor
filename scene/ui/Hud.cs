@@ -5,6 +5,8 @@ using System.Collections.Generic;
 public partial class Hud : CanvasLayer
 {
 	private const string MainScenePath = "res://scene/main/Main.tscn";
+	private const int InventorySlotCount = 4;
+	private const float InventoryIconSize = 44.0f;
 
 	private ProgressBar _healthBar;
 	private ProgressBar _experienceBar;
@@ -12,10 +14,10 @@ public partial class Hud : CanvasLayer
 	private Control _gameOverPanel;
 	private Label _finalSurvivalTimeLabel;
 	private Button _confirmButton;
-	private Label[] _weaponSlotLabels;
-	private Label[] _passiveSlotLabels;
 	private TextureRect[] _weaponSlotIcons;
 	private TextureRect[] _passiveSlotIcons;
+	private Label[] _weaponSlotLevelLabels;
+	private Label[] _passiveSlotLevelLabels;
 	private WeaponInventory _boundWeaponInventory;
 	private PassiveInventory _boundPassiveInventory;
 	private readonly Dictionary<string, Texture2D> _iconCache = new(StringComparer.Ordinal);
@@ -28,10 +30,12 @@ public partial class Hud : CanvasLayer
 		_gameOverPanel = GetNode<Control>("GameOverCenter/PanelContainer");
 		_finalSurvivalTimeLabel = GetNode<Label>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/FinalSurvivalTimeLabel");
 		_confirmButton = GetNode<Button>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/ConfirmButton");
-		_weaponSlotLabels = LoadSlotLabels("LeftInventoryPanel/MarginContainer/Content/WeaponSlots", "WeaponSlot");
-		_passiveSlotLabels = LoadSlotLabels("RightInventoryPanel/MarginContainer/Content/PassiveSlots", "PassiveSlot");
 		_weaponSlotIcons = LoadSlotIcons("LeftInventoryPanel/MarginContainer/Content/WeaponSlots", "WeaponSlot");
 		_passiveSlotIcons = LoadSlotIcons("RightInventoryPanel/MarginContainer/Content/PassiveSlots", "PassiveSlot");
+		HideSlotTextLabels("LeftInventoryPanel/MarginContainer/Content/WeaponSlots", "WeaponSlot");
+		HideSlotTextLabels("RightInventoryPanel/MarginContainer/Content/PassiveSlots", "PassiveSlot");
+		_weaponSlotLevelLabels = CreateSlotLevelLabels(_weaponSlotIcons);
+		_passiveSlotLevelLabels = CreateSlotLevelLabels(_passiveSlotIcons);
 		_confirmButton.Pressed += OnConfirmButtonPressed;
 
 		if (GameSession.Instance is null)
@@ -145,75 +149,49 @@ public partial class Hud : CanvasLayer
 
 	private void RefreshWeaponSlots()
 	{
-		if (_weaponSlotLabels is null)
+		if (_weaponSlotIcons is null)
 		{
 			return;
 		}
 
-		for (int i = 0; i < _weaponSlotLabels.Length; i++)
+		for (int i = 0; i < _weaponSlotIcons.Length; i++)
 		{
-			if (_weaponSlotLabels[i] is null)
-			{
-				continue;
-			}
-
 			if (_boundWeaponInventory != null && i < _boundWeaponInventory.Weapons.Count)
 			{
 				WeaponInventoryEntry weapon = _boundWeaponInventory.Weapons[i];
-				_weaponSlotLabels[i].Text = $"{weapon.DisplayName} Lv.{weapon.Level}";
-				SetSlotIcon(_weaponSlotIcons, i, weapon.Config?.IconTexturePath);
+				SetInventorySlot(_weaponSlotIcons, _weaponSlotLevelLabels, i, weapon.Config?.IconTexturePath, weapon.Level, weapon.DisplayName);
 			}
 			else
 			{
-				_weaponSlotLabels[i].Text = "Empty";
-				SetSlotIcon(_weaponSlotIcons, i, string.Empty);
+				SetInventorySlot(_weaponSlotIcons, _weaponSlotLevelLabels, i, string.Empty, 0, string.Empty);
 			}
 		}
 	}
 
 	private void RefreshPassiveSlots()
 	{
-		if (_passiveSlotLabels is null)
+		if (_passiveSlotIcons is null)
 		{
 			return;
 		}
 
-		for (int i = 0; i < _passiveSlotLabels.Length; i++)
+		for (int i = 0; i < _passiveSlotIcons.Length; i++)
 		{
-			if (_passiveSlotLabels[i] is null)
-			{
-				continue;
-			}
-
 			if (_boundPassiveInventory != null && i < _boundPassiveInventory.Passives.Count)
 			{
 				PassiveInventoryEntry passive = _boundPassiveInventory.Passives[i];
-				_passiveSlotLabels[i].Text = $"{passive.DisplayName} Lv.{passive.Level}";
-				SetSlotIcon(_passiveSlotIcons, i, passive.Config?.IconTexturePath);
+				SetInventorySlot(_passiveSlotIcons, _passiveSlotLevelLabels, i, passive.Config?.IconTexturePath, passive.Level, passive.DisplayName);
 			}
 			else
 			{
-				_passiveSlotLabels[i].Text = "Empty";
-				SetSlotIcon(_passiveSlotIcons, i, string.Empty);
+				SetInventorySlot(_passiveSlotIcons, _passiveSlotLevelLabels, i, string.Empty, 0, string.Empty);
 			}
 		}
-	}
-
-	private Label[] LoadSlotLabels(string rootPath, string slotNamePrefix)
-	{
-		Label[] labels = new Label[4];
-		for (int i = 0; i < labels.Length; i++)
-		{
-			string path = $"{rootPath}/{slotNamePrefix}{i + 1}/SlotMargin/SlotContent/TextLabel";
-			labels[i] = GetNodeOrNull<Label>(path);
-		}
-
-		return labels;
 	}
 
 	private TextureRect[] LoadSlotIcons(string rootPath, string slotNamePrefix)
 	{
-		TextureRect[] icons = new TextureRect[4];
+		TextureRect[] icons = new TextureRect[InventorySlotCount];
 		for (int i = 0; i < icons.Length; i++)
 		{
 			string path = $"{rootPath}/{slotNamePrefix}{i + 1}/SlotMargin/SlotContent/IconSlot";
@@ -223,14 +201,86 @@ public partial class Hud : CanvasLayer
 		return icons;
 	}
 
-	private void SetSlotIcon(TextureRect[] icons, int index, string texturePath)
+	private void HideSlotTextLabels(string rootPath, string slotNamePrefix)
+	{
+		for (int i = 0; i < InventorySlotCount; i++)
+		{
+			string path = $"{rootPath}/{slotNamePrefix}{i + 1}/SlotMargin/SlotContent/TextLabel";
+			Label label = GetNodeOrNull<Label>(path);
+			if (label != null)
+			{
+				label.Visible = false;
+			}
+		}
+	}
+
+	private Label[] CreateSlotLevelLabels(TextureRect[] icons)
+	{
+		if (icons is null)
+		{
+			return null;
+		}
+
+		Label[] labels = new Label[icons.Length];
+		for (int i = 0; i < icons.Length; i++)
+		{
+			TextureRect icon = icons[i];
+			if (icon is null)
+			{
+				continue;
+			}
+
+			icon.CustomMinimumSize = new Vector2(InventoryIconSize, InventoryIconSize);
+			icon.MouseFilter = Control.MouseFilterEnum.Pass;
+
+			Label label = icon.GetNodeOrNull<Label>("LevelLabel");
+			if (label is null)
+			{
+				label = new Label { Name = "LevelLabel" };
+				icon.AddChild(label);
+			}
+
+			label.Visible = false;
+			label.MouseFilter = Control.MouseFilterEnum.Ignore;
+			label.ZIndex = 1;
+			label.AnchorLeft = 1.0f;
+			label.AnchorRight = 1.0f;
+			label.OffsetLeft = -InventoryIconSize;
+			label.OffsetTop = 0.0f;
+			label.OffsetRight = 0.0f;
+			label.OffsetBottom = 16.0f;
+			label.HorizontalAlignment = HorizontalAlignment.Right;
+			label.VerticalAlignment = VerticalAlignment.Top;
+			label.AddThemeFontSizeOverride("font_size", 11);
+			label.AddThemeColorOverride("font_color", new Color(1.0f, 0.94f, 0.36f));
+			label.AddThemeColorOverride("font_outline_color", new Color(0.05f, 0.04f, 0.03f));
+			label.AddThemeConstantOverride("outline_size", 2);
+			labels[i] = label;
+		}
+
+		return labels;
+	}
+
+	private void SetInventorySlot(TextureRect[] icons, Label[] levelLabels, int index, string texturePath, int level, string tooltipText)
 	{
 		if (icons is null || index < 0 || index >= icons.Length || icons[index] is null)
 		{
 			return;
 		}
 
-		icons[index].Texture = LoadIconTexture(texturePath);
+		Texture2D texture = LoadIconTexture(texturePath);
+		icons[index].Texture = texture;
+		icons[index].Visible = true;
+		icons[index].TooltipText = tooltipText ?? string.Empty;
+
+		if (levelLabels is null || index >= levelLabels.Length || levelLabels[index] is null)
+		{
+			return;
+		}
+
+		levelLabels[index].Visible = level > 0;
+		levelLabels[index].Text = level > 0 ? $"Lv.{level}" : string.Empty;
+		levelLabels[index].TooltipText = tooltipText ?? string.Empty;
 	}
 
 	private Texture2D LoadIconTexture(string path)
