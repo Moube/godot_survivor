@@ -151,10 +151,11 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="IconSlot" type="ColorRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot1/SlotMargin/SlotContent"]
+[node name="IconSlot" type="TextureRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot1/SlotMargin/SlotContent"]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
-color = Color(0.55, 0.72, 0.92, 0.45)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot1/SlotMargin/SlotContent"]
 layout_mode = 2
@@ -178,10 +179,11 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="IconSlot" type="ColorRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot2/SlotMargin/SlotContent"]
+[node name="IconSlot" type="TextureRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot2/SlotMargin/SlotContent"]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
-color = Color(0.55, 0.72, 0.92, 0.45)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot2/SlotMargin/SlotContent"]
 layout_mode = 2
@@ -205,10 +207,11 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="IconSlot" type="ColorRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot3/SlotMargin/SlotContent"]
+[node name="IconSlot" type="TextureRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot3/SlotMargin/SlotContent"]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
-color = Color(0.55, 0.72, 0.92, 0.45)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot3/SlotMargin/SlotContent"]
 layout_mode = 2
@@ -232,10 +235,11 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="IconSlot" type="ColorRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot4/SlotMargin/SlotContent"]
+[node name="IconSlot" type="TextureRect" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot4/SlotMargin/SlotContent"]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
-color = Color(0.55, 0.72, 0.92, 0.45)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="LeftInventoryPanel/MarginContainer/Content/WeaponSlots/WeaponSlot4/SlotMargin/SlotContent"]
 layout_mode = 2
@@ -290,10 +294,11 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="IconSlot" type="ColorRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot1/SlotMargin/SlotContent"]
+[node name="IconSlot" type="TextureRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot1/SlotMargin/SlotContent"]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
-color = Color(0.84, 0.74, 0.46, 0.48)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot1/SlotMargin/SlotContent"]
 layout_mode = 2
@@ -317,10 +322,11 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="IconSlot" type="ColorRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot2/SlotMargin/SlotContent"]
+[node name="IconSlot" type="TextureRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot2/SlotMargin/SlotContent"]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
-color = Color(0.84, 0.74, 0.46, 0.48)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot2/SlotMargin/SlotContent"]
 layout_mode = 2
@@ -344,10 +350,11 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="IconSlot" type="ColorRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot3/SlotMargin/SlotContent"]
+[node name="IconSlot" type="TextureRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot3/SlotMargin/SlotContent"]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
-color = Color(0.84, 0.74, 0.46, 0.48)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot3/SlotMargin/SlotContent"]
 layout_mode = 2
@@ -371,10 +378,11 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="IconSlot" type="ColorRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot4/SlotMargin/SlotContent"]
+[node name="IconSlot" type="TextureRect" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot4/SlotMargin/SlotContent"]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
-color = Color(0.84, 0.74, 0.46, 0.48)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TextLabel" type="Label" parent="RightInventoryPanel/MarginContainer/Content/PassiveSlots/PassiveSlot4/SlotMargin/SlotContent"]
 layout_mode = 2

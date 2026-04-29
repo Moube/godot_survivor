@@ -134,6 +134,9 @@ public partial class GameConfigManager : Node
 				ScenePath = GetString(row, "scene_path", context),
 				BehaviorType = GetEnum(row, "behavior_type", WeaponBehaviorType.ProjectileEmitter, context),
 				BulletScenePath = GetString(row, "bullet_scene_path", context),
+				WeaponTexturePath = GetString(row, "weapon_texture_path", context, required: false),
+				BulletTexturePath = GetString(row, "bullet_texture_path", context, required: false),
+				IconTexturePath = GetString(row, "icon_texture_path", context, required: false),
 				ProjectileFireMode = GetEnum(row, "projectile_fire_mode", ProjectileFireMode.MouseDirection, context),
 				FireCooldownSeconds = GetFloat(row, "fire_cooldown_seconds", 0.5f, context),
 				Damage = GetInt(row, "damage", 1, context),
@@ -157,6 +160,7 @@ public partial class GameConfigManager : Node
 				DisplayName = GetString(row, "display_name", context),
 				Description = GetString(row, "description", context, required: false),
 				StatType = GetEnum(row, "stat_type", PlayerStatType.MoveSpeed, context),
+				IconTexturePath = GetString(row, "icon_texture_path", context, required: false),
 				ValuePerLevel = GetFloat(row, "value_per_level", 0.0f, context),
 				MaxLevel = GetInt(row, "max_level", 5, context),
 				IsMultiplier = GetBool(row, "is_multiplier", false, context),
@@ -714,12 +718,17 @@ public partial class GameConfigManager : Node
 		{
 			ValidateScenePath(weapon.BulletScenePath, $"weapon '{weapon.Id}' bullet scene");
 			ValidatePositive(weapon.ProjectileCount, $"weapon '{weapon.Id}' projectile count");
+			ValidateTexturePath(weapon.WeaponTexturePath, $"weapon '{weapon.Id}' visual texture");
+			ValidateTexturePath(weapon.BulletTexturePath, $"weapon '{weapon.Id}' bullet texture");
 		}
+
+		ValidateTexturePath(weapon.IconTexturePath, $"weapon '{weapon.Id}' icon texture");
 	}
 
 	private static void ValidatePassiveConfig(PassiveConfig passive)
 	{
 		ValidatePositive(passive.MaxLevel, $"passive '{passive.Id}' max level");
+		ValidateTexturePath(passive.IconTexturePath, $"passive '{passive.Id}' icon texture");
 	}
 
 	private static void ValidateEnemyConfig(EnemyConfig enemy)
@@ -855,6 +864,19 @@ public partial class GameConfigManager : Node
 		if (!ResourceLoader.Exists(scenePath, "PackedScene"))
 		{
 			GD.PushError($"{context} path does not exist or is not a PackedScene: {scenePath}");
+		}
+	}
+
+	private static void ValidateTexturePath(string texturePath, string context)
+	{
+		if (string.IsNullOrWhiteSpace(texturePath))
+		{
+			return;
+		}
+
+		if (!ResourceLoader.Exists(texturePath, "Texture2D") && !FileAccess.FileExists(texturePath))
+		{
+			GD.PushError($"{context} path does not exist or is not a Texture2D: {texturePath}");
 		}
 	}
 

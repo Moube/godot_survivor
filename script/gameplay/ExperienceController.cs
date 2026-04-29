@@ -50,7 +50,8 @@ public partial class ExperienceController : Node
 			return;
 		}
 
-		CurrentExperience = Mathf.Min(RequiredExperience, CurrentExperience + amount);
+		long nextExperience = (long)CurrentExperience + amount;
+		CurrentExperience = nextExperience >= RequiredExperience ? RequiredExperience : (int)nextExperience;
 		EmitExperienceChanged();
 
 		if (CurrentExperience >= RequiredExperience)

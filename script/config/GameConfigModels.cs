@@ -15,6 +15,9 @@ public sealed class WeaponConfig : IGameConfig
 	public string ScenePath { get; set; } = string.Empty;
 	public WeaponBehaviorType BehaviorType { get; set; } = WeaponBehaviorType.ProjectileEmitter;
 	public string BulletScenePath { get; set; } = string.Empty;
+	public string WeaponTexturePath { get; set; } = string.Empty;
+	public string BulletTexturePath { get; set; } = string.Empty;
+	public string IconTexturePath { get; set; } = string.Empty;
 	public ProjectileFireMode ProjectileFireMode { get; set; } = ProjectileFireMode.MouseDirection;
 	public float FireCooldownSeconds { get; set; } = 0.5f;
 	public int Damage { get; set; } = 1;
@@ -28,6 +31,7 @@ public sealed class PassiveConfig : IGameConfig
 	public string DisplayName { get; set; } = string.Empty;
 	public string Description { get; set; } = string.Empty;
 	public PlayerStatType StatType { get; set; } = PlayerStatType.MoveSpeed;
+	public string IconTexturePath { get; set; } = string.Empty;
 	public float ValuePerLevel { get; set; }
 	public int MaxLevel { get; set; } = 5;
 	public bool IsMultiplier { get; set; }

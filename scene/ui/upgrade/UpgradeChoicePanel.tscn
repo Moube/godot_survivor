@@ -90,10 +90,11 @@ theme_override_constants/margin_bottom = 12
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="IconSlot" type="ColorRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin/CardContent"]
-custom_minimum_size = Vector2(40, 34)
+[node name="IconSlot" type="TextureRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin/CardContent"]
+custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
-color = Color(0.44, 0.62, 0.8, 0.46)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin/CardContent"]
 layout_mode = 2
@@ -135,10 +136,11 @@ theme_override_constants/margin_bottom = 12
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="IconSlot" type="ColorRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin/CardContent"]
-custom_minimum_size = Vector2(40, 34)
+[node name="IconSlot" type="TextureRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin/CardContent"]
+custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
-color = Color(0.44, 0.62, 0.8, 0.46)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin/CardContent"]
 layout_mode = 2
@@ -180,10 +182,11 @@ theme_override_constants/margin_bottom = 12
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="IconSlot" type="ColorRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin/CardContent"]
-custom_minimum_size = Vector2(40, 34)
+[node name="IconSlot" type="TextureRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin/CardContent"]
+custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
-color = Color(0.44, 0.62, 0.8, 0.46)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin/CardContent"]
 layout_mode = 2

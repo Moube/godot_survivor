@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class Hud : CanvasLayer
 {
@@ -13,8 +14,11 @@ public partial class Hud : CanvasLayer
 	private Button _confirmButton;
 	private Label[] _weaponSlotLabels;
 	private Label[] _passiveSlotLabels;
+	private TextureRect[] _weaponSlotIcons;
+	private TextureRect[] _passiveSlotIcons;
 	private WeaponInventory _boundWeaponInventory;
 	private PassiveInventory _boundPassiveInventory;
+	private readonly Dictionary<string, Texture2D> _iconCache = new(StringComparer.Ordinal);
 
 	public override void _Ready()
 	{
@@ -26,6 +30,8 @@ public partial class Hud : CanvasLayer
 		_confirmButton = GetNode<Button>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/ConfirmButton");
 		_weaponSlotLabels = LoadSlotLabels("LeftInventoryPanel/MarginContainer/Content/WeaponSlots", "WeaponSlot");
 		_passiveSlotLabels = LoadSlotLabels("RightInventoryPanel/MarginContainer/Content/PassiveSlots", "PassiveSlot");
+		_weaponSlotIcons = LoadSlotIcons("LeftInventoryPanel/MarginContainer/Content/WeaponSlots", "WeaponSlot");
+		_passiveSlotIcons = LoadSlotIcons("RightInventoryPanel/MarginContainer/Content/PassiveSlots", "PassiveSlot");
 		_confirmButton.Pressed += OnConfirmButtonPressed;
 
 		if (GameSession.Instance is null)
@@ -155,10 +161,12 @@ public partial class Hud : CanvasLayer
 			{
 				WeaponInventoryEntry weapon = _boundWeaponInventory.Weapons[i];
 				_weaponSlotLabels[i].Text = $"{weapon.DisplayName} Lv.{weapon.Level}";
+				SetSlotIcon(_weaponSlotIcons, i, weapon.Config?.IconTexturePath);
 			}
 			else
 			{
 				_weaponSlotLabels[i].Text = "Empty";
+				SetSlotIcon(_weaponSlotIcons, i, string.Empty);
 			}
 		}
 	}
@@ -181,10 +189,12 @@ public partial class Hud : CanvasLayer
 			{
 				PassiveInventoryEntry passive = _boundPassiveInventory.Passives[i];
 				_passiveSlotLabels[i].Text = $"{passive.DisplayName} Lv.{passive.Level}";
+				SetSlotIcon(_passiveSlotIcons, i, passive.Config?.IconTexturePath);
 			}
 			else
 			{
 				_passiveSlotLabels[i].Text = "Empty";
+				SetSlotIcon(_passiveSlotIcons, i, string.Empty);
 			}
 		}
 	}
@@ -199,6 +209,50 @@ public partial class Hud : CanvasLayer
 		}
 
 		return labels;
+	}
+
+	private TextureRect[] LoadSlotIcons(string rootPath, string slotNamePrefix)
+	{
+		TextureRect[] icons = new TextureRect[4];
+		for (int i = 0; i < icons.Length; i++)
+		{
+			string path = $"{rootPath}/{slotNamePrefix}{i + 1}/SlotMargin/SlotContent/IconSlot";
+			icons[i] = GetNodeOrNull<TextureRect>(path);
+		}
+
+		return icons;
+	}
+
+	private void SetSlotIcon(TextureRect[] icons, int index, string texturePath)
+	{
+		if (icons is null || index < 0 || index >= icons.Length || icons[index] is null)
+		{
+			return;
+		}
+
+		icons[index].Texture = LoadIconTexture(texturePath);
+	}
+
+	private Texture2D LoadIconTexture(string path)
+	{
+		if (string.IsNullOrWhiteSpace(path))
+		{
+			return null;
+		}
+
+		if (_iconCache.TryGetValue(path, out Texture2D cachedTexture))
+		{
+			return cachedTexture;
+		}
+
+		Texture2D texture = ResourceLoader.Load<Texture2D>(path);
+		if (texture == null)
+		{
+			GD.PushWarning($"Unable to load HUD icon texture: {path}");
+		}
+
+		_iconCache[path] = texture;
+		return texture;
 	}
 
 	private void UnbindInventorySignals()

@@ -14,9 +14,14 @@ public partial class Bullet : Area2D
 	[Export]
 	public PackedScene HitSparkScene { get; set; }
 
+	[Export]
+	public NodePath SpritePath { get; set; } = new("Sprite2D");
+
 	public Vector2 Direction { get; private set; } = Vector2.Right;
 
 	private double _remainingLifetime;
+	private Texture2D _visualTextureOverride;
+	private Sprite2D _sprite;
 
 	public void Initialize(Vector2 direction)
 	{
@@ -24,8 +29,16 @@ public partial class Bullet : Area2D
 		Rotation = Direction.Angle();
 	}
 
+	public void SetVisualTexture(Texture2D texture)
+	{
+		_visualTextureOverride = texture;
+		ApplyVisualTextureOverride();
+	}
+
 	public override void _Ready()
 	{
+		_sprite = GetNodeOrNull<Sprite2D>(SpritePath);
+		ApplyVisualTextureOverride();
 		_remainingLifetime = LifetimeSeconds;
 		BodyEntered += OnBodyEntered;
 	}
@@ -72,5 +85,19 @@ public partial class Bullet : Area2D
 		GetParent()?.AddChild(hitSpark);
 		hitSpark.GlobalPosition = GlobalPosition;
 		hitSpark.GlobalRotation = GlobalRotation;
+	}
+
+	private void ApplyVisualTextureOverride()
+	{
+		if (_visualTextureOverride == null)
+		{
+			return;
+		}
+
+		_sprite ??= GetNodeOrNull<Sprite2D>(SpritePath);
+		if (_sprite != null)
+		{
+			_sprite.Texture = _visualTextureOverride;
+		}
 	}
 }

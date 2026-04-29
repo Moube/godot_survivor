@@ -2,3 +2,4 @@
 "slime_small"	"Small Slime"	"Basic low-pressure chasing slime."	"res://scene/enemy/SlimeEnemy.tscn"	"3"	"50.0"	"1"	"0.75"	"1"	"1.0"
 "slime_medium"	"Medium Slime"	"Sturdier slime used once the run pressure rises."	"res://scene/enemy/SlimeEnemy.tscn"	"7"	"44.0"	"1"	"0.75"	"2"	"1.25"
 "slime_large"	"Large Slime"	"Large high-health slime reserved for later pressure spikes."	"res://scene/enemy/SlimeEnemy.tscn"	"16"	"32.0"	"2"	"0.9"	"5"	"1.6"
+"test_max_exp_enemy"	"Max EXP Test Enemy"	"Testing enemy that drops the maximum integer experience value."	"res://scene/enemy/SlimeEnemy.tscn"	"1"	"40.0"	"1"	"0.75"	"2147483647"	"1.0"

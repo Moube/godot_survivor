@@ -3,12 +3,13 @@ using System.Collections.Generic;
 
 public sealed class UpgradeChoiceOption
 {
-	public UpgradeChoiceOption(UpgradeRewardConfig reward, string title, string typeLabel, string description)
+	public UpgradeChoiceOption(UpgradeRewardConfig reward, string title, string typeLabel, string description, string iconTexturePath)
 	{
 		Reward = reward;
 		Title = title;
 		TypeLabel = typeLabel;
 		Description = description;
+		IconTexturePath = iconTexturePath;
 	}
 
 	public UpgradeRewardConfig Reward { get; }
@@ -18,6 +19,8 @@ public sealed class UpgradeChoiceOption
 	public string TypeLabel { get; }
 
 	public string Description { get; }
+
+	public string IconTexturePath { get; }
 }
 
 public partial class UpgradeManager : Node
@@ -256,7 +259,7 @@ public partial class UpgradeManager : Node
 			description = fallbackDescription;
 		}
 
-		return new UpgradeChoiceOption(reward, weapon.DisplayName, typeLabel, description);
+		return new UpgradeChoiceOption(reward, weapon.DisplayName, typeLabel, description, weapon.IconTexturePath);
 	}
 
 	private UpgradeChoiceOption BuildPassiveOption(UpgradeRewardConfig reward, string typeLabel, string fallbackDescription)
@@ -273,7 +276,7 @@ public partial class UpgradeManager : Node
 			description = fallbackDescription;
 		}
 
-		return new UpgradeChoiceOption(reward, passive.DisplayName, typeLabel, description);
+		return new UpgradeChoiceOption(reward, passive.DisplayName, typeLabel, description, passive.IconTexturePath);
 	}
 
 	private string GetWeaponUpgradeDescription(string weaponId)

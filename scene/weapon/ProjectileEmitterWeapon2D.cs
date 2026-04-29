@@ -113,6 +113,7 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 
 	private readonly RandomNumberGenerator _random = new();
 	private Node2D _dropShadowAnchor;
+	private Texture2D _bulletTextureOverride;
 	private bool _isPlayingFireAnimation;
 	private bool _projectileSpawnedThisCycle;
 	private double _fireCooldownRemaining;
@@ -140,6 +141,7 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 			Sprite.Frame = IdleFrame;
 		}
 
+		ApplyConfiguredVisuals();
 		SetupDropShadow();
 	}
 
@@ -168,6 +170,8 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 			}
 		}
 
+		_bulletTextureOverride = LoadTexture(config.BulletTexturePath, $"weapon '{config.Id}' bullet texture");
+		ApplyConfiguredVisuals();
 		RefreshEffectiveStats();
 	}
 
@@ -515,11 +519,49 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 			return;
 		}
 
+		if (_bulletTextureOverride != null)
+		{
+			bullet.SetVisualTexture(_bulletTextureOverride);
+		}
+
 		Node parent = GetTree().CurrentScene ?? GetTree().Root;
 		parent.AddChild(bullet);
 
 		bullet.GlobalPosition = Muzzle.GlobalPosition;
 		bullet.Damage = Damage;
 		bullet.Initialize(direction);
+	}
+
+	private void ApplyConfiguredVisuals()
+	{
+		if (Sprite == null || Config == null)
+		{
+			return;
+		}
+
+		Texture2D weaponTexture = LoadTexture(Config.WeaponTexturePath, $"weapon '{Config.Id}' visual texture");
+		if (weaponTexture != null)
+		{
+			Sprite.Texture = weaponTexture;
+		}
+
+		Sprite.Hframes = Mathf.Max(1, FireAnimationFrameCount);
+		Sprite.Frame = IdleFrame;
+	}
+
+	private static Texture2D LoadTexture(string path, string context)
+	{
+		if (string.IsNullOrWhiteSpace(path))
+		{
+			return null;
+		}
+
+		Texture2D texture = ResourceLoader.Load<Texture2D>(path);
+		if (texture is null)
+		{
+			GD.PushError($"{context} cannot be loaded: {path}");
+		}
+
+		return texture;
 	}
 }
