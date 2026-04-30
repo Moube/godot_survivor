@@ -522,7 +522,7 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 			bullet.SetVisualTexture(_bulletTextureOverride);
 		}
 
-		Node parent = GetTree().CurrentScene ?? GetTree().Root;
+		Node parent = WorldNodeUtilities.ResolveRuntimeVisualParent(this);
 		parent.AddChild(bullet);
 
 		bullet.GlobalPosition = GetConfiguredMuzzleGlobalPosition();

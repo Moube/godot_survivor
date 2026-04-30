@@ -20,6 +20,7 @@ public partial class Hud : CanvasLayer
 	private PanelContainer _runTimePanel;
 	private PanelContainer _leftInventoryPanel;
 	private PanelContainer _rightInventoryPanel;
+	private Control _gameOverCenter;
 	private PanelContainer _gameOverPanel;
 	private Label _finalSurvivalTimeLabel;
 	private Button _confirmButton;
@@ -42,6 +43,7 @@ public partial class Hud : CanvasLayer
 		_runTimeLabel = GetNode<Label>("TopCenter/RunTimePanel/RunTimeMargin/RunTimeLabel");
 		_leftInventoryPanel = GetNode<PanelContainer>("LeftInventoryPanel");
 		_rightInventoryPanel = GetNode<PanelContainer>("RightInventoryPanel");
+		_gameOverCenter = GetNode<Control>("GameOverCenter");
 		_gameOverPanel = GetNode<PanelContainer>("GameOverCenter/PanelContainer");
 		_finalSurvivalTimeLabel = GetNode<Label>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/FinalSurvivalTimeLabel");
 		_confirmButton = GetNode<Button>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/ConfirmButton");
@@ -149,13 +151,22 @@ public partial class Hud : CanvasLayer
 
 	private void SetGameOverVisible(bool isVisible, double finalSurvivalTime)
 	{
+		_gameOverCenter.Visible = isVisible;
+		_gameOverCenter.MouseFilter = isVisible ? Control.MouseFilterEnum.Stop : Control.MouseFilterEnum.Ignore;
 		_gameOverPanel.Visible = isVisible;
+		_confirmButton.Disabled = !isVisible;
 		_finalSurvivalTimeLabel.Text = $"Survived {FormatRunTime(finalSurvivalTime)}";
 	}
 
 	private void OnConfirmButtonPressed()
 	{
+		SetGameOverVisible(false, 0.0);
 		GetTree().Paused = false;
+		CallDeferred(nameof(ReturnToMainScene));
+	}
+
+	private void ReturnToMainScene()
+	{
 		GetTree().ChangeSceneToFile(MainScenePath);
 	}
 

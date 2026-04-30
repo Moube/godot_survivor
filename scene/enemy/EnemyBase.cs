@@ -6,6 +6,8 @@ public partial class EnemyBase : CharacterBody2D
 	private const string DeathDissolveShaderPath = "res://asset/art/effects/sprite_death_dissolve.gdshader";
 	private const string HitFlashShaderPath = "res://asset/art/effects/sprite_solid_flash.gdshader";
 	private const string DefaultExperienceGemScenePath = "res://scene/pickup/ExperienceGem.tscn";
+	private const float DefaultCollisionRadius = 12.0f;
+	private const float DistanceEpsilonSquared = 0.0001f;
 
 	[Export]
 	public float MoveSpeed { get; set; } = 120.0f;
@@ -21,6 +23,12 @@ public partial class EnemyBase : CharacterBody2D
 
 	[Export]
 	public float ContactDamageCooldownSeconds { get; set; } = 0.75f;
+
+	[Export]
+	public float ContactDistancePadding { get; set; } = 1.0f;
+
+	[Export]
+	public float ContactRetreatSpeedMultiplier { get; set; } = 0.65f;
 
 	[Export(PropertyHint.File, "*.tscn")]
 	public string ExperienceGemScenePath { get; set; } = DefaultExperienceGemScenePath;
@@ -182,7 +190,18 @@ public partial class EnemyBase : CharacterBody2D
 		}
 
 		Vector2 toTarget = _target.GlobalPosition - GlobalPosition;
-		if (toTarget.LengthSquared() <= StopDistance * StopDistance)
+		float contactDistance = GetContactDistanceTo(_target);
+		float desiredStopDistance = Mathf.Max(StopDistance, contactDistance);
+		float distanceSquared = toTarget.LengthSquared();
+		if (distanceSquared <= DistanceEpsilonSquared)
+		{
+			Velocity = Vector2.Zero;
+		}
+		else if (distanceSquared < contactDistance * contactDistance)
+		{
+			Velocity = -toTarget.Normalized() * MoveSpeed * Mathf.Max(0.0f, ContactRetreatSpeedMultiplier);
+		}
+		else if (distanceSquared <= desiredStopDistance * desiredStopDistance)
 		{
 			Velocity = Vector2.Zero;
 		}
@@ -219,6 +238,11 @@ public partial class EnemyBase : CharacterBody2D
 			return;
 		}
 
+		if (TryApplyTargetContactDamage())
+		{
+			return;
+		}
+
 		for (int i = 0; i < GetSlideCollisionCount(); i++)
 		{
 			KinematicCollision2D collision = GetSlideCollision(i);
@@ -244,6 +268,34 @@ public partial class EnemyBase : CharacterBody2D
 				return;
 			}
 		}
+	}
+
+	private bool TryApplyTargetContactDamage()
+	{
+		if (_target is null || !IsInstanceValid(_target) || !_target.IsInGroup(TargetGroupName))
+		{
+			return false;
+		}
+
+		CombatComponent targetCombat = _target.GetNodeOrNull<CombatComponent>("CombatComponent");
+		if (targetCombat is null || targetCombat.IsDead)
+		{
+			return false;
+		}
+
+		float contactDistance = GetContactDistanceTo(_target);
+		if (GlobalPosition.DistanceSquaredTo(_target.GlobalPosition) > contactDistance * contactDistance)
+		{
+			return false;
+		}
+
+		if (!targetCombat.ApplyDamage(ContactDamage))
+		{
+			return false;
+		}
+
+		_contactDamageCooldownRemaining = ContactDamageCooldownSeconds;
+		return true;
 	}
 
 	private CharacterBody2D FindTarget()
@@ -505,10 +557,50 @@ public partial class EnemyBase : CharacterBody2D
 			return;
 		}
 
-		Node parent = GetParent() ?? GetTree().CurrentScene ?? GetTree().Root;
+		Node parent = WorldNodeUtilities.ResolveRuntimeVisualParent(this);
 		parent.AddChild(experienceGem);
 		experienceGem.GlobalPosition = GlobalPosition;
 		experienceGem.Initialize(ExperienceValue);
+	}
+
+	private float GetContactDistanceTo(Node2D target)
+	{
+		return GetCollisionRadius(this) + GetCollisionRadius(target) + Mathf.Max(0.0f, ContactDistancePadding);
+	}
+
+	private static float GetCollisionRadius(Node2D body)
+	{
+		if (body is null)
+		{
+			return DefaultCollisionRadius;
+		}
+
+		foreach (Node child in body.GetChildren())
+		{
+			if (child is CollisionShape2D collisionShape && !collisionShape.Disabled && collisionShape.Shape != null)
+			{
+				return GetCollisionShapeRadius(collisionShape);
+			}
+		}
+
+		return DefaultCollisionRadius * GetMaxAbsScale(body.GlobalScale);
+	}
+
+	private static float GetCollisionShapeRadius(CollisionShape2D collisionShape)
+	{
+		Vector2 scale = collisionShape.GlobalScale.Abs();
+		return collisionShape.Shape switch
+		{
+			CircleShape2D circle => circle.Radius * Mathf.Max(scale.X, scale.Y),
+			RectangleShape2D rectangle => new Vector2(rectangle.Size.X * scale.X, rectangle.Size.Y * scale.Y).Length() * 0.5f,
+			CapsuleShape2D capsule => Mathf.Max(capsule.Radius * scale.X, capsule.Height * 0.5f * scale.Y),
+			_ => DefaultCollisionRadius * Mathf.Max(scale.X, scale.Y),
+		};
+	}
+
+	private static float GetMaxAbsScale(Vector2 scale)
+	{
+		return Mathf.Max(Mathf.Abs(scale.X), Mathf.Abs(scale.Y));
 	}
 
 	private void StartDeathDissolve()

@@ -400,11 +400,13 @@ text = "Empty"
 vertical_alignment = 1
 
 [node name="GameOverCenter" type="CenterContainer" parent="." unique_id=2027087495]
+visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="GameOverCenter" unique_id=602488008]
 visible = false

@@ -29,6 +29,11 @@ public partial class Level01 : Node2D
 	private Hud _hud;
 	private Player _playerNode;
 
+	public override void _EnterTree()
+	{
+		GameSession.Instance?.StartNewRun();
+	}
+
 	public override void _Ready()
 	{
 		_worldRoot = GetNode<Node2D>("World");
@@ -37,7 +42,6 @@ public partial class Level01 : Node2D
 		string levelConfigId = string.IsNullOrWhiteSpace(selectedLevelConfigId) ? LevelConfigId : selectedLevelConfigId;
 		_levelConfig = GameConfigManager.Instance?.GetLevelConfig(levelConfigId);
 
-		GameSession.Instance?.StartNewRun();
 		ExperienceController.Instance?.StartNewRun(_levelConfig?.ExperienceCurveId ?? string.Empty);
 		SpawnPlayer();
 		StartSpawnDirector();
