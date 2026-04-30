@@ -5,37 +5,57 @@ using System.Collections.Generic;
 public partial class Hud : CanvasLayer
 {
 	private const string MainScenePath = "res://scene/main/Main.tscn";
+	private const string HudTimerPanelTexturePath = "res://asset/art/ui/ui_hud_timer_panel.png";
+	private const string HudInventoryPanelTexturePath = "res://asset/art/ui/ui_hud_inventory_panel.png";
+	private const string HudGameOverPanelTexturePath = "res://asset/art/ui/ui_hud_game_over_panel.png";
+	private const string HudSlotEmptyTexturePath = "res://asset/art/ui/ui_hud_slot_empty.png";
+	private const string HudExperienceBarBackgroundTexturePath = "res://asset/art/ui/ui_hud_experience_bar_bg.png";
+	private const string HudExperienceBarFillTexturePath = "res://asset/art/ui/ui_hud_experience_bar_fill.png";
+	private const string HudHealthBarBackgroundTexturePath = "res://asset/art/ui/ui_hud_health_bar_bg.png";
+	private const string HudHealthBarFillTexturePath = "res://asset/art/ui/ui_hud_health_bar_fill.png";
 	private const int InventorySlotCount = 4;
 	private const float InventoryIconSize = 44.0f;
 
 	private ProgressBar _healthBar;
 	private ProgressBar _experienceBar;
 	private Label _runTimeLabel;
-	private Control _gameOverPanel;
+	private PanelContainer _runTimePanel;
+	private PanelContainer _leftInventoryPanel;
+	private PanelContainer _rightInventoryPanel;
+	private PanelContainer _gameOverPanel;
 	private Label _finalSurvivalTimeLabel;
 	private Button _confirmButton;
+	private PanelContainer[] _weaponSlotPanels;
+	private PanelContainer[] _passiveSlotPanels;
 	private TextureRect[] _weaponSlotIcons;
 	private TextureRect[] _passiveSlotIcons;
 	private Label[] _weaponSlotLevelLabels;
 	private Label[] _passiveSlotLevelLabels;
+	private StyleBoxTexture _slotEmptyStyle;
 	private WeaponInventory _boundWeaponInventory;
 	private PassiveInventory _boundPassiveInventory;
 	private readonly Dictionary<string, Texture2D> _iconCache = new(StringComparer.Ordinal);
 
 	public override void _Ready()
 	{
+		_runTimePanel = GetNode<PanelContainer>("TopCenter/RunTimePanel");
 		_healthBar = GetNode<ProgressBar>("BottomCenter/VitalsStack/HealthBar");
 		_experienceBar = GetNode<ProgressBar>("BottomCenter/VitalsStack/ExperienceBar");
 		_runTimeLabel = GetNode<Label>("TopCenter/RunTimePanel/RunTimeMargin/RunTimeLabel");
-		_gameOverPanel = GetNode<Control>("GameOverCenter/PanelContainer");
+		_leftInventoryPanel = GetNode<PanelContainer>("LeftInventoryPanel");
+		_rightInventoryPanel = GetNode<PanelContainer>("RightInventoryPanel");
+		_gameOverPanel = GetNode<PanelContainer>("GameOverCenter/PanelContainer");
 		_finalSurvivalTimeLabel = GetNode<Label>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/FinalSurvivalTimeLabel");
 		_confirmButton = GetNode<Button>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/ConfirmButton");
+		_weaponSlotPanels = LoadSlotPanels("LeftInventoryPanel/MarginContainer/Content/WeaponSlots", "WeaponSlot");
+		_passiveSlotPanels = LoadSlotPanels("RightInventoryPanel/MarginContainer/Content/PassiveSlots", "PassiveSlot");
 		_weaponSlotIcons = LoadSlotIcons("LeftInventoryPanel/MarginContainer/Content/WeaponSlots", "WeaponSlot");
 		_passiveSlotIcons = LoadSlotIcons("RightInventoryPanel/MarginContainer/Content/PassiveSlots", "PassiveSlot");
 		HideSlotTextLabels("LeftInventoryPanel/MarginContainer/Content/WeaponSlots", "WeaponSlot");
 		HideSlotTextLabels("RightInventoryPanel/MarginContainer/Content/PassiveSlots", "PassiveSlot");
 		_weaponSlotLevelLabels = CreateSlotLevelLabels(_weaponSlotIcons);
 		_passiveSlotLevelLabels = CreateSlotLevelLabels(_passiveSlotIcons);
+		ApplyHudTextureStyles();
 		_confirmButton.Pressed += OnConfirmButtonPressed;
 
 		if (GameSession.Instance is null)
@@ -159,11 +179,11 @@ public partial class Hud : CanvasLayer
 			if (_boundWeaponInventory != null && i < _boundWeaponInventory.Weapons.Count)
 			{
 				WeaponInventoryEntry weapon = _boundWeaponInventory.Weapons[i];
-				SetInventorySlot(_weaponSlotIcons, _weaponSlotLevelLabels, i, weapon.Config?.IconTexturePath, weapon.Level, weapon.DisplayName);
+				SetInventorySlot(_weaponSlotIcons, _weaponSlotLevelLabels, _weaponSlotPanels, i, weapon.Config?.IconTexturePath, weapon.Level, weapon.DisplayName);
 			}
 			else
 			{
-				SetInventorySlot(_weaponSlotIcons, _weaponSlotLevelLabels, i, string.Empty, 0, string.Empty);
+				SetInventorySlot(_weaponSlotIcons, _weaponSlotLevelLabels, _weaponSlotPanels, i, string.Empty, 0, string.Empty);
 			}
 		}
 	}
@@ -180,13 +200,25 @@ public partial class Hud : CanvasLayer
 			if (_boundPassiveInventory != null && i < _boundPassiveInventory.Passives.Count)
 			{
 				PassiveInventoryEntry passive = _boundPassiveInventory.Passives[i];
-				SetInventorySlot(_passiveSlotIcons, _passiveSlotLevelLabels, i, passive.Config?.IconTexturePath, passive.Level, passive.DisplayName);
+				SetInventorySlot(_passiveSlotIcons, _passiveSlotLevelLabels, _passiveSlotPanels, i, passive.Config?.IconTexturePath, passive.Level, passive.DisplayName);
 			}
 			else
 			{
-				SetInventorySlot(_passiveSlotIcons, _passiveSlotLevelLabels, i, string.Empty, 0, string.Empty);
+				SetInventorySlot(_passiveSlotIcons, _passiveSlotLevelLabels, _passiveSlotPanels, i, string.Empty, 0, string.Empty);
 			}
 		}
+	}
+
+	private PanelContainer[] LoadSlotPanels(string rootPath, string slotNamePrefix)
+	{
+		PanelContainer[] panels = new PanelContainer[InventorySlotCount];
+		for (int i = 0; i < panels.Length; i++)
+		{
+			string path = $"{rootPath}/{slotNamePrefix}{i + 1}";
+			panels[i] = GetNodeOrNull<PanelContainer>(path);
+		}
+
+		return panels;
 	}
 
 	private TextureRect[] LoadSlotIcons(string rootPath, string slotNamePrefix)
@@ -261,17 +293,19 @@ public partial class Hud : CanvasLayer
 		return labels;
 	}
 
-	private void SetInventorySlot(TextureRect[] icons, Label[] levelLabels, int index, string texturePath, int level, string tooltipText)
+	private void SetInventorySlot(TextureRect[] icons, Label[] levelLabels, PanelContainer[] slotPanels, int index, string texturePath, int level, string tooltipText)
 	{
 		if (icons is null || index < 0 || index >= icons.Length || icons[index] is null)
 		{
 			return;
 		}
 
+		bool hasItem = !string.IsNullOrWhiteSpace(texturePath);
 		Texture2D texture = LoadIconTexture(texturePath);
 		icons[index].Texture = texture;
 		icons[index].Visible = true;
 		icons[index].TooltipText = tooltipText ?? string.Empty;
+		ApplySlotPanelStyle(slotPanels, index, hasItem);
 
 		if (levelLabels is null || index >= levelLabels.Length || levelLabels[index] is null)
 		{
@@ -303,6 +337,103 @@ public partial class Hud : CanvasLayer
 
 		_iconCache[path] = texture;
 		return texture;
+	}
+
+	private void ApplyHudTextureStyles()
+	{
+		ApplyPanelStyle(_runTimePanel, HudTimerPanelTexturePath, 32.0f, 18.0f);
+		ApplyPanelStyle(_leftInventoryPanel, HudInventoryPanelTexturePath, 24.0f, 20.0f);
+		ApplyPanelStyle(_rightInventoryPanel, HudInventoryPanelTexturePath, 24.0f, 20.0f);
+		ApplyPanelStyle(_gameOverPanel, HudGameOverPanelTexturePath, 34.0f, 34.0f);
+		ApplyProgressBarStyle(_experienceBar, HudExperienceBarBackgroundTexturePath, HudExperienceBarFillTexturePath, 16.0f, 3.0f);
+		ApplyProgressBarStyle(_healthBar, HudHealthBarBackgroundTexturePath, HudHealthBarFillTexturePath, 18.0f, 5.0f);
+
+		_slotEmptyStyle = CreateTextureStyle(HudSlotEmptyTexturePath, 11.0f, 11.0f);
+		ApplySlotPanelStyles(_weaponSlotPanels, _slotEmptyStyle);
+		ApplySlotPanelStyles(_passiveSlotPanels, _slotEmptyStyle);
+	}
+
+	private static void ApplyPanelStyle(PanelContainer panel, string texturePath, float marginX, float marginY)
+	{
+		StyleBoxTexture style = CreateTextureStyle(texturePath, marginX, marginY);
+		if (style is null)
+		{
+			return;
+		}
+
+		panel?.AddThemeStyleboxOverride("panel", style);
+	}
+
+	private static void ApplyProgressBarStyle(ProgressBar progressBar, string backgroundTexturePath, string fillTexturePath, float marginX, float marginY)
+	{
+		if (progressBar is null)
+		{
+			return;
+		}
+
+		StyleBoxTexture backgroundStyle = CreateTextureStyle(backgroundTexturePath, marginX, marginY);
+		StyleBoxTexture fillStyle = CreateTextureStyle(fillTexturePath, marginX, marginY);
+		if (backgroundStyle != null)
+		{
+			progressBar.AddThemeStyleboxOverride("background", backgroundStyle);
+		}
+
+		if (fillStyle != null)
+		{
+			progressBar.AddThemeStyleboxOverride("fill", fillStyle);
+		}
+	}
+
+	private void ApplySlotPanelStyle(PanelContainer[] slotPanels, int index, bool hasItem)
+	{
+		if (slotPanels is null || index < 0 || index >= slotPanels.Length || slotPanels[index] is null)
+		{
+			return;
+		}
+
+		if (_slotEmptyStyle is null)
+		{
+			return;
+		}
+
+		slotPanels[index].AddThemeStyleboxOverride("panel", _slotEmptyStyle);
+	}
+
+	private static void ApplySlotPanelStyles(PanelContainer[] slotPanels, StyleBoxTexture style)
+	{
+		if (slotPanels is null || style is null)
+		{
+			return;
+		}
+
+		foreach (PanelContainer slotPanel in slotPanels)
+		{
+			slotPanel?.AddThemeStyleboxOverride("panel", style);
+		}
+	}
+
+	private static StyleBoxTexture CreateTextureStyle(string texturePath, float marginX, float marginY)
+	{
+		Texture2D texture = ResourceLoader.Load<Texture2D>(texturePath);
+		if (texture is null)
+		{
+			GD.PushWarning($"Unable to load HUD UI texture: {texturePath}");
+			return null;
+		}
+
+		StyleBoxTexture style = new()
+		{
+			Texture = texture,
+		};
+		style.SetTextureMargin(Side.Left, marginX);
+		style.SetTextureMargin(Side.Right, marginX);
+		style.SetTextureMargin(Side.Top, marginY);
+		style.SetTextureMargin(Side.Bottom, marginY);
+		style.SetContentMargin(Side.Left, 0.0f);
+		style.SetContentMargin(Side.Right, 0.0f);
+		style.SetContentMargin(Side.Top, 0.0f);
+		style.SetContentMargin(Side.Bottom, 0.0f);
+		return style;
 	}
 
 	private void UnbindInventorySignals()
