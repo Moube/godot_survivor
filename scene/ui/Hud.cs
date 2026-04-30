@@ -9,9 +9,7 @@ public partial class Hud : CanvasLayer
 	private const string HudInventoryPanelTexturePath = "res://asset/art/ui/ui_hud_inventory_panel.png";
 	private const string HudGameOverPanelTexturePath = "res://asset/art/ui/ui_hud_game_over_panel.png";
 	private const string HudSlotEmptyTexturePath = "res://asset/art/ui/ui_hud_slot_empty.png";
-	private const string HudExperienceBarBackgroundTexturePath = "res://asset/art/ui/ui_hud_experience_bar_bg.png";
 	private const string HudExperienceBarFillTexturePath = "res://asset/art/ui/ui_hud_experience_bar_fill.png";
-	private const string HudHealthBarBackgroundTexturePath = "res://asset/art/ui/ui_hud_health_bar_bg.png";
 	private const string HudHealthBarFillTexturePath = "res://asset/art/ui/ui_hud_health_bar_fill.png";
 	private const int InventorySlotCount = 4;
 	private const float InventoryIconSize = 44.0f;
@@ -345,8 +343,8 @@ public partial class Hud : CanvasLayer
 		ApplyPanelStyle(_leftInventoryPanel, HudInventoryPanelTexturePath, 24.0f, 20.0f);
 		ApplyPanelStyle(_rightInventoryPanel, HudInventoryPanelTexturePath, 24.0f, 20.0f);
 		ApplyPanelStyle(_gameOverPanel, HudGameOverPanelTexturePath, 34.0f, 34.0f);
-		ApplyProgressBarStyle(_experienceBar, HudExperienceBarBackgroundTexturePath, HudExperienceBarFillTexturePath, 16.0f, 3.0f);
-		ApplyProgressBarStyle(_healthBar, HudHealthBarBackgroundTexturePath, HudHealthBarFillTexturePath, 18.0f, 5.0f);
+		ApplyProgressBarFillStyle(_experienceBar, HudExperienceBarFillTexturePath, 16.0f, 3.0f);
+		ApplyProgressBarFillStyle(_healthBar, HudHealthBarFillTexturePath, 18.0f, 5.0f);
 
 		_slotEmptyStyle = CreateTextureStyle(HudSlotEmptyTexturePath, 11.0f, 11.0f);
 		ApplySlotPanelStyles(_weaponSlotPanels, _slotEmptyStyle);
@@ -364,24 +362,20 @@ public partial class Hud : CanvasLayer
 		panel?.AddThemeStyleboxOverride("panel", style);
 	}
 
-	private static void ApplyProgressBarStyle(ProgressBar progressBar, string backgroundTexturePath, string fillTexturePath, float marginX, float marginY)
+	private static void ApplyProgressBarFillStyle(ProgressBar progressBar, string texturePath, float marginX, float marginY)
 	{
 		if (progressBar is null)
 		{
 			return;
 		}
 
-		StyleBoxTexture backgroundStyle = CreateTextureStyle(backgroundTexturePath, marginX, marginY);
-		StyleBoxTexture fillStyle = CreateTextureStyle(fillTexturePath, marginX, marginY);
-		if (backgroundStyle != null)
+		StyleBoxTexture style = CreateTextureStyle(texturePath, marginX, marginY);
+		if (style is null)
 		{
-			progressBar.AddThemeStyleboxOverride("background", backgroundStyle);
+			return;
 		}
 
-		if (fillStyle != null)
-		{
-			progressBar.AddThemeStyleboxOverride("fill", fillStyle);
-		}
+		progressBar.AddThemeStyleboxOverride("fill", style);
 	}
 
 	private void ApplySlotPanelStyle(PanelContainer[] slotPanels, int index, bool hasItem)
