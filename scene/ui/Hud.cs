@@ -8,11 +8,18 @@ public partial class Hud : CanvasLayer
 	private const string HudTimerPanelTexturePath = "res://asset/art/ui/ui_hud_timer_panel.png";
 	private const string HudInventoryPanelTexturePath = "res://asset/art/ui/ui_hud_inventory_panel.png";
 	private const string HudGameOverPanelTexturePath = "res://asset/art/ui/ui_hud_game_over_panel.png";
+	private const string HudGameOverConfirmButtonNormalTexturePath = "res://asset/art/ui/ui_hud_game_over_confirm_button_normal.png";
+	private const string HudGameOverConfirmButtonHoverTexturePath = "res://asset/art/ui/ui_hud_game_over_confirm_button_hover.png";
+	private const string HudGameOverConfirmButtonPressedTexturePath = "res://asset/art/ui/ui_hud_game_over_confirm_button_pressed.png";
+	private const string HudGameOverConfirmButtonDisabledTexturePath = "res://asset/art/ui/ui_hud_game_over_confirm_button_disabled.png";
 	private const string HudSlotEmptyTexturePath = "res://asset/art/ui/ui_hud_slot_empty.png";
 	private const string HudExperienceBarFillTexturePath = "res://asset/art/ui/ui_hud_experience_bar_fill.png";
 	private const string HudHealthBarFillTexturePath = "res://asset/art/ui/ui_hud_health_bar_fill.png";
 	private const int InventorySlotCount = 4;
 	private const float InventoryIconSize = 44.0f;
+	private const float GameOverConfirmButtonTextureMarginX = 34.0f;
+	private const float GameOverConfirmButtonTextureMarginY = 14.0f;
+	private static readonly Vector2 GameOverConfirmButtonSize = new(220.0f, 52.0f);
 
 	private ProgressBar _healthBar;
 	private ProgressBar _experienceBar;
@@ -354,6 +361,7 @@ public partial class Hud : CanvasLayer
 		ApplyPanelStyle(_leftInventoryPanel, HudInventoryPanelTexturePath, 24.0f, 20.0f);
 		ApplyPanelStyle(_rightInventoryPanel, HudInventoryPanelTexturePath, 24.0f, 20.0f);
 		ApplyPanelStyle(_gameOverPanel, HudGameOverPanelTexturePath, 34.0f, 34.0f);
+		ApplyGameOverConfirmButtonStyle(_confirmButton);
 		ApplyProgressBarFillStyle(_experienceBar, HudExperienceBarFillTexturePath, 16.0f, 3.0f);
 		ApplyProgressBarFillStyle(_healthBar, HudHealthBarFillTexturePath, 18.0f, 5.0f);
 
@@ -387,6 +395,48 @@ public partial class Hud : CanvasLayer
 		}
 
 		progressBar.AddThemeStyleboxOverride("fill", style);
+	}
+
+	private static void ApplyGameOverConfirmButtonStyle(Button button)
+	{
+		if (button is null)
+		{
+			return;
+		}
+
+		StyleBoxTexture normalStyle = CreateTextureStyle(
+			HudGameOverConfirmButtonNormalTexturePath,
+			GameOverConfirmButtonTextureMarginX,
+			GameOverConfirmButtonTextureMarginY);
+		if (normalStyle is null)
+		{
+			return;
+		}
+
+		StyleBoxTexture hoverStyle = CreateTextureStyle(
+			HudGameOverConfirmButtonHoverTexturePath,
+			GameOverConfirmButtonTextureMarginX,
+			GameOverConfirmButtonTextureMarginY);
+		StyleBoxTexture pressedStyle = CreateTextureStyle(
+			HudGameOverConfirmButtonPressedTexturePath,
+			GameOverConfirmButtonTextureMarginX,
+			GameOverConfirmButtonTextureMarginY);
+		StyleBoxTexture disabledStyle = CreateTextureStyle(
+			HudGameOverConfirmButtonDisabledTexturePath,
+			GameOverConfirmButtonTextureMarginX,
+			GameOverConfirmButtonTextureMarginY);
+
+		button.CustomMinimumSize = GameOverConfirmButtonSize;
+		button.AddThemeStyleboxOverride("normal", normalStyle);
+		button.AddThemeStyleboxOverride("hover", hoverStyle ?? normalStyle);
+		button.AddThemeStyleboxOverride("pressed", pressedStyle ?? normalStyle);
+		button.AddThemeStyleboxOverride("disabled", disabledStyle ?? normalStyle);
+		button.AddThemeStyleboxOverride("focus", hoverStyle ?? normalStyle);
+		button.AddThemeColorOverride("font_color", new Color(0.18f, 0.09f, 0.035f));
+		button.AddThemeColorOverride("font_hover_color", new Color(0.13f, 0.065f, 0.025f));
+		button.AddThemeColorOverride("font_pressed_color", new Color(0.95f, 0.82f, 0.58f));
+		button.AddThemeColorOverride("font_disabled_color", new Color(0.36f, 0.31f, 0.25f));
+		button.AddThemeConstantOverride("outline_size", 0);
 	}
 
 	private void ApplySlotPanelStyle(PanelContainer[] slotPanels, int index, bool hasItem)

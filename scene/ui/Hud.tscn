@@ -441,5 +441,7 @@ text = "Survived 00:00"
 horizontal_alignment = 1
 
 [node name="ConfirmButton" type="Button" parent="GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content" unique_id=1215819195]
+custom_minimum_size = Vector2(220, 52)
 layout_mode = 2
+size_flags_horizontal = 4
 text = "Confirm"
