@@ -33,6 +33,7 @@ public partial class ExperienceGem : Node2D
 	private readonly RandomNumberGenerator _random = new();
 
 	private Node2D _visualRoot;
+	private Sprite2D _textureVisual;
 	private Polygon2D _polygonVisual;
 	private Vector2 _launchStartPosition;
 	private Vector2 _landingPosition;
@@ -45,6 +46,7 @@ public partial class ExperienceGem : Node2D
 	{
 		_random.Randomize();
 		_visualRoot = GetNode<Node2D>("VisualRoot");
+		_textureVisual = GetNodeOrNull<Sprite2D>("VisualRoot/TextureSlot");
 		_polygonVisual = GetNodeOrNull<Polygon2D>("VisualRoot/PolygonVisual");
 		UpdateVisualState();
 	}
@@ -153,16 +155,29 @@ public partial class ExperienceGem : Node2D
 
 	private void UpdateVisualState()
 	{
+		bool hasTextureVisual = _textureVisual?.Texture is not null;
+		if (_textureVisual is not null)
+		{
+			_textureVisual.Visible = hasTextureVisual;
+			_textureVisual.Modulate = _state switch
+			{
+				GemState.Launching => new Color(1.0f, 0.94f, 0.72f, 0.85f),
+				GemState.Attracting => new Color(1.0f, 0.98f, 0.78f, 1.0f),
+				_ => Colors.White,
+			};
+		}
+
 		if (_polygonVisual is null)
 		{
 			return;
 		}
 
+		_polygonVisual.Visible = !hasTextureVisual;
 		_polygonVisual.Color = _state switch
 		{
-			GemState.Launching => new Color(0.3f, 0.9f, 1.0f, 0.85f),
-			GemState.Attracting => new Color(0.55f, 1.0f, 0.95f, 1.0f),
-			_ => new Color(0.16f, 0.75f, 1.0f, 1.0f),
+			GemState.Launching => new Color(1.0f, 0.82f, 0.28f, 0.85f),
+			GemState.Attracting => new Color(1.0f, 0.95f, 0.52f, 1.0f),
+			_ => new Color(1.0f, 0.65f, 0.08f, 1.0f),
 		};
 	}
 }
