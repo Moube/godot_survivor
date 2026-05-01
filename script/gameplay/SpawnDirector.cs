@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public partial class SpawnDirector : Node
 {
 	private const float RetryDelayWhenAtEnemyLimitSeconds = 0.35f;
+	private const float EnemySpawnSeparationPadding = 4.0f;
 
 	private readonly RandomNumberGenerator _random = new();
 	private readonly Dictionary<string, PackedScene> _enemySceneCache = new();
@@ -175,8 +176,9 @@ public partial class SpawnDirector : Node
 			return;
 		}
 
+		Vector2 spawnPosition = FindEnemySpawnPosition(enemyConfig);
 		_worldRoot.AddChild(enemy);
-		enemy.GlobalPosition = FindEnemySpawnPosition();
+		enemy.GlobalPosition = spawnPosition;
 		enemy.ApplyConfig(enemyConfig);
 	}
 
@@ -198,14 +200,16 @@ public partial class SpawnDirector : Node
 		return scene;
 	}
 
-	private Vector2 FindEnemySpawnPosition()
+	private Vector2 FindEnemySpawnPosition(EnemyConfig enemyConfig)
 	{
 		Vector2 fallback = _spawnOrigin + new Vector2(_spawnAreaHalfExtents.X, 0.0f);
+		float collisionRadius = Mathf.Max(0.1f, enemyConfig?.CollisionRadius ?? 12.0f);
 
-		for (int attempt = 0; attempt < 12; attempt++)
+		for (int attempt = 0; attempt < 24; attempt++)
 		{
 			Vector2 candidate = _spawnOrigin + GetPerimeterSpawnOffset();
-			if (candidate.DistanceTo(_player.GlobalPosition) >= _minSpawnDistanceFromPlayer)
+			if (candidate.DistanceTo(_player.GlobalPosition) >= _minSpawnDistanceFromPlayer
+				&& IsEnemySpawnPositionClear(candidate, collisionRadius))
 			{
 				return candidate;
 			}
@@ -214,6 +218,25 @@ public partial class SpawnDirector : Node
 		}
 
 		return fallback;
+	}
+
+	private bool IsEnemySpawnPositionClear(Vector2 candidate, float collisionRadius)
+	{
+		foreach (Node node in GetTree().GetNodesInGroup("enemy"))
+		{
+			if (node is not EnemyBase enemy || !IsInstanceValid(enemy))
+			{
+				continue;
+			}
+
+			float minDistance = collisionRadius + Mathf.Max(0.1f, enemy.CollisionRadius) + EnemySpawnSeparationPadding;
+			if (candidate.DistanceSquaredTo(enemy.GlobalPosition) < minDistance * minDistance)
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private Vector2 GetPerimeterSpawnOffset()

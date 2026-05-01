@@ -8,6 +8,7 @@ public partial class EnemyBase : CharacterBody2D
 	private const string DefaultExperienceGemScenePath = "res://scene/pickup/ExperienceGem.tscn";
 	private const float DefaultCollisionRadius = 12.0f;
 	private const float DistanceEpsilonSquared = 0.0001f;
+	private const uint EnemyPhysicsLayerMask = 1u << 2;
 
 	[Export]
 	public float MoveSpeed { get; set; } = 120.0f;
@@ -36,6 +37,8 @@ public partial class EnemyBase : CharacterBody2D
 	public string EnemyId { get; private set; } = string.Empty;
 
 	public int ExperienceValue { get; private set; } = 1;
+
+	public float CollisionRadius { get; private set; } = DefaultCollisionRadius;
 
 	[Export]
 	public NodePath MoveAnimationSpritePath { get; set; } = new("Sprite2D");
@@ -87,6 +90,7 @@ public partial class EnemyBase : CharacterBody2D
 	private Sprite2D _moveAnimationSprite;
 	private Sprite2D _hitFlashSprite;
 	private Sprite2D _deathDissolveSprite;
+	private CollisionShape2D _collisionShape;
 	private Material _hitFlashOriginalMaterial;
 	private ShaderMaterial _hitFlashMaterial;
 	private Material _deathDissolveOriginalMaterial;
@@ -103,6 +107,9 @@ public partial class EnemyBase : CharacterBody2D
 	public override void _Ready()
 	{
 		ConfigureEnemyDefaults();
+		EnsureEnemyCollisionLayer();
+		_collisionShape = GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+		ApplyCollisionRadius(CollisionRadius);
 		AddToGroup("enemy");
 		_combat = GetNode<CombatComponent>("CombatComponent");
 		_combat.Damaged += OnDamaged;
@@ -135,6 +142,9 @@ public partial class EnemyBase : CharacterBody2D
 		ContactDamageCooldownSeconds = Mathf.Max(0.01f, config.ContactDamageCooldownSeconds);
 		ExperienceValue = Mathf.Max(1, config.ExperienceValue);
 		Scale = Vector2.One * Mathf.Max(0.1f, config.VisualScale);
+		CollisionRadius = Mathf.Max(0.1f, config.CollisionRadius);
+		EnsureEnemyCollisionLayer();
+		ApplyCollisionRadius(CollisionRadius);
 
 		_combat ??= GetNodeOrNull<CombatComponent>("CombatComponent");
 		if (_combat != null)
@@ -521,6 +531,33 @@ public partial class EnemyBase : CharacterBody2D
 
 	protected virtual void ConfigureDropShadow(DropShadow2D dropShadow)
 	{
+	}
+
+	private void EnsureEnemyCollisionLayer()
+	{
+		CollisionLayer |= EnemyPhysicsLayerMask;
+		CollisionMask |= EnemyPhysicsLayerMask;
+	}
+
+	private void ApplyCollisionRadius(float collisionRadius)
+	{
+		_collisionShape ??= GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+		if (_collisionShape?.Shape is not CircleShape2D circleShape)
+		{
+			GD.PushWarning($"{Name} cannot apply collision radius because its CollisionShape2D is not a CircleShape2D.");
+			return;
+		}
+
+		CircleShape2D editableShape = circleShape.Duplicate() as CircleShape2D;
+		if (editableShape is null)
+		{
+			GD.PushWarning($"{Name} cannot duplicate collision shape.");
+			return;
+		}
+
+		float scale = Mathf.Max(0.001f, GetMaxAbsScale(GlobalScale));
+		editableShape.Radius = Mathf.Max(0.1f, collisionRadius) / scale;
+		_collisionShape.Shape = editableShape;
 	}
 
 	private void OnDamaged(int amount, int currentHealth, int maxHealth)
