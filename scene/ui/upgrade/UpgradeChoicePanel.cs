@@ -8,7 +8,6 @@ public partial class UpgradeChoicePanel : Control
 	public delegate void OptionSelectedEventHandler(int optionIndex);
 
 	private const int ChoiceCount = 3;
-	private const float RotatingLightRadiansPerSecond = 0.22f;
 
 	private readonly Control[] _cards = new Control[ChoiceCount];
 	private readonly Label[] _titleLabels = new Label[ChoiceCount];
@@ -17,13 +16,10 @@ public partial class UpgradeChoicePanel : Control
 	private readonly TextureRect[] _iconSlots = new TextureRect[ChoiceCount];
 	private readonly Button[] _buttons = new Button[ChoiceCount];
 	private readonly Dictionary<string, Texture2D> _iconCache = new(StringComparer.Ordinal);
-	private TextureRect _rotatingLight;
-	private float _effectTime;
 
 	public override void _Ready()
 	{
 		ProcessMode = ProcessModeEnum.Always;
-		_rotatingLight = GetNodeOrNull<TextureRect>("CenterContainer/PanelContainer/RotatingLight");
 
 		for (int i = 0; i < ChoiceCount; i++)
 		{
@@ -40,21 +36,6 @@ public partial class UpgradeChoicePanel : Control
 		}
 
 		HideChoices();
-	}
-
-	public override void _Process(double delta)
-	{
-		if (!Visible || _rotatingLight == null)
-		{
-			return;
-		}
-
-		float deltaSeconds = (float)delta;
-		_effectTime += deltaSeconds;
-		_rotatingLight.Rotation += RotatingLightRadiansPerSecond * deltaSeconds;
-
-		float alpha = 0.46f + Mathf.Sin(_effectTime * 1.4f) * 0.06f;
-		_rotatingLight.Modulate = new Color(1f, 1f, 1f, alpha);
 	}
 
 	public void ShowChoices(IReadOnlyList<UpgradeChoiceOption> options)
