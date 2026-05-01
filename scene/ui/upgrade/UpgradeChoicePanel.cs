@@ -10,7 +10,7 @@ public partial class UpgradeChoicePanel : Control
 	private const int ChoiceCount = 3;
 	private const float RotatingLightRadiansPerSecond = 0.22f;
 
-	private readonly PanelContainer[] _cards = new PanelContainer[ChoiceCount];
+	private readonly Control[] _cards = new Control[ChoiceCount];
 	private readonly Label[] _titleLabels = new Label[ChoiceCount];
 	private readonly Label[] _typeLabels = new Label[ChoiceCount];
 	private readonly Label[] _descriptionLabels = new Label[ChoiceCount];
@@ -29,12 +29,13 @@ public partial class UpgradeChoicePanel : Control
 		{
 			int optionIndex = i;
 			string cardPath = $"CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card{i + 1}";
-			_cards[i] = GetNode<PanelContainer>(cardPath);
-			_iconSlots[i] = GetNode<TextureRect>($"{cardPath}/CardMargin/CardContent/IconSlot");
-			_titleLabels[i] = GetNode<Label>($"{cardPath}/CardMargin/CardContent/TitleLabel");
-			_typeLabels[i] = GetNode<Label>($"{cardPath}/CardMargin/CardContent/TypeLabel");
-			_descriptionLabels[i] = GetNode<Label>($"{cardPath}/CardMargin/CardContent/DescriptionLabel");
-			_buttons[i] = GetNode<Button>($"{cardPath}/CardMargin/CardContent/SelectButton");
+			_cards[i] = GetNode<Control>(cardPath);
+			string contentPath = $"{cardPath}/OptionCardPanel/CardMargin/CardContent";
+			_iconSlots[i] = GetNode<TextureRect>($"{contentPath}/IconSlot");
+			_titleLabels[i] = GetNode<Label>($"{contentPath}/TitleLabel");
+			_typeLabels[i] = GetNode<Label>($"{contentPath}/TypeLabel");
+			_descriptionLabels[i] = GetNode<Label>($"{contentPath}/DescriptionLabel");
+			_buttons[i] = GetNode<Button>($"{cardPath}/SelectButton");
 			_buttons[i].Pressed += () => EmitSignal(SignalName.OptionSelected, optionIndex);
 		}
 

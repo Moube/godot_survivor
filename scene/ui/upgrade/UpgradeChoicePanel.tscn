@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scene/ui/upgrade/UpgradeChoicePanel.cs" id="1_script"]
 [ext_resource type="Texture2D" path="res://asset/art/ui/upgrade/ui_upgrade_background.png" id="2_panel_texture"]
+[ext_resource type="Texture2D" path="res://asset/art/ui/upgrade/ui_upgrade_option_background.png" id="3_option_background_texture"]
 [ext_resource type="Texture2D" path="res://asset/art/ui/upgrade/ui_upgrade_rotating_light.png" id="8_rotating_light_texture"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_overlay_panel"]
@@ -13,6 +14,13 @@ texture_margin_left = 64.0
 texture_margin_top = 48.0
 texture_margin_right = 64.0
 texture_margin_bottom = 48.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_option_background"]
+texture = ExtResource("3_option_background_texture")
+texture_margin_left = 28.0
+texture_margin_top = 28.0
+texture_margin_right = 28.0
+texture_margin_bottom = 28.0
 
 [node name="UpgradeChoicePanel" type="Control"]
 process_mode = 3
@@ -43,9 +51,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(920, 300)
+[node name="PanelContainer" type="Panel" parent="CenterContainer"]
+custom_minimum_size = Vector2(920, 620)
 layout_mode = 2
+clip_contents = true
 theme_override_styles/panel = SubResource("StyleBoxTexture_panel")
 
 [node name="RotatingLight" type="TextureRect" parent="CenterContainer/PanelContainer"]
@@ -69,54 +78,67 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 80
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 80
 
 [node name="Content" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 16
-
-[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content"]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.878431, 0.470588, 1)
-theme_override_colors/font_shadow_color = Color(0.117647, 0.0509804, 0.0117647, 0.9)
-theme_override_constants/shadow_offset_x = 1
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 24
-text = "Choose an Upgrade"
-horizontal_alignment = 1
-
-[node name="CardRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content"]
-layout_mode = 2
-theme_override_constants/separation = 16
 alignment = 1
 
-[node name="Card1" type="PanelContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow"]
-custom_minimum_size = Vector2(280, 190)
+[node name="CardRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content"]
+custom_minimum_size = Vector2(872, 386)
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 10
+alignment = 1
 
-[node name="CardMargin" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1"]
+[node name="Card1" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow"]
+custom_minimum_size = Vector2(260, 386)
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
+size_flags_horizontal = 1
+size_flags_vertical = 4
+theme_override_constants/separation = 10
+alignment = 1
 
-[node name="CardContent" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin"]
+[node name="OptionCardPanel" type="Panel" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1"]
+custom_minimum_size = Vector2(260, 340)
 layout_mode = 2
-theme_override_constants/separation = 8
+clip_contents = true
+theme_override_styles/panel = SubResource("StyleBoxTexture_option_background")
 
-[node name="IconSlot" type="TextureRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin/CardContent"]
+[node name="CardMargin" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/OptionCardPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 38
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 26
+
+[node name="CardContent" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/OptionCardPanel/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="IconSlot" type="TextureRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/OptionCardPanel/CardMargin/CardContent"]
 custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin/CardContent"]
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/OptionCardPanel/CardMargin/CardContent"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.894118, 0.556863, 1)
 theme_override_colors/font_shadow_color = Color(0.0901961, 0.0352941, 0.00784314, 0.85)
@@ -126,13 +148,13 @@ text = "Reward"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="TypeLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin/CardContent"]
+[node name="TypeLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/OptionCardPanel/CardMargin/CardContent"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.505882, 0.886275, 1, 1)
 text = "Type"
 horizontal_alignment = 1
 
-[node name="DescriptionLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin/CardContent"]
+[node name="DescriptionLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/OptionCardPanel/CardMargin/CardContent"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.941176, 0.843137, 0.647059, 1)
@@ -140,37 +162,54 @@ text = "Description"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="SelectButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1/CardMargin/CardContent"]
+[node name="SelectButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card1"]
+custom_minimum_size = Vector2(240, 36)
 layout_mode = 2
+size_flags_horizontal = 4
 theme_override_colors/font_color = Color(0.219608, 0.0941176, 0.0196078, 1)
 theme_override_colors/font_hover_color = Color(0.160784, 0.0588235, 0.00392157, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.862745, 0.415686, 1)
 theme_override_colors/font_disabled_color = Color(0.337255, 0.290196, 0.239216, 1)
 text = "Select"
 
-[node name="Card2" type="PanelContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow"]
-custom_minimum_size = Vector2(280, 190)
+[node name="Card2" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow"]
+custom_minimum_size = Vector2(260, 386)
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 1
+size_flags_vertical = 4
+theme_override_constants/separation = 10
+alignment = 1
 
-[node name="CardMargin" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2"]
+[node name="OptionCardPanel" type="Panel" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2"]
+custom_minimum_size = Vector2(260, 340)
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
+clip_contents = true
+theme_override_styles/panel = SubResource("StyleBoxTexture_option_background")
 
-[node name="CardContent" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin"]
+[node name="CardMargin" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/OptionCardPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 38
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 26
+
+[node name="CardContent" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/OptionCardPanel/CardMargin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
+alignment = 1
 
-[node name="IconSlot" type="TextureRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin/CardContent"]
+[node name="IconSlot" type="TextureRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/OptionCardPanel/CardMargin/CardContent"]
 custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin/CardContent"]
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/OptionCardPanel/CardMargin/CardContent"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.894118, 0.556863, 1)
 theme_override_colors/font_shadow_color = Color(0.0901961, 0.0352941, 0.00784314, 0.85)
@@ -180,13 +219,13 @@ text = "Reward"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="TypeLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin/CardContent"]
+[node name="TypeLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/OptionCardPanel/CardMargin/CardContent"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.505882, 0.886275, 1, 1)
 text = "Type"
 horizontal_alignment = 1
 
-[node name="DescriptionLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin/CardContent"]
+[node name="DescriptionLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/OptionCardPanel/CardMargin/CardContent"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.941176, 0.843137, 0.647059, 1)
@@ -194,37 +233,54 @@ text = "Description"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="SelectButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2/CardMargin/CardContent"]
+[node name="SelectButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card2"]
+custom_minimum_size = Vector2(240, 36)
 layout_mode = 2
+size_flags_horizontal = 4
 theme_override_colors/font_color = Color(0.219608, 0.0941176, 0.0196078, 1)
 theme_override_colors/font_hover_color = Color(0.160784, 0.0588235, 0.00392157, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.862745, 0.415686, 1)
 theme_override_colors/font_disabled_color = Color(0.337255, 0.290196, 0.239216, 1)
 text = "Select"
 
-[node name="Card3" type="PanelContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow"]
-custom_minimum_size = Vector2(280, 190)
+[node name="Card3" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow"]
+custom_minimum_size = Vector2(260, 386)
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 1
+size_flags_vertical = 4
+theme_override_constants/separation = 10
+alignment = 1
 
-[node name="CardMargin" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3"]
+[node name="OptionCardPanel" type="Panel" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3"]
+custom_minimum_size = Vector2(260, 340)
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
+clip_contents = true
+theme_override_styles/panel = SubResource("StyleBoxTexture_option_background")
 
-[node name="CardContent" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin"]
+[node name="CardMargin" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/OptionCardPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 38
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 26
+
+[node name="CardContent" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/OptionCardPanel/CardMargin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
+alignment = 1
 
-[node name="IconSlot" type="TextureRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin/CardContent"]
+[node name="IconSlot" type="TextureRect" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/OptionCardPanel/CardMargin/CardContent"]
 custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin/CardContent"]
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/OptionCardPanel/CardMargin/CardContent"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.894118, 0.556863, 1)
 theme_override_colors/font_shadow_color = Color(0.0901961, 0.0352941, 0.00784314, 0.85)
@@ -234,13 +290,13 @@ text = "Reward"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="TypeLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin/CardContent"]
+[node name="TypeLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/OptionCardPanel/CardMargin/CardContent"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.505882, 0.886275, 1, 1)
 text = "Type"
 horizontal_alignment = 1
 
-[node name="DescriptionLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin/CardContent"]
+[node name="DescriptionLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/OptionCardPanel/CardMargin/CardContent"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.941176, 0.843137, 0.647059, 1)
@@ -248,8 +304,10 @@ text = "Description"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="SelectButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3/CardMargin/CardContent"]
+[node name="SelectButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/Content/CardRow/Card3"]
+custom_minimum_size = Vector2(240, 36)
 layout_mode = 2
+size_flags_horizontal = 4
 theme_override_colors/font_color = Color(0.219608, 0.0941176, 0.0196078, 1)
 theme_override_colors/font_hover_color = Color(0.160784, 0.0588235, 0.00392157, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.862745, 0.415686, 1)
