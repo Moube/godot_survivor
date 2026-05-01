@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scene/ui/upgrade/UpgradeChoicePanel.cs" id="1_script"]
 [ext_resource type="Texture2D" path="res://asset/art/ui/upgrade/ui_upgrade_background.png" id="2_panel_texture"]
@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" path="res://asset/art/ui/upgrade/ui_upgrade_select_button_hover.png" id="5_select_button_hover_texture"]
 [ext_resource type="Texture2D" path="res://asset/art/ui/upgrade/ui_upgrade_select_button_pressed.png" id="6_select_button_pressed_texture"]
 [ext_resource type="Texture2D" path="res://asset/art/ui/upgrade/ui_upgrade_select_button_disabled.png" id="7_select_button_disabled_texture"]
+[ext_resource type="Script" path="res://scene/ui/upgrade/UpgradeSparkleLayer.cs" id="8_sparkle_layer_script"]
+[ext_resource type="Texture2D" path="res://asset/art/ui/upgrade/ui_upgrade_sparkle.png" id="9_sparkle_texture"]
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_overlay_panel"]
 bg_color = Color(0.0352941, 0.0313726, 0.0235294, 0.86)
 
@@ -88,6 +90,148 @@ custom_minimum_size = Vector2(920, 620)
 layout_mode = 2
 clip_contents = true
 theme_override_styles/panel = SubResource("StyleBoxTexture_panel")
+
+[node name="SparkleLayer" type="Control" parent="CenterContainer/PanelContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("8_sparkle_layer_script")
+
+[node name="SparkleTopLeft" type="TextureRect" parent="CenterContainer/PanelContainer/SparkleLayer"]
+layout_mode = 1
+offset_left = 83.0
+offset_top = 4.0
+offset_right = 123.0
+offset_bottom = 44.0
+pivot_offset = Vector2(20, 20)
+mouse_filter = 2
+texture = ExtResource("9_sparkle_texture")
+stretch_mode = 5
+
+[node name="SparkleTopInnerLeft" type="TextureRect" parent="CenterContainer/PanelContainer/SparkleLayer"]
+layout_mode = 1
+offset_left = 242.0
+offset_top = 8.0
+offset_right = 282.0
+offset_bottom = 48.0
+pivot_offset = Vector2(20, 20)
+mouse_filter = 2
+texture = ExtResource("9_sparkle_texture")
+stretch_mode = 5
+
+[node name="SparkleTopInnerRight" type="TextureRect" parent="CenterContainer/PanelContainer/SparkleLayer"]
+layout_mode = 1
+offset_left = 664.0
+offset_top = 8.0
+offset_right = 704.0
+offset_bottom = 48.0
+pivot_offset = Vector2(20, 20)
+mouse_filter = 2
+texture = ExtResource("9_sparkle_texture")
+stretch_mode = 5
+
+[node name="SparkleTopRight" type="TextureRect" parent="CenterContainer/PanelContainer/SparkleLayer"]
+layout_mode = 1
+offset_left = 803.0
+offset_top = 4.0
+offset_right = 843.0
+offset_bottom = 44.0
+pivot_offset = Vector2(20, 20)
+mouse_filter = 2
+texture = ExtResource("9_sparkle_texture")
+stretch_mode = 5
+
+[node name="SparkleLeftTop" type="TextureRect" parent="CenterContainer/PanelContainer/SparkleLayer"]
+layout_mode = 1
+offset_left = 5.0
+offset_top = 90.0
+offset_right = 45.0
+offset_bottom = 130.0
+pivot_offset = Vector2(20, 20)
+mouse_filter = 2
+texture = ExtResource("9_sparkle_texture")
+stretch_mode = 5
+
+[node name="SparkleLeftMiddle" type="TextureRect" parent="CenterContainer/PanelContainer/SparkleLayer"]
+layout_mode = 1
+offset_left = 4.0
+offset_top = 210.0
+offset_right = 44.0
+offset_bottom = 250.0
+pivot_offset = Vector2(20, 20)
+mouse_filter = 2
+texture = ExtResource("9_sparkle_texture")
+stretch_mode = 5
+
+[node name="SparkleLeftBottom" type="TextureRect" parent="CenterContainer/PanelContainer/SparkleLayer"]
+layout_mode = 1
+offset_left = 4.0
+offset_top = 380.0
+offset_right = 44.0
+offset_bottom = 420.0
+pivot_offset = Vector2(20, 20)
+mouse_filter = 2
+texture = ExtResource("9_sparkle_texture")
+stretch_mode = 5
+
+[node name="SparkleRightTop" type="TextureRect" parent="CenterContainer/PanelContainer/SparkleLayer"]
+layout_mode = 1
+offset_left = 875.0
+offset_top = 91.0
+offset_right = 915.0
+offset_bottom = 131.0
+pivot_offset = Vector2(20, 20)
+mouse_filter = 2
+texture = ExtResource("9_sparkle_texture")
+stretch_mode = 5
+
+[node name="SparkleRightMiddle" type="TextureRect" parent="CenterContainer/PanelContainer/SparkleLayer"]
+layout_mode = 1
+offset_left = 879.0
+offset_top = 221.0
+offset_right = 919.0
+offset_bottom = 261.0
+pivot_offset = Vector2(20, 20)
+mouse_filter = 2
+texture = ExtResource("9_sparkle_texture")
+stretch_mode = 5
+
+[node name="SparkleRightBottom" type="TextureRect" parent="CenterContainer/PanelContainer/SparkleLayer"]
+layout_mode = 1
+offset_left = 875.0
+offset_top = 376.0
+offset_right = 915.0
+offset_bottom = 416.0
+pivot_offset = Vector2(20, 20)
+mouse_filter = 2
+texture = ExtResource("9_sparkle_texture")
+stretch_mode = 5
+
+[node name="SparkleBottomLeft" type="TextureRect" parent="CenterContainer/PanelContainer/SparkleLayer"]
+layout_mode = 1
+offset_left = 87.0
+offset_top = 572.0
+offset_right = 127.0
+offset_bottom = 612.0
+pivot_offset = Vector2(20, 20)
+mouse_filter = 2
+texture = ExtResource("9_sparkle_texture")
+stretch_mode = 5
+
+[node name="SparkleBottomRight" type="TextureRect" parent="CenterContainer/PanelContainer/SparkleLayer"]
+layout_mode = 1
+offset_left = 783.0
+offset_top = 572.0
+offset_right = 823.0
+offset_bottom = 612.0
+pivot_offset = Vector2(20, 20)
+mouse_filter = 2
+texture = ExtResource("9_sparkle_texture")
+stretch_mode = 5
 
 [node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
 layout_mode = 1
