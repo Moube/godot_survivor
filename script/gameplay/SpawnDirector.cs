@@ -5,6 +5,7 @@ public partial class SpawnDirector : Node
 {
 	private const float RetryDelayWhenAtEnemyLimitSeconds = 0.35f;
 	private const float EnemySpawnSeparationPadding = 4.0f;
+	private const int SpawnPositionAttemptCount = 48;
 
 	private readonly RandomNumberGenerator _random = new();
 	private readonly Dictionary<string, PackedScene> _enemySceneCache = new();
@@ -14,9 +15,14 @@ public partial class SpawnDirector : Node
 	private Node2D _player;
 	private Vector2 _spawnOrigin;
 	private Vector2 _spawnAreaHalfExtents;
+	private Rect2 _spawnBounds;
 	private float _minSpawnDistanceFromPlayer;
+	private float _despawnDistanceFromPlayer;
+	private float _startupEnemySafeDurationRemaining;
 	private double _spawnCooldownRemaining;
 	private int _activeEntryIndex = -1;
+	private bool _hasSpawnBounds;
+	private bool _spawnAroundPlayer;
 	private bool _isRunning;
 
 	public override void _Ready()
@@ -35,6 +41,9 @@ public partial class SpawnDirector : Node
 		{
 			return;
 		}
+
+		DespawnEnemiesOutsidePlayerRange();
+		ApplyStartupEnemySafety((float)delta);
 
 		SpawnScheduleEntryConfig activeEntry = GetActiveEntry(GameSession.Instance?.ElapsedRunTime ?? 0.0);
 		if (activeEntry is null)
@@ -66,13 +75,45 @@ public partial class SpawnDirector : Node
 		Vector2 spawnAreaHalfExtents,
 		float minSpawnDistanceFromPlayer)
 	{
+		Initialize(
+			spawnSchedule,
+			worldRoot,
+			player,
+			spawnOrigin,
+			spawnAreaHalfExtents,
+			minSpawnDistanceFromPlayer,
+			0.0f,
+			new Rect2(),
+			false,
+			0.0f,
+			0.0f);
+	}
+
+	public void Initialize(
+		SpawnScheduleConfig spawnSchedule,
+		Node2D worldRoot,
+		Node2D player,
+		Vector2 spawnOrigin,
+		Vector2 spawnAreaHalfExtents,
+		float minSpawnDistanceFromPlayer,
+		float despawnDistanceFromPlayer,
+		Rect2 spawnBounds,
+		bool spawnAroundPlayer,
+		float initialSpawnDelaySeconds,
+		float startupEnemySafeDurationSeconds)
+	{
 		_spawnSchedule = spawnSchedule;
 		_worldRoot = worldRoot;
 		_player = player;
 		_spawnOrigin = spawnOrigin;
 		_spawnAreaHalfExtents = spawnAreaHalfExtents;
+		_spawnBounds = spawnBounds;
+		_hasSpawnBounds = spawnBounds.Size.X > 0.0f && spawnBounds.Size.Y > 0.0f;
 		_minSpawnDistanceFromPlayer = Mathf.Max(0.0f, minSpawnDistanceFromPlayer);
-		_spawnCooldownRemaining = 0.0;
+		_despawnDistanceFromPlayer = Mathf.Max(0.0f, despawnDistanceFromPlayer);
+		_startupEnemySafeDurationRemaining = Mathf.Max(0.0f, startupEnemySafeDurationSeconds);
+		_spawnAroundPlayer = spawnAroundPlayer;
+		_spawnCooldownRemaining = Mathf.Max(0.0f, initialSpawnDelaySeconds);
 		_activeEntryIndex = -1;
 		_isRunning = _spawnSchedule is not null && _worldRoot is not null && _player is not null;
 
@@ -176,9 +217,20 @@ public partial class SpawnDirector : Node
 			return;
 		}
 
-		Vector2 spawnPosition = FindEnemySpawnPosition(enemyConfig);
+		if (!TryFindEnemySpawnPosition(enemyConfig, out Vector2 spawnPosition))
+		{
+			enemy.QueueFree();
+			return;
+		}
+
 		_worldRoot.AddChild(enemy);
 		enemy.GlobalPosition = spawnPosition;
+		if (!IsEnemyOutsidePlayerSafeDistance(enemy.GlobalPosition))
+		{
+			enemy.QueueFree();
+			return;
+		}
+
 		enemy.ApplyConfig(enemyConfig);
 	}
 
@@ -200,24 +252,155 @@ public partial class SpawnDirector : Node
 		return scene;
 	}
 
-	private Vector2 FindEnemySpawnPosition(EnemyConfig enemyConfig)
+	private bool TryFindEnemySpawnPosition(EnemyConfig enemyConfig, out Vector2 spawnPosition)
 	{
-		Vector2 fallback = _spawnOrigin + new Vector2(_spawnAreaHalfExtents.X, 0.0f);
+		Vector2 spawnCenter = GetSpawnCenter();
 		float collisionRadius = Mathf.Max(0.1f, enemyConfig?.CollisionRadius ?? 12.0f);
 
-		for (int attempt = 0; attempt < 24; attempt++)
+		for (int attempt = 0; attempt < SpawnPositionAttemptCount; attempt++)
 		{
-			Vector2 candidate = _spawnOrigin + GetPerimeterSpawnOffset();
-			if (candidate.DistanceTo(_player.GlobalPosition) >= _minSpawnDistanceFromPlayer
-				&& IsEnemySpawnPositionClear(candidate, collisionRadius))
+			Vector2 candidate = ClampToSpawnBounds(spawnCenter + GetPerimeterSpawnOffset(), collisionRadius);
+			if (IsEnemySpawnPositionValid(candidate, collisionRadius))
 			{
-				return candidate;
+				spawnPosition = candidate;
+				return true;
 			}
-
-			fallback = candidate;
 		}
 
-		return fallback;
+		foreach (Vector2 fallbackOffset in GetFallbackSpawnOffsets())
+		{
+			Vector2 candidate = ClampToSpawnBounds(spawnCenter + fallbackOffset, collisionRadius);
+			if (IsEnemySpawnPositionValid(candidate, collisionRadius))
+			{
+				spawnPosition = candidate;
+				return true;
+			}
+		}
+
+		spawnPosition = Vector2.Zero;
+		return false;
+	}
+
+	private IEnumerable<Vector2> GetFallbackSpawnOffsets()
+	{
+		float x = Mathf.Max(_spawnAreaHalfExtents.X, _minSpawnDistanceFromPlayer);
+		float y = Mathf.Max(_spawnAreaHalfExtents.Y, _minSpawnDistanceFromPlayer);
+		yield return new Vector2(x, 0.0f);
+		yield return new Vector2(-x, 0.0f);
+		yield return new Vector2(0.0f, y);
+		yield return new Vector2(0.0f, -y);
+		yield return new Vector2(x, y);
+		yield return new Vector2(-x, y);
+		yield return new Vector2(x, -y);
+		yield return new Vector2(-x, -y);
+	}
+
+	private bool IsEnemySpawnPositionValid(Vector2 candidate, float collisionRadius)
+	{
+		if (!IsEnemyOutsidePlayerSafeDistance(candidate))
+		{
+			return false;
+		}
+
+		return IsEnemySpawnPositionClear(candidate, collisionRadius);
+	}
+
+	private bool IsEnemyOutsidePlayerSafeDistance(Vector2 position)
+	{
+		if (_player is null || !IsInstanceValid(_player))
+		{
+			return true;
+		}
+
+		float minDistance = Mathf.Max(0.0f, _minSpawnDistanceFromPlayer);
+		return position.DistanceSquaredTo(_player.GlobalPosition) >= minDistance * minDistance;
+	}
+
+	private void DespawnEnemiesOutsidePlayerRange()
+	{
+		if (_despawnDistanceFromPlayer <= 0.0f || _player is null || !IsInstanceValid(_player))
+		{
+			return;
+		}
+
+		float despawnDistanceSquared = _despawnDistanceFromPlayer * _despawnDistanceFromPlayer;
+		Vector2 playerPosition = _player.GlobalPosition;
+		foreach (Node node in GetTree().GetNodesInGroup("enemy"))
+		{
+			if (node is not EnemyBase enemy || !IsInstanceValid(enemy))
+			{
+				continue;
+			}
+
+			if (enemy.GlobalPosition.DistanceSquaredTo(playerPosition) <= despawnDistanceSquared)
+			{
+				continue;
+			}
+
+			enemy.QueueFree();
+		}
+	}
+
+	private void ApplyStartupEnemySafety(float delta)
+	{
+		if (_startupEnemySafeDurationRemaining <= 0.0f || _player is null || !IsInstanceValid(_player))
+		{
+			return;
+		}
+
+		_startupEnemySafeDurationRemaining -= Mathf.Max(0.0f, delta);
+		foreach (Node node in GetTree().GetNodesInGroup("enemy"))
+		{
+			if (node is not EnemyBase enemy || !IsInstanceValid(enemy))
+			{
+				continue;
+			}
+
+			if (IsEnemyOutsidePlayerSafeDistance(enemy.GlobalPosition))
+			{
+				continue;
+			}
+
+			enemy.QueueFree();
+		}
+	}
+
+	private Vector2 GetSpawnCenter()
+	{
+		return _spawnAroundPlayer && _player != null && IsInstanceValid(_player)
+			? _player.GlobalPosition
+			: _spawnOrigin;
+	}
+
+	private Vector2 ClampToSpawnBounds(Vector2 position, float clearance)
+	{
+		if (!_hasSpawnBounds)
+		{
+			return position;
+		}
+
+		float minX = _spawnBounds.Position.X + clearance;
+		float maxX = _spawnBounds.End.X - clearance;
+		float minY = _spawnBounds.Position.Y + clearance;
+		float maxY = _spawnBounds.End.Y - clearance;
+
+		if (minX > maxX)
+		{
+			float centerX = _spawnBounds.Position.X + _spawnBounds.Size.X * 0.5f;
+			minX = centerX;
+			maxX = centerX;
+		}
+
+		if (minY > maxY)
+		{
+			float centerY = _spawnBounds.Position.Y + _spawnBounds.Size.Y * 0.5f;
+			minY = centerY;
+			maxY = centerY;
+		}
+
+		return new Vector2(
+			Mathf.Clamp(position.X, minX, maxX),
+			Mathf.Clamp(position.Y, minY, maxY));
 	}
 
 	private bool IsEnemySpawnPositionClear(Vector2 candidate, float collisionRadius)

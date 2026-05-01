@@ -1,0 +1,108 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" uid="uid://dsre48o6hfo3g" path="res://scene/level/FormalSurvivorLevel.cs" id="1_formal_level"]
+[ext_resource type="PackedScene" uid="uid://2drw8henhjlg" path="res://scene/player/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scene/ui/Hud.tscn" id="3_hud"]
+[ext_resource type="Texture2D" path="res://asset/art/level/floor_tile.png" id="4_floor"]
+[ext_resource type="PackedScene" path="res://scene/level/ObstaclePillar.tscn" id="6_pillar"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_horizontal"]
+size = Vector2(8192, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_vertical"]
+size = Vector2(64, 8192)
+
+[node name="FormalSurvivorLevel" type="Node2D"]
+script = ExtResource("1_formal_level")
+PlayerScene = ExtResource("2_player")
+LevelConfigId = "formal_survivor_01"
+MinSpawnDistanceFromPlayer = 720.0
+SpawnAreaHalfExtents = Vector2(960, 620)
+EnemyDespawnDistanceFromPlayer = 1800.0
+SpawnEnemiesAroundPlayer = true
+InitialSpawnDelaySeconds = 1.2
+StartupEnemySafeDurationSeconds = 2.0
+ObstaclePillarScene = ExtResource("6_pillar")
+LevelSize = Vector2(8192, 8192)
+BoundaryWallThickness = 64.0
+BoundaryVisualThickness = 8.0
+ObstaclePillarCount = 72
+
+[node name="Floor" type="Polygon2D" parent="."]
+z_index = -10
+texture_repeat = 2
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(-4096, -4096, 4096, -4096, 4096, 4096, -4096, 4096)
+uv = PackedVector2Array(0, 0, 8192, 0, 8192, 8192, 0, 8192)
+texture = ExtResource("4_floor")
+
+[node name="World" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="PlayerSpawn" type="Marker2D" parent="."]
+
+[node name="Hud" parent="." instance=ExtResource("3_hud")]
+
+[node name="Walls" type="Node2D" parent="."]
+
+[node name="TopWall" type="StaticBody2D" parent="Walls"]
+collision_layer = 1
+collision_mask = 14
+position = Vector2(0, -4064)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/TopWall"]
+shape = SubResource("RectangleShape2D_wall_horizontal")
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/TopWall"]
+position = Vector2(0, -28)
+texture_repeat = 2
+color = Color(0.88, 0.96, 0.72, 0.78)
+polygon = PackedVector2Array(-4096, -4, 4096, -4, 4096, 4, -4096, 4)
+uv = PackedVector2Array(0, 0, 8192, 0, 8192, 8, 0, 8)
+
+[node name="BottomWall" type="StaticBody2D" parent="Walls"]
+collision_layer = 1
+collision_mask = 14
+position = Vector2(0, 4064)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/BottomWall"]
+shape = SubResource("RectangleShape2D_wall_horizontal")
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/BottomWall"]
+position = Vector2(0, 28)
+texture_repeat = 2
+color = Color(0.88, 0.96, 0.72, 0.78)
+polygon = PackedVector2Array(-4096, -4, 4096, -4, 4096, 4, -4096, 4)
+uv = PackedVector2Array(0, 0, 8192, 0, 8192, 8, 0, 8)
+
+[node name="LeftWall" type="StaticBody2D" parent="Walls"]
+collision_layer = 1
+collision_mask = 14
+position = Vector2(-4064, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/LeftWall"]
+shape = SubResource("RectangleShape2D_wall_vertical")
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/LeftWall"]
+position = Vector2(-28, 0)
+rotation = 1.5708
+texture_repeat = 2
+color = Color(0.88, 0.96, 0.72, 0.78)
+polygon = PackedVector2Array(-4096, -4, 4096, -4, 4096, 4, -4096, 4)
+uv = PackedVector2Array(0, 0, 8192, 0, 8192, 8, 0, 8)
+
+[node name="RightWall" type="StaticBody2D" parent="Walls"]
+collision_layer = 1
+collision_mask = 14
+position = Vector2(4064, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/RightWall"]
+shape = SubResource("RectangleShape2D_wall_vertical")
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/RightWall"]
+position = Vector2(28, 0)
+rotation = 1.5708
+texture_repeat = 2
+color = Color(0.88, 0.96, 0.72, 0.78)
+polygon = PackedVector2Array(-4096, -4, 4096, -4, 4096, 4, -4096, 4)
+uv = PackedVector2Array(0, 0, 8192, 0, 8192, 8, 0, 8)
