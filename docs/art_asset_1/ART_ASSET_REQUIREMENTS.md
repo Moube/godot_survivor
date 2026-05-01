@@ -327,7 +327,7 @@
 
 建议命名：
 
-- `wall_tile_01.png`
+- `wall_border_line.png`
 
 ### 4.3 障碍物贴图
 
@@ -442,7 +442,7 @@
 7. `hit_spark_strip.png`
 8. `enemy_death_strip.png`
 9. `floor_tile.png`
-10. `wall_tile_01.png`
+10. `wall_border_line.png`
 11. `ui_panel_basic.png`
 
 这套资源已经足够支撑：
@@ -481,7 +481,7 @@ res://asset/art/bullet/magic_projectile_basic.png
 res://asset/art/effects/hit_spark_strip.png
 res://asset/art/effects/enemy_death_strip.png
 res://asset/art/level/floor_tile.png
-res://asset/art/level/wall_tile_01.png
+res://asset/art/level/wall_border_line.png
 res://asset/art/ui/ui_panel_basic.png
 ```
 

@@ -412,6 +412,7 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 			ProjectileFireMode.MouseDirection => TryGetMouseDirection(out direction),
 			ProjectileFireMode.NearestEnemy => TryGetNearestEnemyDirection(out direction),
 			ProjectileFireMode.RandomDirection => TryGetRandomDirection(out direction),
+			ProjectileFireMode.PlayerLastMoveDirection => TryGetPlayerLastMoveDirection(out direction),
 			_ => TryGetMouseDirection(out direction),
 		};
 	}
@@ -481,6 +482,35 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 		float angle = _random.RandfRange(0.0f, Mathf.Tau);
 		direction = Vector2.Right.Rotated(angle);
 		return true;
+	}
+
+	private bool TryGetPlayerLastMoveDirection(out Vector2 direction)
+	{
+		Player player = FindOwningPlayer();
+		direction = player?.LastMoveDirection ?? Vector2.Right;
+		if (direction.LengthSquared() <= AimEpsilonSquared)
+		{
+			direction = Vector2.Right;
+		}
+
+		direction = direction.Normalized();
+		return true;
+	}
+
+	private Player FindOwningPlayer()
+	{
+		Node current = this;
+		while (current != null)
+		{
+			if (current is Player player)
+			{
+				return player;
+			}
+
+			current = current.GetParent();
+		}
+
+		return null;
 	}
 
 	private void SpawnProjectiles()

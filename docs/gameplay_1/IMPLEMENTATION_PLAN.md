@@ -168,7 +168,7 @@ res://asset/config/
 
 把当前依赖射击输入的武器改造为自动生效的战斗能力系统。
 
-注意：Gameplay 1 中的“武器”不应被限定为“发射器”。武器可以是投射物、地面范围、光环、环绕物、周期脉冲或定点打击。第一版为了验证闭环，可以先实现 `ProjectileEmitter` 类武器，但代码结构需要允许后续加入非发射器武器。
+注意：Gameplay 1 中的“武器”不应被限定为“可见的漂浮发射器”。武器可以是投射物、地面范围、光环、环绕物、周期脉冲或定点打击。第一版为了验证闭环，可以先实现 `ProjectileEmitter` 类武器，但 `ProjectileEmitter` 只表示“生成投射物的行为”，不要求美术上一定有一个漂浮在玩家周围的发射器。
 
 ### 任务
 
@@ -181,12 +181,13 @@ res://asset/config/
 2. 第一版先修改 `Weapon2D` 作为 `ProjectileEmitter` 实现：
    - 不再依赖外部持续调用 `SetFireRequested(true)`。
    - 根据武器启用状态、冷却和发射行为自动发起攻击。
-   - 保留发射动画和子弹生成逻辑。
+   - 保留可选发射动画和子弹生成逻辑；没有可见发射器的投射物武器可以只生成子弹。
 
 3. 引入 `ProjectileEmitter` 的发射行为：
    - `MouseDirection`
    - `NearestEnemy`
    - `RandomDirection`
+   - `PlayerLastMoveDirection`
 
 4. 新增或调整武器控制层：
    - 玩家持有多个武器。

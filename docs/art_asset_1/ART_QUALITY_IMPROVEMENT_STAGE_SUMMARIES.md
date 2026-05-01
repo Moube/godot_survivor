@@ -105,11 +105,12 @@
 - `asset/art/level/obstacle_pillar.png`
 - `asset/art/level/wall_border_line.png`
 
-保留：
+清理：
 
+- `scene/level/WallBlock.tscn`
 - `asset/art/level/wall_tile_01.png`
 
-保留原因是 `scene/level/WallBlock.tscn` 仍然引用该资源作为基础墙体场景的默认贴图。当前关卡实例会用 `wall_border_line.png` 覆盖显示，但基类场景依赖仍有效，因此暂不删除。
+清理原因是旧基础墙体场景已不再作为正式墙体实现使用。`Level01.tscn` 已改为直接定义墙体节点，并继续使用 `wall_border_line.png` 作为墙体显示资源。
 
 ### 验收结果
 

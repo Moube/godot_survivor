@@ -1,4 +1,5 @@
 using Godot;
+using System.Collections.Generic;
 
 public partial class Bullet : Area2D
 {
@@ -12,6 +13,12 @@ public partial class Bullet : Area2D
 	public int Damage { get; set; } = 1;
 
 	[Export]
+	public int MaxHitCount { get; set; } = 1;
+
+	[Export]
+	public float VisualSpinDegreesPerSecond { get; set; }
+
+	[Export]
 	public PackedScene HitSparkScene { get; set; }
 
 	[Export]
@@ -20,8 +27,10 @@ public partial class Bullet : Area2D
 	public Vector2 Direction { get; private set; } = Vector2.Right;
 
 	private double _remainingLifetime;
+	private int _remainingHitCount;
 	private Texture2D _visualTextureOverride;
 	private Sprite2D _sprite;
+	private readonly HashSet<ulong> _hitBodyIds = new();
 
 	public void Initialize(Vector2 direction)
 	{
@@ -40,12 +49,17 @@ public partial class Bullet : Area2D
 		_sprite = GetNodeOrNull<Sprite2D>(SpritePath);
 		ApplyVisualTextureOverride();
 		_remainingLifetime = LifetimeSeconds;
+		_remainingHitCount = Mathf.Max(1, MaxHitCount);
 		BodyEntered += OnBodyEntered;
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
 		GlobalPosition += Direction * Speed * (float)delta;
+		if (_sprite != null && !Mathf.IsZeroApprox(VisualSpinDegreesPerSecond))
+		{
+			_sprite.RotationDegrees += VisualSpinDegreesPerSecond * (float)delta;
+		}
 
 		_remainingLifetime -= delta;
 		if (_remainingLifetime <= 0.0)
@@ -61,10 +75,29 @@ public partial class Bullet : Area2D
 			return;
 		}
 
+		ulong bodyId = body.GetInstanceId();
+		if (_hitBodyIds.Contains(bodyId))
+		{
+			return;
+		}
+
 		CombatComponent targetCombat = body.GetNodeOrNull<CombatComponent>("CombatComponent");
-		targetCombat?.ApplyDamage(Damage);
+		if (targetCombat is null)
+		{
+			SpawnHitSpark();
+			QueueFree();
+			return;
+		}
+
+		_hitBodyIds.Add(bodyId);
+		targetCombat.ApplyDamage(Damage);
 		SpawnHitSpark();
-		QueueFree();
+
+		_remainingHitCount--;
+		if (_remainingHitCount <= 0)
+		{
+			QueueFree();
+		}
 	}
 
 	private void SpawnHitSpark()

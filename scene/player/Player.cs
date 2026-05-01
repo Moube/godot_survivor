@@ -22,6 +22,8 @@ public partial class Player : CharacterBody2D
 
 	public PlayerStats PlayerStats => _playerStats;
 
+	public Vector2 LastMoveDirection { get; private set; } = Vector2.Right;
+
 	private Sprite2D _sprite;
 	private WeaponInventory _weaponInventory;
 	private PassiveInventory _passiveInventory;
@@ -95,6 +97,11 @@ public partial class Player : CharacterBody2D
 		}
 
 		Vector2 inputDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
+		if (inputDirection != Vector2.Zero)
+		{
+			LastMoveDirection = inputDirection.Normalized();
+		}
+
 		Velocity = inputDirection * MoveSpeed;
 		MoveAndSlide();
 		UpdateWalkAnimation(delta, inputDirection);

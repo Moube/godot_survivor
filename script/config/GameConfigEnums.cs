@@ -13,6 +13,7 @@ public enum ProjectileFireMode
 	MouseDirection,
 	NearestEnemy,
 	RandomDirection,
+	PlayerLastMoveDirection,
 	ForwardSweep,
 	MultipleNearest,
 	FixedPattern,

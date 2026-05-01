@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" uid="uid://bpswcj3hhq2xv" path="res://scene/bullet/Bullet.cs" id="1_script"]
+[ext_resource type="Texture2D" path="res://asset/art/bullet/star_blade_projectile.png" id="2_texture"]
+[ext_resource type="PackedScene" path="res://scene/effects/HitSpark.tscn" id="3_hit_spark"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_star_blade"]
+radius = 6.0
+
+[node name="StarBladeProjectile" type="Area2D"]
+collision_layer = 8
+collision_mask = 5
+script = ExtResource("1_script")
+Speed = 720.0
+LifetimeSeconds = 1.25
+MaxHitCount = 2
+HitSparkScene = ExtResource("3_hit_spark")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_star_blade")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_texture")
