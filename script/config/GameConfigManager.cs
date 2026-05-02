@@ -133,13 +133,13 @@ public partial class GameConfigManager : Node
 				Description = GetString(row, "description", context, required: false),
 				ScenePath = GetString(row, "scene_path", context),
 				BehaviorType = GetEnum(row, "behavior_type", WeaponBehaviorType.ProjectileEmitter, context),
-				BulletScenePath = GetString(row, "bullet_scene_path", context),
+				BulletScenePath = GetString(row, "bullet_scene_path", context, required: false),
 				WeaponTexturePath = GetString(row, "weapon_texture_path", context, required: false),
 				BulletTexturePath = GetString(row, "bullet_texture_path", context, required: false),
 				IconTexturePath = GetString(row, "icon_texture_path", context, required: false),
 				MuzzleLocalPositionX = GetFloat(row, "muzzle_local_position_x", 15.0f, context),
 				MuzzleLocalPositionY = GetFloat(row, "muzzle_local_position_y", 0.0f, context),
-				ProjectileFireMode = GetEnum(row, "projectile_fire_mode", ProjectileFireMode.MouseDirection, context),
+				ProjectileFireMode = GetEnum(row, "projectile_fire_mode", ProjectileFireMode.MouseDirection, context, required: false),
 				FireCooldownSeconds = GetFloat(row, "fire_cooldown_seconds", 0.5f, context),
 				Damage = GetInt(row, "damage", 1, context),
 				ProjectileCount = GetInt(row, "projectile_count", 1, context),
@@ -601,10 +601,15 @@ public partial class GameConfigManager : Node
 		return fallback;
 	}
 
-	private static TEnum GetEnum<TEnum>(CsvRow row, string columnName, TEnum fallback, string context)
+	private static TEnum GetEnum<TEnum>(CsvRow row, string columnName, TEnum fallback, string context, bool required = true)
 		where TEnum : struct, Enum
 	{
-		string value = GetString(row, columnName, context);
+		string value = GetString(row, columnName, context, required);
+		if (string.IsNullOrWhiteSpace(value))
+		{
+			return fallback;
+		}
+
 		if (Enum.TryParse(value, ignoreCase: true, out TEnum parsed))
 		{
 			return parsed;

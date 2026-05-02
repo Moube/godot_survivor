@@ -1,0 +1,34 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scene/weapon/HolyWaterArea.cs" id="1_script"]
+[ext_resource type="PackedScene" path="res://scene/weapon/HolyWaterFlameField.tscn" id="2_flame_field"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_holy_water"]
+radius = 48.0
+
+[node name="HolyWaterArea" type="Area2D"]
+z_index = -9
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_holy_water")
+
+[node name="VisualRoot" type="Node2D" parent="."]
+z_index = 0
+
+[node name="PoolFill" type="Polygon2D" parent="VisualRoot"]
+color = Color(0.25, 0.78, 0.62, 0.34)
+polygon = PackedVector2Array(48, 0, 44.35, 18.37, 33.94, 33.94, 18.37, 44.35, 0, 48, -18.37, 44.35, -33.94, 33.94, -44.35, 18.37, -48, 0, -44.35, -18.37, -33.94, -33.94, -18.37, -44.35, 0, -48, 18.37, -44.35, 33.94, -33.94, 44.35, -18.37)
+
+[node name="PoolRim" type="Line2D" parent="VisualRoot"]
+points = PackedVector2Array(48, 0, 44.35, 18.37, 33.94, 33.94, 18.37, 44.35, 0, 48, -18.37, 44.35, -33.94, 33.94, -44.35, 18.37, -48, 0, -44.35, -18.37, -33.94, -33.94, -18.37, -44.35, 0, -48, 18.37, -44.35, 33.94, -33.94, 44.35, -18.37, 48, 0)
+width = 3.0
+default_color = Color(0.75, 1, 0.86, 0.62)
+
+[node name="InnerGlow" type="Polygon2D" parent="VisualRoot"]
+color = Color(0.62, 1, 0.86, 0.22)
+polygon = PackedVector2Array(24, 0, 20.78, 12, 12, 20.78, 0, 24, -12, 20.78, -20.78, 12, -24, 0, -20.78, -12, -12, -20.78, 0, -24, 12, -20.78, 20.78, -12)
+
+[node name="FlameField" parent="VisualRoot" instance=ExtResource("2_flame_field")]

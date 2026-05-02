@@ -346,6 +346,7 @@ public partial class Hud : CanvasLayer
 		}
 
 		Texture2D texture = ResourceLoader.Load<Texture2D>(path);
+		texture ??= LoadImageTexture(path);
 		if (texture == null)
 		{
 			GD.PushWarning($"Unable to load HUD icon texture: {path}");
@@ -353,6 +354,17 @@ public partial class Hud : CanvasLayer
 
 		_iconCache[path] = texture;
 		return texture;
+	}
+
+	private static Texture2D LoadImageTexture(string path)
+	{
+		if (!FileAccess.FileExists(path))
+		{
+			return null;
+		}
+
+		Image image = Image.LoadFromFile(path);
+		return image == null || image.IsEmpty() ? null : ImageTexture.CreateFromImage(image);
 	}
 
 	private void ApplyHudTextureStyles()
