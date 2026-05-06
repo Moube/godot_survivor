@@ -1,2 +1,3 @@
 "id"	"display_name"	"description"
 "default_experience_curve"	"Default Experience Curve"	"Early Gameplay 1 curve tuned for frequent first upgrades."
+"formal_survivor_experience_curve"	"Formal Survivor Experience Curve"	"Longer survival curve tuned against the formal spawn schedule's rising experience supply."

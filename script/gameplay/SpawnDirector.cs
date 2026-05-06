@@ -159,29 +159,41 @@ public partial class SpawnDirector : Node
 	{
 		int remainingSlots = entry.MaxEnemyCount - GetTree().GetNodesInGroup("enemy").Count;
 		int spawnCount = Mathf.Min(entry.SpawnCount, Mathf.Max(0, remainingSlots));
+		HashSet<string> selectedScenePaths = new();
 		for (int i = 0; i < spawnCount; i++)
 		{
-			EnemyConfig enemyConfig = PickEnemyConfig(entry);
+			EnemyConfig enemyConfig = PickEnemyConfig(entry, selectedScenePaths) ?? PickEnemyConfig(entry);
 			if (enemyConfig is null)
 			{
 				continue;
 			}
 
+			selectedScenePaths.Add(enemyConfig.ScenePath);
 			SpawnEnemy(enemyConfig);
 		}
 	}
 
-	private EnemyConfig PickEnemyConfig(SpawnScheduleEntryConfig entry)
+	private EnemyConfig PickEnemyConfig(SpawnScheduleEntryConfig entry, HashSet<string> excludedScenePaths = null)
 	{
 		int totalWeight = 0;
 		foreach (SpawnEnemyWeightConfig enemyWeight in entry.EnemyWeights)
 		{
+			EnemyConfig enemyConfig = GameConfigManager.Instance?.GetEnemyConfig(enemyWeight.EnemyId);
+			if (enemyConfig is null || excludedScenePaths?.Contains(enemyConfig.ScenePath) == true)
+			{
+				continue;
+			}
+
 			totalWeight += Mathf.Max(0, enemyWeight.Weight);
 		}
 
 		if (totalWeight <= 0)
 		{
-			GD.PushError("Spawn schedule entry has no positive enemy weights.");
+			if (excludedScenePaths is null)
+			{
+				GD.PushError("Spawn schedule entry has no positive enemy weights.");
+			}
+
 			return null;
 		}
 
@@ -189,13 +201,19 @@ public partial class SpawnDirector : Node
 		int accumulatedWeight = 0;
 		foreach (SpawnEnemyWeightConfig enemyWeight in entry.EnemyWeights)
 		{
+			EnemyConfig enemyConfig = GameConfigManager.Instance?.GetEnemyConfig(enemyWeight.EnemyId);
+			if (enemyConfig is null || excludedScenePaths?.Contains(enemyConfig.ScenePath) == true)
+			{
+				continue;
+			}
+
 			accumulatedWeight += Mathf.Max(0, enemyWeight.Weight);
 			if (roll > accumulatedWeight)
 			{
 				continue;
 			}
 
-			return GameConfigManager.Instance?.GetEnemyConfig(enemyWeight.EnemyId);
+			return enemyConfig;
 		}
 
 		return null;
