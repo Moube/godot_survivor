@@ -7,8 +7,8 @@
 z_index = 3
 script = ExtResource("1_script")
 AreaScene = ExtResource("2_area")
-DropHeight = 150.0
-DropDurationSeconds = 0.42
+DropHeight = 820.0
+DropDurationSeconds = 0.64
 RotationDegreesPerSecond = 720.0
 
 [node name="VisualRoot" type="Node2D" parent="."]

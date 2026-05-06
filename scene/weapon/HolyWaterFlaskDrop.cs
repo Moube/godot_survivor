@@ -15,10 +15,10 @@ public partial class HolyWaterFlaskDrop : Node2D
 	public string BottleTexturePath { get; set; } = "res://asset/art/item/weapon_holy_water.png";
 
 	[Export]
-	public float DropHeight { get; set; } = 150.0f;
+	public float DropHeight { get; set; } = 820.0f;
 
 	[Export]
-	public float DropDurationSeconds { get; set; } = 0.42f;
+	public float DropDurationSeconds { get; set; } = 0.64f;
 
 	[Export]
 	public float RotationDegreesPerSecond { get; set; } = 720.0f;
