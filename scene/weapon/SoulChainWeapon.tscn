@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scene/weapon/SoulChainWeapon.cs" id="1_script"]
+[ext_resource type="PackedScene" path="res://scene/weapon/SoulChainEffect.tscn" id="2_effect"]
+
+[node name="SoulChainWeapon" type="Node2D"]
+script = ExtResource("1_script")
+ChainEffectScene = ExtResource("2_effect")
+TargetSearchRadius = 760.0
+JumpRadius = 178.0
+StepDelaySeconds = 0.09
+EffectLingerSeconds = 0.22
+EmptyTargetRetrySeconds = 0.24

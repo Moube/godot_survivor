@@ -6,6 +6,7 @@ public enum WeaponBehaviorType
 	OrbitingObject,
 	AreaPulse,
 	TargetedStrike,
+	ChainDamage,
 }
 
 public enum ProjectileFireMode
