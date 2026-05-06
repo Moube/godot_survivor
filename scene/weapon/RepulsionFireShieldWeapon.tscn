@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scene/weapon/RepulsionFireShieldWeapon.cs" id="1_script"]
+[ext_resource type="PackedScene" path="res://scene/weapon/OrbitingFireball.tscn" id="2_fireball"]
+
+[node name="RepulsionFireShieldWeapon" type="Node2D"]
+z_index = 2
+script = ExtResource("1_script")
+FireballScene = ExtResource("2_fireball")

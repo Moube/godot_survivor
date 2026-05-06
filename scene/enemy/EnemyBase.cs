@@ -68,6 +68,9 @@ public partial class EnemyBase : CharacterBody2D
 	public float HitStunDurationSeconds { get; set; } = 0.18f;
 
 	[Export]
+	public float DeathDissolveDelayAfterHitSeconds { get; set; } = 0.08f;
+
+	[Export]
 	public NodePath DeathDissolveSpritePath { get; set; } = new("Sprite2D");
 
 	[Export]
@@ -101,6 +104,8 @@ public partial class EnemyBase : CharacterBody2D
 	private double _hitFlashRemaining;
 	private double _hitStunRemaining;
 	private double _deathDissolveElapsed;
+	private double _deathDissolveDelayRemaining;
+	private bool _isDeathDissolvePending;
 	private bool _isDeathDissolving;
 	private PackedScene _experienceGemScene;
 
@@ -562,6 +567,11 @@ public partial class EnemyBase : CharacterBody2D
 
 	private void OnDamaged(int amount, int currentHealth, int maxHealth)
 	{
+		PlayHitReaction(amount, currentHealth, maxHealth);
+	}
+
+	protected virtual void PlayHitReaction(int amount, int currentHealth, int maxHealth)
+	{
 		StartHitFlash();
 		_hitStunRemaining = Mathf.Max(0.0f, HitStunDurationSeconds);
 	}
@@ -569,6 +579,14 @@ public partial class EnemyBase : CharacterBody2D
 	private void OnDied()
 	{
 		DropExperience();
+		if (DeathDissolveDelayAfterHitSeconds > 0.0f)
+		{
+			DisableCombatCollision();
+			_isDeathDissolvePending = true;
+			_deathDissolveDelayRemaining = DeathDissolveDelayAfterHitSeconds;
+			return;
+		}
+
 		StartDeathDissolve();
 	}
 
@@ -646,8 +664,7 @@ public partial class EnemyBase : CharacterBody2D
 		_deathDissolveElapsed = 0.0;
 		_hitFlashRemaining = 0.0;
 		ApplyHitFlash(false);
-		CollisionLayer = 0;
-		CollisionMask = 0;
+		DisableCombatCollision();
 
 		if (_dropShadow != null)
 		{
@@ -675,6 +692,18 @@ public partial class EnemyBase : CharacterBody2D
 
 	private void UpdateDeathDissolve(double delta)
 	{
+		if (_isDeathDissolvePending)
+		{
+			_deathDissolveDelayRemaining -= delta;
+			if (_deathDissolveDelayRemaining <= 0.0)
+			{
+				_isDeathDissolvePending = false;
+				StartDeathDissolve();
+			}
+
+			return;
+		}
+
 		if (!_isDeathDissolving)
 		{
 			return;
@@ -689,5 +718,11 @@ public partial class EnemyBase : CharacterBody2D
 		{
 			QueueFree();
 		}
+	}
+
+	private void DisableCombatCollision()
+	{
+		CollisionLayer = 0;
+		CollisionMask = 0;
 	}
 }
