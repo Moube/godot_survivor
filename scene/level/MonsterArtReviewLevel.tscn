@@ -27,10 +27,16 @@ enabled = true
 [node name="PreviewGuide" type="Node2D" parent="."]
 
 [node name="MoveLane" type="Line2D" parent="PreviewGuide"]
-position = Vector2(0, -118)
-points = PackedVector2Array(-320, 0, 320, 0)
+position = Vector2(0, -128)
+points = PackedVector2Array(-500, 0, 500, 0)
 width = 2.0
 default_color = Color(0.18, 0.13, 0.22, 0.2)
+
+[node name="DeathLane" type="Line2D" parent="PreviewGuide"]
+position = Vector2(0, 120)
+points = PackedVector2Array(-500, 0, 500, 0)
+width = 2.0
+default_color = Color(0.18, 0.13, 0.22, 0.14)
 
 [node name="MoveTargetMarker" type="StaticBody2D" parent="PreviewGuide"]
 visible = false
@@ -52,11 +58,32 @@ offset_left = 24.0
 offset_top = 68.0
 offset_right = 360.0
 offset_bottom = 94.0
-text = "bat_preview - move loop"
+text = "Top row - move loop"
 
 [node name="DeathLabel" type="Label" parent="UiLayer"]
 offset_left = 24.0
 offset_top = 500.0
 offset_right = 360.0
 offset_bottom = 526.0
-text = "bat_preview - hit + death loop"
+text = "Bottom row - hit + death loop"
+
+[node name="BatLabel" type="Label" parent="UiLayer"]
+offset_left = 338.0
+offset_top = 68.0
+offset_right = 494.0
+offset_bottom = 94.0
+text = "bat_preview"
+
+[node name="FlowerLabel" type="Label" parent="UiLayer"]
+offset_left = 612.0
+offset_top = 68.0
+offset_right = 796.0
+offset_bottom = 94.0
+text = "flower_preview"
+
+[node name="StoneLabel" type="Label" parent="UiLayer"]
+offset_left = 898.0
+offset_top = 68.0
+offset_right = 1078.0
+offset_bottom = 94.0
+text = "stone_preview"

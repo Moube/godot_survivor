@@ -1,135 +1,169 @@
 using Godot;
+using System.Collections.Generic;
 
 public partial class MonsterArtReviewLevel : Node2D
 {
-	private const string MoveTargetGroupName = "monster_review_move_target";
-	private const string EnemyConfigId = "bat_preview";
+	private static readonly string[] ReviewEnemyConfigIds =
+	{
+		"bat_preview",
+		"flower_preview",
+		"stone_preview",
+	};
+
 	private const double DeathHitDelaySeconds = 0.65;
 	private const double DeathCycleSeconds = 2.6;
+	private const float MovePreviewY = -128.0f;
+	private const float DeathPreviewY = 120.0f;
+	private const float TargetMoveRadius = 62.0f;
+	private const float SlotSpacing = 280.0f;
 
+	private readonly List<PreviewSlot> _previewSlots = new();
 	private Node2D _world;
-	private CharacterBody2D _moveTarget;
-	private EnemyBase _movingEnemy;
-	private EnemyBase _deathEnemy;
-	private EnemyConfig _enemyConfig;
 	private double _elapsedSeconds;
-	private double _deathElapsedSeconds;
-	private bool _deathDamageApplied;
 
 	public override void _Ready()
 	{
 		GameSession.Instance?.StartNewRun();
 		_world = GetNode<Node2D>("World");
-		_enemyConfig = GameConfigManager.Instance?.GetEnemyConfig(EnemyConfigId);
-
-		CreateMoveTarget();
-		SpawnMovingPreview();
-		SpawnDeathPreview();
+		CreatePreviewSlots();
 	}
 
 	public override void _Process(double delta)
 	{
 		_elapsedSeconds += delta;
-		UpdateMoveTarget();
-		UpdateMovingPreview();
-		UpdateDeathPreview(delta);
+		foreach (PreviewSlot slot in _previewSlots)
+		{
+			UpdateMoveTarget(slot);
+			UpdateMovingPreview(slot);
+			UpdateDeathPreview(slot, delta);
+		}
 	}
 
-	private void CreateMoveTarget()
+	private void CreatePreviewSlots()
 	{
-		_moveTarget = new CharacterBody2D
+		float startX = -(ReviewEnemyConfigIds.Length - 1) * SlotSpacing * 0.5f;
+		for (int i = 0; i < ReviewEnemyConfigIds.Length; i++)
 		{
-			Name = "BatMoveTarget",
+			string configId = ReviewEnemyConfigIds[i];
+			EnemyConfig config = GameConfigManager.Instance?.GetEnemyConfig(configId);
+			if (config is null)
+			{
+				GD.PushError($"{Name} cannot create preview slot because enemy config '{configId}' is missing.");
+				continue;
+			}
+
+			PreviewSlot slot = new()
+			{
+				ConfigId = configId,
+				MoveTargetGroupName = $"monster_review_move_target_{i}",
+				Config = config,
+				OriginX = startX + i * SlotSpacing,
+				MovePhaseOffset = i * 1.35f,
+				DeathElapsedSeconds = i * 0.45,
+			};
+			CreateMoveTarget(slot, i);
+			_previewSlots.Add(slot);
+			SpawnMovingPreview(slot);
+			SpawnDeathPreview(slot);
+		}
+	}
+
+	private void CreateMoveTarget(PreviewSlot slot, int index)
+	{
+		slot.MoveTarget = new CharacterBody2D
+		{
+			Name = $"PreviewMoveTarget{index}",
 			CollisionLayer = 0,
 			CollisionMask = 0,
 		};
-		_moveTarget.AddToGroup(MoveTargetGroupName);
-		_world.AddChild(_moveTarget);
-		UpdateMoveTarget();
+		slot.MoveTarget.AddToGroup(slot.MoveTargetGroupName);
+		_world.AddChild(slot.MoveTarget);
+		UpdateMoveTarget(slot);
 	}
 
-	private void UpdateMoveTarget()
+	private void UpdateMoveTarget(PreviewSlot slot)
 	{
-		if (_moveTarget is null || !IsInstanceValid(_moveTarget))
+		if (slot.MoveTarget is null || !IsInstanceValid(slot.MoveTarget))
 		{
 			return;
 		}
 
-		float x = Mathf.Sin((float)_elapsedSeconds * 0.75f) * 260.0f;
-		float y = -118.0f + Mathf.Cos((float)_elapsedSeconds * 0.5f) * 32.0f;
-		_moveTarget.GlobalPosition = new Vector2(x, y);
+		float time = (float)_elapsedSeconds + slot.MovePhaseOffset;
+		float x = slot.OriginX + Mathf.Sin(time * 0.75f) * TargetMoveRadius;
+		float y = MovePreviewY + Mathf.Cos(time * 0.5f) * 28.0f;
+		slot.MoveTarget.GlobalPosition = new Vector2(x, y);
 	}
 
-	private void UpdateMovingPreview()
+	private void UpdateMovingPreview(PreviewSlot slot)
 	{
-		if (_movingEnemy != null && IsInstanceValid(_movingEnemy))
+		if (slot.MovingEnemy != null && IsInstanceValid(slot.MovingEnemy))
 		{
 			return;
 		}
 
-		SpawnMovingPreview();
+		SpawnMovingPreview(slot);
 	}
 
-	private void UpdateDeathPreview(double delta)
+	private void UpdateDeathPreview(PreviewSlot slot, double delta)
 	{
-		_deathElapsedSeconds += delta;
-		if (!_deathDamageApplied && _deathElapsedSeconds >= DeathHitDelaySeconds)
+		slot.DeathElapsedSeconds += delta;
+		if (!slot.DeathDamageApplied && slot.DeathElapsedSeconds >= DeathHitDelaySeconds)
 		{
-			ApplyDeathPreviewDamage();
-			_deathDamageApplied = true;
+			ApplyDeathPreviewDamage(slot);
+			slot.DeathDamageApplied = true;
 		}
 
-		if (_deathElapsedSeconds < DeathCycleSeconds)
+		if (slot.DeathElapsedSeconds < DeathCycleSeconds)
 		{
 			return;
 		}
 
-		if (_deathEnemy != null && IsInstanceValid(_deathEnemy))
+		if (slot.DeathEnemy != null && IsInstanceValid(slot.DeathEnemy))
 		{
-			_deathEnemy.QueueFree();
+			slot.DeathEnemy.QueueFree();
 		}
 
 		ClearDroppedExperience();
-		SpawnDeathPreview();
+		SpawnDeathPreview(slot);
 	}
 
-	private void SpawnMovingPreview()
+	private void SpawnMovingPreview(PreviewSlot slot)
 	{
-		_movingEnemy = SpawnPreviewEnemy(new Vector2(-260.0f, -118.0f));
-		if (_movingEnemy is null)
+		slot.MovingEnemy = SpawnPreviewEnemy(slot, new Vector2(slot.OriginX - TargetMoveRadius, MovePreviewY));
+		if (slot.MovingEnemy is null)
 		{
 			return;
 		}
 
-		_movingEnemy.TargetGroupName = MoveTargetGroupName;
+		slot.MovingEnemy.TargetGroupName = slot.MoveTargetGroupName;
 	}
 
-	private void SpawnDeathPreview()
+	private void SpawnDeathPreview(PreviewSlot slot)
 	{
-		_deathElapsedSeconds = 0.0;
-		_deathDamageApplied = false;
-		_deathEnemy = SpawnPreviewEnemy(new Vector2(0.0f, 116.0f));
-		if (_deathEnemy is null)
+		slot.DeathElapsedSeconds = 0.0;
+		slot.DeathDamageApplied = false;
+		slot.DeathEnemy = SpawnPreviewEnemy(slot, new Vector2(slot.OriginX, DeathPreviewY));
+		if (slot.DeathEnemy is null)
 		{
 			return;
 		}
 
-		_deathEnemy.TargetGroupName = "monster_review_no_target";
-		_deathEnemy.MoveSpeed = 0.1f;
+		slot.DeathEnemy.TargetGroupName = "monster_review_no_target";
+		slot.DeathEnemy.MoveSpeed = 0.1f;
 	}
 
-	private EnemyBase SpawnPreviewEnemy(Vector2 position)
+	private EnemyBase SpawnPreviewEnemy(PreviewSlot slot, Vector2 position)
 	{
-		if (_enemyConfig is null)
+		if (slot.Config is null)
 		{
-			GD.PushError($"{Name} cannot spawn preview enemy because enemy config '{EnemyConfigId}' is missing.");
+			GD.PushError($"{Name} cannot spawn preview enemy because enemy config '{slot.ConfigId}' is missing.");
 			return null;
 		}
 
-		PackedScene scene = ResourceLoader.Load<PackedScene>(_enemyConfig.ScenePath);
+		PackedScene scene = ResourceLoader.Load<PackedScene>(slot.Config.ScenePath);
 		if (scene is null)
 		{
-			GD.PushError($"{Name} cannot load enemy scene: {_enemyConfig.ScenePath}");
+			GD.PushError($"{Name} cannot load enemy scene: {slot.Config.ScenePath}");
 			return null;
 		}
 
@@ -143,18 +177,18 @@ public partial class MonsterArtReviewLevel : Node2D
 
 		_world.AddChild(enemy);
 		enemy.GlobalPosition = position;
-		enemy.ApplyConfig(_enemyConfig);
+		enemy.ApplyConfig(slot.Config);
 		return enemy;
 	}
 
-	private void ApplyDeathPreviewDamage()
+	private void ApplyDeathPreviewDamage(PreviewSlot slot)
 	{
-		if (_deathEnemy is null || !IsInstanceValid(_deathEnemy))
+		if (slot.DeathEnemy is null || !IsInstanceValid(slot.DeathEnemy))
 		{
 			return;
 		}
 
-		CombatComponent combat = _deathEnemy.GetNodeOrNull<CombatComponent>("CombatComponent");
+		CombatComponent combat = slot.DeathEnemy.GetNodeOrNull<CombatComponent>("CombatComponent");
 		combat?.ApplyDamage(999);
 	}
 
@@ -172,5 +206,19 @@ public partial class MonsterArtReviewLevel : Node2D
 				child.QueueFree();
 			}
 		}
+	}
+
+	private sealed class PreviewSlot
+	{
+		public string ConfigId { get; set; } = string.Empty;
+		public string MoveTargetGroupName { get; set; } = string.Empty;
+		public EnemyConfig Config { get; set; }
+		public CharacterBody2D MoveTarget { get; set; }
+		public EnemyBase MovingEnemy { get; set; }
+		public EnemyBase DeathEnemy { get; set; }
+		public float OriginX { get; set; }
+		public float MovePhaseOffset { get; set; }
+		public double DeathElapsedSeconds { get; set; }
+		public bool DeathDamageApplied { get; set; }
 	}
 }
