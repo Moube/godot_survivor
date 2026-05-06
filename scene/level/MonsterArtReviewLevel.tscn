@@ -1,0 +1,62 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scene/level/MonsterArtReviewLevel.cs" id="1_script"]
+[ext_resource type="Texture2D" path="res://asset/art/level/floor_tile.png" id="2_floor"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_target"]
+size = Vector2(8, 8)
+
+[node name="MonsterArtReviewLevel" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Floor" type="Polygon2D" parent="."]
+z_index = -10
+texture_repeat = 2
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(-640, -360, 640, -360, 640, 360, -640, 360)
+uv = PackedVector2Array(0, 0, 1280, 0, 1280, 720, 0, 720)
+texture = ExtResource("2_floor")
+
+[node name="World" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(0, 0)
+enabled = true
+
+[node name="PreviewGuide" type="Node2D" parent="."]
+
+[node name="MoveLane" type="Line2D" parent="PreviewGuide"]
+position = Vector2(0, -118)
+points = PackedVector2Array(-320, 0, 320, 0)
+width = 2.0
+default_color = Color(0.18, 0.13, 0.22, 0.2)
+
+[node name="MoveTargetMarker" type="StaticBody2D" parent="PreviewGuide"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PreviewGuide/MoveTargetMarker"]
+shape = SubResource("RectangleShape2D_target")
+
+[node name="UiLayer" type="CanvasLayer" parent="."]
+
+[node name="Title" type="Label" parent="UiLayer"]
+offset_left = 24.0
+offset_top = 18.0
+offset_right = 420.0
+offset_bottom = 48.0
+text = "Monster Art Review"
+
+[node name="MoveLabel" type="Label" parent="UiLayer"]
+offset_left = 24.0
+offset_top = 68.0
+offset_right = 360.0
+offset_bottom = 94.0
+text = "bat_preview - move loop"
+
+[node name="DeathLabel" type="Label" parent="UiLayer"]
+offset_left = 24.0
+offset_top = 500.0
+offset_right = 360.0
+offset_bottom = 526.0
+text = "bat_preview - hit + death loop"
