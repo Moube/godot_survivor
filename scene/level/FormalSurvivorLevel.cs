@@ -4,6 +4,9 @@ using System.Collections.Generic;
 public partial class FormalSurvivorLevel : SurvivorLevelBase
 {
 	private const string GeneratedObstacleGroupName = "formal_survivor_generated_obstacle";
+	private const string GeneratedDecorationGroupName = "formal_survivor_generated_decoration";
+
+	private readonly List<Vector2> _generatedObstaclePositions = new();
 
 	[Export]
 	public PackedScene ObstaclePillarScene { get; set; }
@@ -32,10 +35,41 @@ public partial class FormalSurvivorLevel : SurvivorLevelBase
 	[Export]
 	public float PlayerSpawnClearRadius { get; set; } = 560.0f;
 
+	[Export]
+	public PackedScene RubbleDecorationScene { get; set; }
+
+	[Export]
+	public PackedScene FlowerDecorationScene { get; set; }
+
+	[Export]
+	public int RubbleDecorationCount { get; set; } = 60;
+
+	[Export]
+	public int FlowerDecorationCount { get; set; } = 40;
+
+	[Export]
+	public int DecorationSeed { get; set; } = 2603;
+
+	[Export]
+	public float DecorationPlacementMargin { get; set; } = 220.0f;
+
+	[Export]
+	public float MinDecorationSpacing { get; set; } = 120.0f;
+
+	[Export]
+	public float SparseDecorationCellSize { get; set; } = 1024.0f;
+
+	[Export]
+	public int SparseDecorationMaxFeatureCount { get; set; } = 1;
+
+	[Export]
+	public int SparseDecorationFillCountLimit { get; set; } = 12;
+
 	protected override void ConfigureLevelBeforePlayerSpawn()
 	{
 		ConfigureLevelGeometry();
 		GenerateObstaclePillars();
+		GenerateGroundDecorations();
 	}
 
 	protected override void OnPlayerSpawned(CharacterBody2D player)
@@ -195,6 +229,7 @@ public partial class FormalSurvivorLevel : SurvivorLevelBase
 	private void GenerateObstaclePillars()
 	{
 		ClearYSortedWorldChildrenInGroup(GeneratedObstacleGroupName);
+		_generatedObstaclePositions.Clear();
 
 		if (ObstaclePillarScene is null)
 		{
@@ -203,6 +238,7 @@ public partial class FormalSurvivorLevel : SurvivorLevelBase
 		}
 
 		List<Vector2> positions = GenerateObstaclePositions();
+		_generatedObstaclePositions.AddRange(positions);
 		for (int i = 0; i < positions.Count; i++)
 		{
 			Node instance = ObstaclePillarScene.Instantiate();
@@ -287,6 +323,358 @@ public partial class FormalSurvivorLevel : SurvivorLevelBase
 		return positions;
 	}
 
+	private void GenerateGroundDecorations()
+	{
+		ClearYSortedWorldChildrenInGroup(GeneratedDecorationGroupName);
+
+		List<DecorationSpawnRequest> spawnRequests = CreateDecorationSpawnRequests();
+		if (spawnRequests.Count == 0)
+		{
+			return;
+		}
+
+		RandomNumberGenerator rng = new()
+		{
+			Seed = (ulong)Mathf.Max(1, DecorationSeed),
+		};
+		ShuffleDecorationRequests(spawnRequests, rng);
+
+		List<Vector2> positions = GenerateDecorationPositions(spawnRequests.Count, rng);
+		AddSparseDecorationFill(spawnRequests, positions, rng);
+		int spawnCount = Mathf.Min(spawnRequests.Count, positions.Count);
+		for (int i = 0; i < spawnCount; i++)
+		{
+			DecorationSpawnRequest request = spawnRequests[i];
+			Node instance = request.Scene.Instantiate();
+			if (instance is not Node2D decoration)
+			{
+				GD.PushWarning($"{Name} decoration scene '{request.NamePrefix}' must instantiate a Node2D.");
+				instance.QueueFree();
+				continue;
+			}
+
+			decoration.Name = $"{request.NamePrefix}{i + 1:000}";
+			decoration.AddToGroup(GeneratedDecorationGroupName);
+			AddYSortedWorldChild(decoration, ToGlobal(positions[i]));
+		}
+
+		if (spawnCount < spawnRequests.Count)
+		{
+			GD.PushWarning($"{Name} placed {spawnCount} of {spawnRequests.Count} ground decorations. Consider lowering MinDecorationSpacing.");
+		}
+	}
+
+	private List<DecorationSpawnRequest> CreateDecorationSpawnRequests()
+	{
+		List<DecorationSpawnRequest> spawnRequests = new();
+		AddDecorationSpawnRequests(spawnRequests, RubbleDecorationScene, RubbleDecorationCount, "RubbleDecoration");
+		AddDecorationSpawnRequests(spawnRequests, FlowerDecorationScene, FlowerDecorationCount, "FlowerDecoration");
+		return spawnRequests;
+	}
+
+	private void AddDecorationSpawnRequests(
+		List<DecorationSpawnRequest> spawnRequests,
+		PackedScene scene,
+		int count,
+		string namePrefix)
+	{
+		int targetCount = Mathf.Max(0, count);
+		if (targetCount == 0)
+		{
+			return;
+		}
+
+		if (scene is null)
+		{
+			GD.PushWarning($"{Name} {namePrefix}Scene is not assigned.");
+			return;
+		}
+
+		for (int i = 0; i < targetCount; i++)
+		{
+			spawnRequests.Add(new DecorationSpawnRequest
+			{
+				Scene = scene,
+				NamePrefix = namePrefix,
+			});
+		}
+	}
+
+	private List<Vector2> GenerateDecorationPositions(int targetCount, RandomNumberGenerator rng)
+	{
+		List<Vector2> positions = new();
+		if (targetCount <= 0)
+		{
+			return positions;
+		}
+
+		Rect2 bounds = GetPlayableBounds();
+		float margin = Mathf.Max(0.0f, DecorationPlacementMargin);
+		float minX = bounds.Position.X + margin;
+		float maxX = bounds.End.X - margin;
+		float minY = bounds.Position.Y + margin;
+		float maxY = bounds.End.Y - margin;
+		if (minX >= maxX || minY >= maxY)
+		{
+			GD.PushWarning($"{Name} decoration placement area is too small.");
+			return positions;
+		}
+
+		Marker2D spawnPoint = GetNodeOrNull<Marker2D>("PlayerSpawn");
+		Vector2 playerSpawnPosition = spawnPoint?.Position ?? Vector2.Zero;
+		float minSpacingSquared = MinDecorationSpacing * MinDecorationSpacing;
+		float playerSpawnClearRadius = PlayerSpawnClearRadius * 0.45f;
+		float playerSpawnClearRadiusSquared = playerSpawnClearRadius * playerSpawnClearRadius;
+		int maxAttempts = targetCount * 50;
+
+		for (int attempt = 0; attempt < maxAttempts && positions.Count < targetCount; attempt++)
+		{
+			Vector2 candidate = new(
+				rng.RandfRange(minX, maxX),
+				rng.RandfRange(minY, maxY));
+
+			if (candidate.DistanceSquaredTo(playerSpawnPosition) < playerSpawnClearRadiusSquared)
+			{
+				continue;
+			}
+
+			if (IsDecorationPositionClear(candidate, positions, minSpacingSquared))
+			{
+				positions.Add(candidate);
+			}
+		}
+
+		return positions;
+	}
+
+	private void AddSparseDecorationFill(
+		List<DecorationSpawnRequest> spawnRequests,
+		List<Vector2> decorationPositions,
+		RandomNumberGenerator rng)
+	{
+		int fillLimit = Mathf.Max(0, SparseDecorationFillCountLimit);
+		if (fillLimit == 0)
+		{
+			return;
+		}
+
+		if (RubbleDecorationScene is null && FlowerDecorationScene is null)
+		{
+			return;
+		}
+
+		Rect2 bounds = GetDecorationPlacementBounds();
+		float cellSize = Mathf.Max(512.0f, SparseDecorationCellSize);
+		int columnCount = Mathf.CeilToInt(bounds.Size.X / cellSize);
+		int rowCount = Mathf.CeilToInt(bounds.Size.Y / cellSize);
+		if (columnCount <= 0 || rowCount <= 0)
+		{
+			return;
+		}
+
+		List<SparseDecorationCell> sparseCells = new();
+		for (int row = 0; row < rowCount; row++)
+		{
+			for (int column = 0; column < columnCount; column++)
+			{
+				Rect2 cellBounds = CreateSparseCellBounds(bounds, column, row, cellSize);
+				int featureCount = CountFeaturesInBounds(cellBounds, decorationPositions);
+				if (featureCount <= Mathf.Max(0, SparseDecorationMaxFeatureCount))
+				{
+					sparseCells.Add(new SparseDecorationCell
+					{
+						Bounds = cellBounds,
+						FeatureCount = featureCount,
+					});
+				}
+			}
+		}
+
+		ShuffleSparseCells(sparseCells, rng);
+
+		List<Vector2> occupiedPositions = new(_generatedObstaclePositions);
+		occupiedPositions.AddRange(decorationPositions);
+		for (int i = 0; i < sparseCells.Count && fillLimit > 0; i++)
+		{
+			if (!TryCreateSparseDecorationPosition(sparseCells[i].Bounds, occupiedPositions, rng, out Vector2 position))
+			{
+				continue;
+			}
+
+			DecorationSpawnRequest request = CreateRandomDecorationSpawnRequest(rng);
+			if (request.Scene is null)
+			{
+				continue;
+			}
+
+			decorationPositions.Add(position);
+			occupiedPositions.Add(position);
+			spawnRequests.Add(request);
+			fillLimit--;
+		}
+	}
+
+	private Rect2 GetDecorationPlacementBounds()
+	{
+		Rect2 bounds = GetPlayableBounds();
+		float margin = Mathf.Max(0.0f, DecorationPlacementMargin);
+		Vector2 size = bounds.Size - Vector2.One * margin * 2.0f;
+		if (size.X <= 0.0f || size.Y <= 0.0f)
+		{
+			return bounds;
+		}
+
+		return new Rect2(bounds.Position + Vector2.One * margin, size);
+	}
+
+	private static Rect2 CreateSparseCellBounds(Rect2 bounds, int column, int row, float cellSize)
+	{
+		float left = bounds.Position.X + column * cellSize;
+		float top = bounds.Position.Y + row * cellSize;
+		float right = Mathf.Min(left + cellSize, bounds.End.X);
+		float bottom = Mathf.Min(top + cellSize, bounds.End.Y);
+		return new Rect2(left, top, Mathf.Max(0.0f, right - left), Mathf.Max(0.0f, bottom - top));
+	}
+
+	private int CountFeaturesInBounds(Rect2 bounds, List<Vector2> decorationPositions)
+	{
+		int count = 0;
+		foreach (Vector2 position in _generatedObstaclePositions)
+		{
+			if (IsPointInsideBounds(bounds, position))
+			{
+				count++;
+			}
+		}
+
+		foreach (Vector2 position in decorationPositions)
+		{
+			if (IsPointInsideBounds(bounds, position))
+			{
+				count++;
+			}
+		}
+
+		return count;
+	}
+
+	private bool TryCreateSparseDecorationPosition(
+		Rect2 bounds,
+		List<Vector2> occupiedPositions,
+		RandomNumberGenerator rng,
+		out Vector2 position)
+	{
+		position = Vector2.Zero;
+		if (bounds.Size.X <= 0.0f || bounds.Size.Y <= 0.0f)
+		{
+			return false;
+		}
+
+		Marker2D spawnPoint = GetNodeOrNull<Marker2D>("PlayerSpawn");
+		Vector2 playerSpawnPosition = spawnPoint?.Position ?? Vector2.Zero;
+		float playerSpawnClearRadius = PlayerSpawnClearRadius * 0.45f;
+		float playerSpawnClearRadiusSquared = playerSpawnClearRadius * playerSpawnClearRadius;
+		float minSpacing = Mathf.Max(MinDecorationSpacing, 220.0f);
+		float minSpacingSquared = minSpacing * minSpacing;
+
+		for (int attempt = 0; attempt < 12; attempt++)
+		{
+			Vector2 candidate = new(
+				rng.RandfRange(bounds.Position.X, bounds.End.X),
+				rng.RandfRange(bounds.Position.Y, bounds.End.Y));
+
+			if (candidate.DistanceSquaredTo(playerSpawnPosition) < playerSpawnClearRadiusSquared)
+			{
+				continue;
+			}
+
+			if (!IsDecorationPositionClear(candidate, occupiedPositions, minSpacingSquared))
+			{
+				continue;
+			}
+
+			position = candidate;
+			return true;
+		}
+
+		return false;
+	}
+
+	private DecorationSpawnRequest CreateRandomDecorationSpawnRequest(RandomNumberGenerator rng)
+	{
+		bool hasRubble = RubbleDecorationScene != null;
+		bool hasFlower = FlowerDecorationScene != null;
+		if (hasRubble && hasFlower)
+		{
+			int totalWeight = Mathf.Max(1, RubbleDecorationCount) + Mathf.Max(1, FlowerDecorationCount);
+			int roll = rng.RandiRange(1, totalWeight);
+			if (roll <= Mathf.Max(1, RubbleDecorationCount))
+			{
+				return new DecorationSpawnRequest
+				{
+					Scene = RubbleDecorationScene,
+					NamePrefix = "SparseRubbleDecoration",
+				};
+			}
+
+			return new DecorationSpawnRequest
+			{
+				Scene = FlowerDecorationScene,
+				NamePrefix = "SparseFlowerDecoration",
+			};
+		}
+
+		return new DecorationSpawnRequest
+		{
+			Scene = hasRubble ? RubbleDecorationScene : FlowerDecorationScene,
+			NamePrefix = hasRubble ? "SparseRubbleDecoration" : "SparseFlowerDecoration",
+		};
+	}
+
+	private static bool IsPointInsideBounds(Rect2 bounds, Vector2 point)
+	{
+		return point.X >= bounds.Position.X
+			&& point.X < bounds.End.X
+			&& point.Y >= bounds.Position.Y
+			&& point.Y < bounds.End.Y;
+	}
+
+	private static void ShuffleSparseCells(List<SparseDecorationCell> sparseCells, RandomNumberGenerator rng)
+	{
+		for (int i = sparseCells.Count - 1; i > 0; i--)
+		{
+			int swapIndex = rng.RandiRange(0, i);
+			(sparseCells[i], sparseCells[swapIndex]) = (sparseCells[swapIndex], sparseCells[i]);
+		}
+	}
+
+	private static bool IsDecorationPositionClear(Vector2 candidate, List<Vector2> positions, float minSpacingSquared)
+	{
+		if (minSpacingSquared <= 0.0f)
+		{
+			return true;
+		}
+
+		foreach (Vector2 position in positions)
+		{
+			if (candidate.DistanceSquaredTo(position) < minSpacingSquared)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private static void ShuffleDecorationRequests(List<DecorationSpawnRequest> spawnRequests, RandomNumberGenerator rng)
+	{
+		for (int i = spawnRequests.Count - 1; i > 0; i--)
+		{
+			int swapIndex = rng.RandiRange(0, i);
+			(spawnRequests[i], spawnRequests[swapIndex]) = (spawnRequests[swapIndex], spawnRequests[i]);
+		}
+	}
+
 	private void ConfigurePlayerCamera(CharacterBody2D player)
 	{
 		Camera2D camera = player.GetNodeOrNull<Camera2D>("Camera2D");
@@ -328,5 +716,19 @@ public partial class FormalSurvivorLevel : SurvivorLevelBase
 	private float GetBoundaryWallThickness()
 	{
 		return Mathf.Max(8.0f, BoundaryWallThickness);
+	}
+
+	private sealed class DecorationSpawnRequest
+	{
+		public PackedScene Scene { get; set; }
+
+		public string NamePrefix { get; set; } = string.Empty;
+	}
+
+	private sealed class SparseDecorationCell
+	{
+		public Rect2 Bounds { get; set; }
+
+		public int FeatureCount { get; set; }
 	}
 }

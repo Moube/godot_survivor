@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scene/level/decoration/FlowerDecoration.cs" id="1_script"]
+[ext_resource type="Texture2D" path="res://asset/art/level/decoration_flower.png" id="2_texture"]
+
+[node name="FlowerDecoration" type="Node2D"]
+z_index = -9
+script = ExtResource("1_script")
+Texture = ExtResource("2_texture")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("2_texture")

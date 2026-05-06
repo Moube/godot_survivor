@@ -1,7 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scene/level/MonsterArtReviewLevel.cs" id="1_script"]
 [ext_resource type="Texture2D" path="res://asset/art/level/floor_tile.png" id="2_floor"]
+[ext_resource type="PackedScene" path="res://scene/level/decoration/RubbleDecoration.tscn" id="3_rubble"]
+[ext_resource type="PackedScene" path="res://scene/level/decoration/FlowerDecoration.tscn" id="4_flower"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_target"]
 size = Vector2(8, 8)
@@ -19,6 +21,24 @@ texture = ExtResource("2_floor")
 
 [node name="World" type="Node2D" parent="."]
 y_sort_enabled = true
+
+[node name="RubbleDecoration01" parent="World" instance=ExtResource("3_rubble")]
+position = Vector2(-520, -236)
+
+[node name="RubbleDecoration02" parent="World" instance=ExtResource("3_rubble")]
+position = Vector2(-225, 25)
+
+[node name="RubbleDecoration03" parent="World" instance=ExtResource("3_rubble")]
+position = Vector2(435, 214)
+
+[node name="FlowerDecoration01" parent="World" instance=ExtResource("4_flower")]
+position = Vector2(-385, 210)
+
+[node name="FlowerDecoration02" parent="World" instance=ExtResource("4_flower")]
+position = Vector2(80, -232)
+
+[node name="FlowerDecoration03" parent="World" instance=ExtResource("4_flower")]
+position = Vector2(548, -56)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(0, 0)

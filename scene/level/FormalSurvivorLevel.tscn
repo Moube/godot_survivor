@@ -1,10 +1,12 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" uid="uid://dsre48o6hfo3g" path="res://scene/level/FormalSurvivorLevel.cs" id="1_formal_level"]
 [ext_resource type="PackedScene" uid="uid://2drw8henhjlg" path="res://scene/player/Player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://scene/ui/Hud.tscn" id="3_hud"]
 [ext_resource type="Texture2D" path="res://asset/art/level/floor_tile.png" id="4_floor"]
 [ext_resource type="PackedScene" path="res://scene/level/ObstaclePillar.tscn" id="6_pillar"]
+[ext_resource type="PackedScene" path="res://scene/level/decoration/RubbleDecoration.tscn" id="7_rubble"]
+[ext_resource type="PackedScene" path="res://scene/level/decoration/FlowerDecoration.tscn" id="8_flower"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_horizontal"]
 size = Vector2(8192, 64)
@@ -27,6 +29,13 @@ LevelSize = Vector2(8192, 8192)
 BoundaryWallThickness = 64.0
 BoundaryVisualThickness = 8.0
 ObstaclePillarCount = 72
+RubbleDecorationScene = ExtResource("7_rubble")
+FlowerDecorationScene = ExtResource("8_flower")
+RubbleDecorationCount = 60
+FlowerDecorationCount = 40
+SparseDecorationCellSize = 1024.0
+SparseDecorationMaxFeatureCount = 1
+SparseDecorationFillCountLimit = 12
 
 [node name="Floor" type="Polygon2D" parent="."]
 z_index = -10
