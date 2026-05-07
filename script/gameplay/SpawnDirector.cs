@@ -148,8 +148,12 @@ public partial class SpawnDirector : Node
 
 		if (selectedIndex != _activeEntryIndex)
 		{
+			bool isInitialEntrySelection = _activeEntryIndex < 0;
 			_activeEntryIndex = selectedIndex;
-			_spawnCooldownRemaining = 0.0;
+			if (!isInitialEntrySelection)
+			{
+				_spawnCooldownRemaining = 0.0;
+			}
 		}
 
 		return _spawnSchedule.Entries[selectedIndex];
