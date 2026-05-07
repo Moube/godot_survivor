@@ -406,7 +406,7 @@ public partial class UpgradeManager : Node
 
 	private void CloseChoice()
 	{
-		_choicePanel.HideChoices();
+		_choicePanel.HideChoices(animate: true);
 		_currentOptions.Clear();
 		_isChoosing = false;
 

@@ -8,6 +8,10 @@ public partial class UpgradeChoicePanel : Control
 	public delegate void OptionSelectedEventHandler(int optionIndex);
 
 	private const int ChoiceCount = 3;
+	private const double ShowTweenDurationSeconds = 0.32;
+	private const double HideTweenDurationSeconds = 0.14;
+	private static readonly Vector2 ShowStartScale = Vector2.One * 0.80f;
+	private static readonly Vector2 HideEndScale = Vector2.One * 0.94f;
 
 	private readonly Control[] _cards = new Control[ChoiceCount];
 	private readonly Label[] _titleLabels = new Label[ChoiceCount];
@@ -16,10 +20,14 @@ public partial class UpgradeChoicePanel : Control
 	private readonly TextureRect[] _iconSlots = new TextureRect[ChoiceCount];
 	private readonly Button[] _buttons = new Button[ChoiceCount];
 	private readonly Dictionary<string, Texture2D> _iconCache = new(StringComparer.Ordinal);
+	private Control _popupRoot;
+	private Tween _popupTween;
+	private bool _isHiding;
 
 	public override void _Ready()
 	{
 		ProcessMode = ProcessModeEnum.Always;
+		_popupRoot = GetNode<Control>("CenterContainer");
 
 		for (int i = 0; i < ChoiceCount; i++)
 		{
@@ -48,6 +56,8 @@ public partial class UpgradeChoicePanel : Control
 
 	public override void _ExitTree()
 	{
+		KillPopupTween();
+
 		if (GameSettings.Instance != null)
 		{
 			GameSettings.Instance.LanguageChanged -= OnLanguageChanged;
@@ -56,6 +66,11 @@ public partial class UpgradeChoicePanel : Control
 
 	public void ShowChoices(IReadOnlyList<UpgradeChoiceOption> options)
 	{
+		bool shouldPlayShowTween = !Visible || _isHiding;
+		KillPopupTween();
+		_isHiding = false;
+		SetPanelAlpha(1.0f);
+		SetOptionButtonsDisabled(false);
 		Visible = true;
 
 		for (int i = 0; i < ChoiceCount; i++)
@@ -74,11 +89,26 @@ public partial class UpgradeChoicePanel : Control
 			_descriptionLabels[i].Text = option.Description;
 			_iconSlots[i].Texture = LoadIconTexture(option.IconTexturePath);
 		}
+
+		if (shouldPlayShowTween)
+		{
+			PlayShowTween();
+		}
+		else if (_popupRoot != null)
+		{
+			_popupRoot.Scale = Vector2.One;
+		}
 	}
 
-	public void HideChoices()
+	public void HideChoices(bool animate = false)
 	{
-		Visible = false;
+		if (!animate || !Visible)
+		{
+			ForceHideChoices();
+			return;
+		}
+
+		PlayHideTween();
 	}
 
 	private void OnSelectButtonPressed(int optionIndex)
@@ -100,6 +130,87 @@ public partial class UpgradeChoicePanel : Control
 	private void OnLanguageChanged(GameLanguage language)
 	{
 		ApplyLocalizedText();
+	}
+
+	private void PlayShowTween()
+	{
+		KillPopupTween();
+		_popupTween = UiTweenUtility.ScaleEaseOutBack(
+			_popupRoot,
+			ShowStartScale,
+			Vector2.One,
+			ShowTweenDurationSeconds);
+	}
+
+	private void PlayHideTween()
+	{
+		KillPopupTween();
+		_isHiding = true;
+		SetOptionButtonsDisabled(true);
+		SetPanelAlpha(1.0f);
+		if (_popupRoot == null)
+		{
+			ForceHideChoices();
+			return;
+		}
+
+		UiTweenUtility.SetPivotToCenter(_popupRoot);
+		_popupRoot.Scale = Vector2.One;
+		_popupTween = CreateTween();
+		_popupTween.BindNode(this);
+		_popupTween.SetPauseMode(Tween.TweenPauseMode.Process);
+		_popupTween.SetParallel(true);
+		_popupTween.TweenProperty(_popupRoot, "scale", HideEndScale, HideTweenDurationSeconds)
+			.SetTrans(Tween.TransitionType.Cubic)
+			.SetEase(Tween.EaseType.In);
+		_popupTween.TweenProperty(this, "modulate:a", 0.0f, HideTweenDurationSeconds)
+			.SetTrans(Tween.TransitionType.Quad)
+			.SetEase(Tween.EaseType.In);
+		_popupTween.Finished += OnHideTweenFinished;
+	}
+
+	private void OnHideTweenFinished()
+	{
+		_popupTween = null;
+		ForceHideChoices();
+	}
+
+	private void KillPopupTween()
+	{
+		UiTweenUtility.KillTween(_popupTween);
+		_popupTween = null;
+	}
+
+	private void ForceHideChoices()
+	{
+		KillPopupTween();
+		_isHiding = false;
+		SetOptionButtonsDisabled(false);
+		SetPanelAlpha(1.0f);
+		if (_popupRoot != null)
+		{
+			_popupRoot.Scale = Vector2.One;
+		}
+
+		Visible = false;
+	}
+
+	private void SetOptionButtonsDisabled(bool disabled)
+	{
+		foreach (Button button in _buttons)
+		{
+			if (button != null)
+			{
+				button.Disabled = disabled;
+			}
+		}
+	}
+
+	private void SetPanelAlpha(float alpha)
+	{
+		Color modulate = Modulate;
+		modulate.A = alpha;
+		Modulate = modulate;
 	}
 
 	private static void PlayUiClickSound()
