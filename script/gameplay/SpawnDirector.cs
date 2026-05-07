@@ -6,6 +6,7 @@ public partial class SpawnDirector : Node
 	private const float RetryDelayWhenAtEnemyLimitSeconds = 0.35f;
 	private const float EnemySpawnSeparationPadding = 4.0f;
 	private const int SpawnPositionAttemptCount = 48;
+	private const uint WorldPhysicsLayerMask = 1u << 0;
 
 	private readonly RandomNumberGenerator _random = new();
 	private readonly Dictionary<string, PackedScene> _enemySceneCache = new();
@@ -245,8 +246,8 @@ public partial class SpawnDirector : Node
 			return;
 		}
 
+		enemy.Position = _worldRoot.ToLocal(spawnPosition);
 		_worldRoot.AddChild(enemy);
-		enemy.GlobalPosition = spawnPosition;
 		if (!IsEnemyOutsidePlayerSafeDistance(enemy.GlobalPosition))
 		{
 			enemy.QueueFree();
@@ -427,6 +428,11 @@ public partial class SpawnDirector : Node
 
 	private bool IsEnemySpawnPositionClear(Vector2 candidate, float collisionRadius)
 	{
+		if (!IsEnemySpawnPositionClearOfWorld(candidate, collisionRadius))
+		{
+			return false;
+		}
+
 		foreach (Node node in GetTree().GetNodesInGroup("enemy"))
 		{
 			if (node is not EnemyBase enemy || !IsInstanceValid(enemy))
@@ -442,6 +448,30 @@ public partial class SpawnDirector : Node
 		}
 
 		return true;
+	}
+
+	private bool IsEnemySpawnPositionClearOfWorld(Vector2 candidate, float collisionRadius)
+	{
+		PhysicsDirectSpaceState2D spaceState = _worldRoot?.GetWorld2D()?.DirectSpaceState;
+		if (spaceState is null)
+		{
+			return true;
+		}
+
+		CircleShape2D shape = new()
+		{
+			Radius = Mathf.Max(0.1f, collisionRadius),
+		};
+		PhysicsShapeQueryParameters2D query = new()
+		{
+			Shape = shape,
+			Transform = new Transform2D(0.0f, candidate),
+			CollisionMask = WorldPhysicsLayerMask,
+			CollideWithBodies = true,
+			CollideWithAreas = false,
+		};
+
+		return spaceState.IntersectShape(query, 1).Count == 0;
 	}
 
 	private Vector2 GetPerimeterSpawnOffset()
