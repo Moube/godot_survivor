@@ -1,6 +1,105 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=8 format=3]
 
-[ext_resource type="PackedScene" path="res://scene/level/Level01.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://8nlbxxmurrua" path="res://scene/level/TestMaxExperienceLevel.cs" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://2drw8henhjlg" path="res://scene/player/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scene/ui/Hud.tscn" id="3_hud"]
+[ext_resource type="Texture2D" path="res://asset/art/level/floor_tile.png" id="4_floor"]
+[ext_resource type="Texture2D" path="res://asset/art/level/wall_border_line.png" id="5_wall"]
+[ext_resource type="PackedScene" path="res://scene/level/ObstaclePillar.tscn" id="6_pillar"]
 
-[node name="TestMaxExperienceLevel" instance=ExtResource("1_base")]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_horizontal"]
+size = Vector2(960, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_vertical"]
+size = Vector2(32, 640)
+
+[node name="TestMaxExperienceLevel" type="Node2D"]
+script = ExtResource("1_script")
+PlayerScene = ExtResource("2_player")
 LevelConfigId = "test_max_experience"
+
+[node name="Floor" type="Polygon2D" parent="."]
+z_index = -10
+texture_repeat = 2
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(-512, -352, 512, -352, 512, 352, -512, 352)
+uv = PackedVector2Array(0, 0, 1024, 0, 1024, 704, 0, 704)
+texture = ExtResource("4_floor")
+
+[node name="World" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="PlayerSpawn" type="Marker2D" parent="."]
+
+[node name="Hud" parent="." instance=ExtResource("3_hud")]
+
+[node name="Walls" type="Node2D" parent="."]
+
+[node name="TopWall" type="StaticBody2D" parent="Walls"]
+collision_layer = 1
+collision_mask = 14
+position = Vector2(0, -320)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/TopWall"]
+shape = SubResource("RectangleShape2D_wall_horizontal")
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/TopWall"]
+texture_repeat = 2
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(-480, -16, 480, -16, 480, 16, -480, 16)
+uv = PackedVector2Array(0, 0, 960, 0, 960, 32, 0, 32)
+texture = ExtResource("5_wall")
+
+[node name="BottomWall" type="StaticBody2D" parent="Walls"]
+collision_layer = 1
+collision_mask = 14
+position = Vector2(0, 320)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/BottomWall"]
+shape = SubResource("RectangleShape2D_wall_horizontal")
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/BottomWall"]
+texture_repeat = 2
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(-480, -16, 480, -16, 480, 16, -480, 16)
+uv = PackedVector2Array(0, 0, 960, 0, 960, 32, 0, 32)
+texture = ExtResource("5_wall")
+
+[node name="LeftWall" type="StaticBody2D" parent="Walls"]
+collision_layer = 1
+collision_mask = 14
+position = Vector2(-480, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/LeftWall"]
+shape = SubResource("RectangleShape2D_wall_vertical")
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/LeftWall"]
+texture_repeat = 2
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(-16, -320, 16, -320, 16, 320, -16, 320)
+uv = PackedVector2Array(0, 0, 0, 32, 640, 32, 640, 0)
+texture = ExtResource("5_wall")
+
+[node name="RightWall" type="StaticBody2D" parent="Walls"]
+collision_layer = 1
+collision_mask = 14
+position = Vector2(480, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/RightWall"]
+shape = SubResource("RectangleShape2D_wall_vertical")
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/RightWall"]
+texture_repeat = 2
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(-16, -320, 16, -320, 16, 320, -16, 320)
+uv = PackedVector2Array(0, 0, 0, 32, 640, 32, 640, 0)
+texture = ExtResource("5_wall")
+
+[node name="CenterBlock" parent="World" instance=ExtResource("6_pillar")]
+position = Vector2(10, -7)
+
+[node name="WideBlockLeft" parent="World" instance=ExtResource("6_pillar")]
+position = Vector2(-170, 229)
+
+[node name="WideBlockRight" parent="World" instance=ExtResource("6_pillar")]
+position = Vector2(190, 229)

@@ -53,14 +53,12 @@ public static class GameText
 		["ui.upgrade.effect.stat_bonus"] = new("属性加成 {0}。", "Stat bonus {0}."),
 		["ui.upgrade.effect.generic_improvement"] = new("提升对应属性加成。", "Improves its stat bonus."),
 
-		["config.level.level_01.name"] = new("训练场", "Training Grounds"),
-		["config.level.level_01.description"] = new("首个生存试炼场。", "First survival test arena."),
-		["config.level.formal_survivor_01.name"] = new("生存之地", "Survivor Grounds"),
+		["config.level.formal_survivor_01.name"] = new("正式关卡", "Formal Level"),
 		["config.level.formal_survivor_01.description"] = new("大型生存场地，散布石柱。", "Large survival arena with scattered pillars."),
-		["config.level.monster_art_review.name"] = new("怪物美术预览", "Monster Art Review"),
+		["config.level.monster_art_review.name"] = new("美术验收关卡", "Art Acceptance Level"),
 		["config.level.monster_art_review.description"] = new("仅用于测试怪物移动和死亡表现的场地。", "Test-only arena for reviewing monster movement and death visuals."),
-		["config.level.test_max_experience.name"] = new("最大经验测试", "Max EXP Test"),
-		["config.level.test_max_experience.description"] = new("仅生成最大经验测试敌人的测试场地。", "Test-only arena that spawns only the max-experience test enemy."),
+		["config.level.test_max_experience.name"] = new("升级验收关卡", "Upgrade Acceptance Level"),
+		["config.level.test_max_experience.description"] = new("仅用于升级验收的测试场地。", "Test-only arena for upgrade acceptance."),
 
 		["config.weapon.magic_wand.name"] = new("浮空法杖", "Floating Magic Wand"),
 		["config.weapon.magic_wand.description"] = new("向鼠标指针发射魔法弹。", "Fires a magic bolt toward the mouse cursor."),

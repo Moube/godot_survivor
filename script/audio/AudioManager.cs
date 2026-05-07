@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 public enum AudioCueId
 {
-	TitleStinger,
 	UiClick,
 	UiHover,
 	GameplayMusic,
@@ -52,6 +51,7 @@ public partial class AudioManager : Node
 		WarmUpCue(AudioCueId.UiClick);
 		WarmUpCue(AudioCueId.UiHover);
 		WarmUpCue(AudioCueId.ExperiencePickup);
+		PlayGameplayMusic();
 	}
 
 	public override void _ExitTree()
@@ -60,11 +60,6 @@ public partial class AudioManager : Node
 		{
 			Instance = null;
 		}
-	}
-
-	public void PlayTitleStinger()
-	{
-		PlaySfx(AudioCueId.TitleStinger);
 	}
 
 	public void PlayUiClick()
@@ -182,18 +177,6 @@ public partial class AudioManager : Node
 	private void RegisterDefaultCues()
 	{
 		_cueDefinitions.Clear();
-		RegisterCue(AudioCueId.TitleStinger, new AudioCueDefinition(
-			new[]
-			{
-				"res://asset/audio/ui/title_start.wav",
-				"res://asset/audio/ui/title_start.ogg",
-				"res://asset/audio/ui/title_start.mp3",
-				"res://asset/audio/title_start.wav",
-				"res://asset/audio/title_start.ogg",
-				"res://asset/audio/title_start.mp3",
-			},
-			volumeDb: -2.0f,
-			minIntervalSeconds: 0.25));
 
 		RegisterCue(AudioCueId.UiClick, new AudioCueDefinition(
 			new[]

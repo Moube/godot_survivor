@@ -1,4 +1,3 @@
 "id"	"display_name"	"description"
-"level_01_schedule"	"Level 01 Spawn Schedule"	"Time-based enemy pressure for the first Gameplay 1 pass."
 "formal_survivor_01_schedule"	"Formal Survivor 01 Spawn Schedule"	"Fifteen-minute mixed-art survival pressure tuned for steadier experience pacing."
 "test_max_experience_schedule"	"Max EXP Test Spawn Schedule"	"Spawns only the max-experience test enemy."

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public partial class Main : Control
 {
-	private const string FallbackLevelScenePath = "res://scene/level/Level01.tscn";
+	private const string FallbackLevelScenePath = "res://scene/level/FormalSurvivorLevel.tscn";
 	private const string GrassTexturePath = "res://asset/art/level/floor_tile.png";
 	private const string SlimeTexturePath = "res://asset/art/enemy/enemy_slime_move_strip_4f.png";
 	private const string DropShadowScenePath = "res://scene/common/DropShadow2D.tscn";
@@ -85,7 +85,6 @@ public partial class Main : Control
 	public override void _Ready()
 	{
 		GetTree().Paused = false;
-		AudioManager.Instance?.StopGameplayMusic();
 		_rng.Randomize();
 		CreateAmbientBackground();
 
@@ -132,7 +131,6 @@ public partial class Main : Control
 		ApplyLocalizedText();
 		PopulateLevelButtons();
 		ShowMainMenu();
-		AudioManager.Instance?.PlayTitleStinger();
 	}
 
 	public override void _ExitTree()
@@ -200,12 +198,12 @@ public partial class Main : Control
 	{
 		Button button = new()
 		{
-			Text = GameText.ConfigName("level", "level_01", "Level 01"),
+			Text = GameText.ConfigName("level", "formal_survivor_01", "正式关卡"),
 			CustomMinimumSize = LevelSelectButtonSize,
 		};
 		ApplyLevelSelectButtonStyle(button);
 		ConnectUiClickSound(button);
-		button.Pressed += () => OnLevelButtonPressed(FallbackLevelScenePath, "level_01");
+		button.Pressed += () => OnLevelButtonPressed(FallbackLevelScenePath, "formal_survivor_01");
 		_levelButtonGrid.AddChild(button);
 	}
 

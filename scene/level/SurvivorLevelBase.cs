@@ -6,7 +6,7 @@ public abstract partial class SurvivorLevelBase : PausableLevelBase
 	public PackedScene PlayerScene { get; set; }
 
 	[Export]
-	public string LevelConfigId { get; set; } = "level_01";
+	public string LevelConfigId { get; set; } = "formal_survivor_01";
 
 	[Export]
 	public int GridSize { get; set; } = 64;
@@ -69,12 +69,6 @@ public abstract partial class SurvivorLevelBase : PausableLevelBase
 		StartSpawnDirector();
 		StartUpgradeManager();
 		QueueRedraw();
-		AudioManager.Instance?.PlayGameplayMusic();
-	}
-
-	public override void _ExitTree()
-	{
-		AudioManager.Instance?.StopGameplayMusic();
 	}
 
 	public override void _Process(double delta)

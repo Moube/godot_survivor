@@ -71,7 +71,7 @@ offset_left = 24.0
 offset_top = 18.0
 offset_right = 420.0
 offset_bottom = 48.0
-text = "Monster Art Review"
+text = "美术验收关卡"
 
 [node name="MoveLabel" type="Label" parent="UiLayer"]
 offset_left = 24.0
