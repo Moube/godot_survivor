@@ -226,7 +226,7 @@ public partial class AudioManager : Node
 				"res://asset/audio/ui_hover.ogg",
 				"res://asset/audio/ui_hover.mp3",
 			},
-			volumeDb: 8.0f,
+			volumeDb: -8.0f,
 			minIntervalSeconds: 0.08,
 			pitchMin: 0.99f,
 			pitchMax: 1.03f));
