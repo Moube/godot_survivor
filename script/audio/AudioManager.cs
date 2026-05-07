@@ -282,7 +282,7 @@ public partial class AudioManager : Node
 				"res://asset/audio/game_over.ogg",
 				"res://asset/audio/game_over.mp3",
 			},
-			volumeDb: -3.0f,
+			volumeDb: -12.0f,
 			minIntervalSeconds: 0.25));
 
 		RegisterCue(AudioCueId.LevelUp, new AudioCueDefinition(

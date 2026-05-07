@@ -85,6 +85,7 @@ public partial class Main : Control
 	public override void _Ready()
 	{
 		GetTree().Paused = false;
+		AudioManager.Instance?.PlayGameplayMusic();
 		_rng.Randomize();
 		CreateAmbientBackground();
 
