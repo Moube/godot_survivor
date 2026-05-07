@@ -24,6 +24,9 @@ public partial class Hud : CanvasLayer
 	private ProgressBar _healthBar;
 	private ProgressBar _experienceBar;
 	private Label _runTimeLabel;
+	private Label _weaponInventoryTitleLabel;
+	private Label _passiveInventoryTitleLabel;
+	private Label _gameOverTitleLabel;
 	private PanelContainer _runTimePanel;
 	private PanelContainer _leftInventoryPanel;
 	private PanelContainer _rightInventoryPanel;
@@ -40,6 +43,7 @@ public partial class Hud : CanvasLayer
 	private StyleBoxTexture _slotEmptyStyle;
 	private WeaponInventory _boundWeaponInventory;
 	private PassiveInventory _boundPassiveInventory;
+	private double _lastFinalSurvivalTime;
 	private readonly Dictionary<string, Texture2D> _iconCache = new(StringComparer.Ordinal);
 
 	public override void _Ready()
@@ -50,8 +54,11 @@ public partial class Hud : CanvasLayer
 		_runTimeLabel = GetNode<Label>("TopCenter/RunTimePanel/RunTimeMargin/RunTimeLabel");
 		_leftInventoryPanel = GetNode<PanelContainer>("LeftInventoryPanel");
 		_rightInventoryPanel = GetNode<PanelContainer>("RightInventoryPanel");
+		_weaponInventoryTitleLabel = GetNode<Label>("LeftInventoryPanel/MarginContainer/Content/TitleLabel");
+		_passiveInventoryTitleLabel = GetNode<Label>("RightInventoryPanel/MarginContainer/Content/TitleLabel");
 		_gameOverCenter = GetNode<Control>("GameOverCenter");
 		_gameOverPanel = GetNode<PanelContainer>("GameOverCenter/PanelContainer");
+		_gameOverTitleLabel = GetNode<Label>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/TitleLabel");
 		_finalSurvivalTimeLabel = GetNode<Label>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/FinalSurvivalTimeLabel");
 		_confirmButton = GetNode<Button>("GameOverCenter/PanelContainer/VBoxContainer/GameOverMargin/Content/ConfirmButton");
 		_weaponSlotPanels = LoadSlotPanels("LeftInventoryPanel/MarginContainer/Content/WeaponSlots", "WeaponSlot");
@@ -66,6 +73,12 @@ public partial class Hud : CanvasLayer
 		_confirmButton.ButtonDown += PlayUiClickSound;
 		_confirmButton.MouseEntered += PlayUiHoverSound;
 		_confirmButton.Pressed += OnConfirmButtonPressed;
+		ApplyLocalizedText();
+
+		if (GameSettings.Instance != null)
+		{
+			GameSettings.Instance.LanguageChanged += OnLanguageChanged;
+		}
 
 		if (GameSession.Instance is null)
 		{
@@ -101,6 +114,11 @@ public partial class Hud : CanvasLayer
 			GameSession.Instance.RunTimeChanged -= OnRunTimeChanged;
 			GameSession.Instance.PlayerHealthChanged -= OnPlayerHealthChanged;
 			GameSession.Instance.GameOver -= OnGameOver;
+		}
+
+		if (GameSettings.Instance != null)
+		{
+			GameSettings.Instance.LanguageChanged -= OnLanguageChanged;
 		}
 
 		if (ExperienceController.Instance != null)
@@ -164,7 +182,8 @@ public partial class Hud : CanvasLayer
 		_gameOverCenter.MouseFilter = isVisible ? Control.MouseFilterEnum.Stop : Control.MouseFilterEnum.Ignore;
 		_gameOverPanel.Visible = isVisible;
 		_confirmButton.Disabled = !isVisible;
-		_finalSurvivalTimeLabel.Text = $"Survived {FormatRunTime(finalSurvivalTime)}";
+		_lastFinalSurvivalTime = finalSurvivalTime;
+		_finalSurvivalTimeLabel.Text = GameText.Format("ui.hud.survived_time", FormatRunTime(finalSurvivalTime));
 	}
 
 	private void OnConfirmButtonPressed()
@@ -341,8 +360,42 @@ public partial class Hud : CanvasLayer
 		}
 
 		levelLabels[index].Visible = level > 0;
-		levelLabels[index].Text = level > 0 ? $"Lv.{level}" : string.Empty;
+		levelLabels[index].Text = level > 0 ? $"{GameText.Tr("ui.hud.level_prefix")}{level}" : string.Empty;
 		levelLabels[index].TooltipText = tooltipText ?? string.Empty;
+	}
+
+	private void ApplyLocalizedText()
+	{
+		if (_weaponInventoryTitleLabel != null)
+		{
+			_weaponInventoryTitleLabel.Text = GameText.Tr("ui.hud.weapons");
+		}
+
+		if (_passiveInventoryTitleLabel != null)
+		{
+			_passiveInventoryTitleLabel.Text = GameText.Tr("ui.hud.passives");
+		}
+
+		if (_gameOverTitleLabel != null)
+		{
+			_gameOverTitleLabel.Text = GameText.Tr("ui.hud.game_over");
+		}
+
+		if (_confirmButton != null)
+		{
+			_confirmButton.Text = GameText.Tr("ui.common.confirm");
+		}
+
+		if (_finalSurvivalTimeLabel != null)
+		{
+			_finalSurvivalTimeLabel.Text = GameText.Format("ui.hud.survived_time", FormatRunTime(_lastFinalSurvivalTime));
+		}
+	}
+
+	private void OnLanguageChanged(GameLanguage language)
+	{
+		ApplyLocalizedText();
+		RefreshInventoryHud();
 	}
 
 	private Texture2D LoadIconTexture(string path)

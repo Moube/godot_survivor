@@ -16,7 +16,10 @@ public sealed class PassiveInventoryEntry
 
 	public int Level { get; set; }
 
-	public string DisplayName => string.IsNullOrWhiteSpace(Config?.DisplayName) ? PassiveId : Config.DisplayName;
+	public string DisplayName => GameText.ConfigName(
+		"passive",
+		PassiveId,
+		string.IsNullOrWhiteSpace(Config?.DisplayName) ? PassiveId : Config.DisplayName);
 
 	public int MaxLevel => Mathf.Max(1, Config?.MaxLevel ?? Level);
 }

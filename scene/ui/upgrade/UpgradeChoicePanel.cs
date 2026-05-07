@@ -37,7 +37,21 @@ public partial class UpgradeChoicePanel : Control
 			_buttons[i].Pressed += () => OnSelectButtonPressed(optionIndex);
 		}
 
+		if (GameSettings.Instance != null)
+		{
+			GameSettings.Instance.LanguageChanged += OnLanguageChanged;
+		}
+
+		ApplyLocalizedText();
 		HideChoices();
+	}
+
+	public override void _ExitTree()
+	{
+		if (GameSettings.Instance != null)
+		{
+			GameSettings.Instance.LanguageChanged -= OnLanguageChanged;
+		}
 	}
 
 	public void ShowChoices(IReadOnlyList<UpgradeChoiceOption> options)
@@ -70,6 +84,22 @@ public partial class UpgradeChoicePanel : Control
 	private void OnSelectButtonPressed(int optionIndex)
 	{
 		EmitSignal(SignalName.OptionSelected, optionIndex);
+	}
+
+	private void ApplyLocalizedText()
+	{
+		foreach (Button button in _buttons)
+		{
+			if (button != null)
+			{
+				button.Text = GameText.Tr("ui.common.select");
+			}
+		}
+	}
+
+	private void OnLanguageChanged(GameLanguage language)
+	{
+		ApplyLocalizedText();
 	}
 
 	private static void PlayUiClickSound()

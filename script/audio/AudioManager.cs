@@ -22,7 +22,6 @@ public partial class AudioManager : Node
 {
 	private const int DefaultSfxPoolSize = 12;
 	private const int DefaultWorldSfxPoolSize = 24;
-	private const string MasterBusName = "Master";
 
 	private readonly Dictionary<AudioCueId, AudioCueDefinition> _cueDefinitions = new();
 	private readonly Dictionary<AudioCueId, AudioStream> _streamCache = new();
@@ -44,6 +43,8 @@ public partial class AudioManager : Node
 
 	public override void _Ready()
 	{
+		GameSettings.EnsureAudioBuses();
+		GameSettings.Instance?.ApplyAllAudioVolumes();
 		RegisterDefaultCues();
 		_musicPlayer = CreateMusicPlayer();
 		GetAvailableSfxPlayer();
@@ -449,7 +450,7 @@ public partial class AudioManager : Node
 		_musicPlayer.Stream = stream;
 		_musicPlayer.VolumeDb = definition.VolumeDb;
 		_musicPlayer.PitchScale = 1.0f;
-		_musicPlayer.Bus = MasterBusName;
+		_musicPlayer.Bus = GameSettings.MusicBusName;
 		_currentMusicCueId = cueId;
 		_musicPlayer.Play();
 		RememberCuePlayed(cueId);
@@ -527,7 +528,7 @@ public partial class AudioManager : Node
 		{
 			Name = "MusicPlayer",
 			ProcessMode = ProcessModeEnum.Always,
-			Bus = MasterBusName,
+			Bus = GameSettings.MusicBusName,
 		};
 		player.Finished += OnMusicFinished;
 		AddChild(player);
@@ -550,7 +551,7 @@ public partial class AudioManager : Node
 			{
 				Name = $"SfxPlayer{_sfxPlayers.Count + 1}",
 				ProcessMode = ProcessModeEnum.Always,
-				Bus = MasterBusName,
+				Bus = GameSettings.SfxBusName,
 			};
 			AddChild(player);
 			_sfxPlayers.Add(player);
@@ -578,7 +579,7 @@ public partial class AudioManager : Node
 			{
 				Name = $"WorldSfxPlayer{_worldSfxPlayers.Count + 1}",
 				ProcessMode = ProcessModeEnum.Always,
-				Bus = MasterBusName,
+				Bus = GameSettings.SfxBusName,
 			};
 			AddChild(player);
 			_worldSfxPlayers.Add(player);
@@ -595,7 +596,7 @@ public partial class AudioManager : Node
 		player.Stream = stream;
 		player.VolumeDb = definition.VolumeDb;
 		player.PitchScale = GetRandomPitchScale(definition);
-		player.Bus = MasterBusName;
+		player.Bus = GameSettings.SfxBusName;
 	}
 
 	private static void ConfigureWorldPlayer(AudioStreamPlayer2D player, AudioStream stream, AudioCueDefinition definition, Vector2 globalPosition)
@@ -606,7 +607,7 @@ public partial class AudioManager : Node
 		player.PitchScale = GetRandomPitchScale(definition);
 		player.MaxDistance = definition.MaxDistance;
 		player.Attenuation = definition.Attenuation;
-		player.Bus = MasterBusName;
+		player.Bus = GameSettings.SfxBusName;
 	}
 
 	private static float GetRandomPitchScale(AudioCueDefinition definition)

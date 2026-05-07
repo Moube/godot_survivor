@@ -18,7 +18,10 @@ public sealed class WeaponInventoryEntry
 
 	public int Level => RuntimeInstance?.WeaponLevel ?? 1;
 
-	public string DisplayName => string.IsNullOrWhiteSpace(Config?.DisplayName) ? WeaponId : Config.DisplayName;
+	public string DisplayName => GameText.ConfigName(
+		"weapon",
+		WeaponId,
+		string.IsNullOrWhiteSpace(Config?.DisplayName) ? WeaponId : Config.DisplayName);
 
 	public int MaxLevel => Mathf.Max(1, Config?.MaxLevel ?? Level);
 }

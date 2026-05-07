@@ -159,39 +159,3 @@ layout_mode = 2
 custom_minimum_size = Vector2(220, 52)
 layout_mode = 2
 text = "Back"
-
-[node name="SettingsPanel" type="CenterContainer" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="PanelContainer" type="PanelContainer" parent="SettingsPanel"]
-custom_minimum_size = Vector2(360, 0)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_menu_panel")
-
-[node name="MarginContainer" type="MarginContainer" parent="SettingsPanel/PanelContainer"]
-layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 24
-
-[node name="Content" type="VBoxContainer" parent="SettingsPanel/PanelContainer/MarginContainer"]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="TitleLabel" type="Label" parent="SettingsPanel/PanelContainer/MarginContainer/Content"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Settings"
-horizontal_alignment = 1
-
-[node name="BackButton" type="Button" parent="SettingsPanel/PanelContainer/MarginContainer/Content"]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-text = "Back"

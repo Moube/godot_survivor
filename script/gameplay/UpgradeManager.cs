@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using System.Globalization;
 
 public sealed class UpgradeChoiceOption
 {
@@ -47,6 +48,11 @@ public partial class UpgradeManager : Node
 	{
 		_random.Randomize();
 		ProcessMode = ProcessModeEnum.Always;
+
+		if (GameSettings.Instance != null)
+		{
+			GameSettings.Instance.LanguageChanged += OnLanguageChanged;
+		}
 	}
 
 	public override void _ExitTree()
@@ -59,6 +65,11 @@ public partial class UpgradeManager : Node
 		if (_choicePanel != null)
 		{
 			_choicePanel.OptionSelected -= OnOptionSelected;
+		}
+
+		if (GameSettings.Instance != null)
+		{
+			GameSettings.Instance.LanguageChanged -= OnLanguageChanged;
 		}
 	}
 
@@ -238,10 +249,10 @@ public partial class UpgradeManager : Node
 	{
 		return reward.Type switch
 		{
-			UpgradeRewardType.NewWeapon => BuildWeaponOption(reward, "New Weapon", "Add this weapon to your run."),
-			UpgradeRewardType.WeaponUpgrade => BuildWeaponOption(reward, "Weapon Upgrade", GetWeaponUpgradeDescription(reward.ContentId)),
-			UpgradeRewardType.NewPassive => BuildPassiveOption(reward, "New Passive", "Gain this passive item."),
-			UpgradeRewardType.PassiveUpgrade => BuildPassiveOption(reward, "Passive Upgrade", GetPassiveUpgradeDescription(reward.ContentId)),
+			UpgradeRewardType.NewWeapon => BuildWeaponOption(reward, GameText.Tr("ui.upgrade.new_weapon"), GameText.Tr("ui.upgrade.add_weapon")),
+			UpgradeRewardType.WeaponUpgrade => BuildWeaponOption(reward, GameText.Tr("ui.upgrade.weapon_upgrade"), GetWeaponUpgradeDescription(reward.ContentId)),
+			UpgradeRewardType.NewPassive => BuildPassiveOption(reward, GameText.Tr("ui.upgrade.new_passive"), GameText.Tr("ui.upgrade.gain_passive")),
+			UpgradeRewardType.PassiveUpgrade => BuildPassiveOption(reward, GameText.Tr("ui.upgrade.passive_upgrade"), GetPassiveUpgradeDescription(reward.ContentId)),
 			_ => null,
 		};
 	}
@@ -254,13 +265,13 @@ public partial class UpgradeManager : Node
 			return null;
 		}
 
-		string description = string.IsNullOrWhiteSpace(weapon.Description) ? fallbackDescription : weapon.Description;
+		string description = GameText.ConfigDescription("weapon", weapon.Id, string.IsNullOrWhiteSpace(weapon.Description) ? fallbackDescription : weapon.Description);
 		if (reward.Type == UpgradeRewardType.WeaponUpgrade)
 		{
 			description = fallbackDescription;
 		}
 
-		return new UpgradeChoiceOption(reward, weapon.DisplayName, typeLabel, description, weapon.IconTexturePath);
+		return new UpgradeChoiceOption(reward, GameText.ConfigName("weapon", weapon.Id, weapon.DisplayName), typeLabel, description, weapon.IconTexturePath);
 	}
 
 	private UpgradeChoiceOption BuildPassiveOption(UpgradeRewardConfig reward, string typeLabel, string fallbackDescription)
@@ -271,13 +282,13 @@ public partial class UpgradeManager : Node
 			return null;
 		}
 
-		string description = string.IsNullOrWhiteSpace(passive.Description) ? fallbackDescription : passive.Description;
+		string description = GameText.ConfigDescription("passive", passive.Id, string.IsNullOrWhiteSpace(passive.Description) ? fallbackDescription : passive.Description);
 		if (reward.Type == UpgradeRewardType.PassiveUpgrade)
 		{
 			description = fallbackDescription;
 		}
 
-		return new UpgradeChoiceOption(reward, passive.DisplayName, typeLabel, description, passive.IconTexturePath);
+		return new UpgradeChoiceOption(reward, GameText.ConfigName("passive", passive.Id, passive.DisplayName), typeLabel, description, passive.IconTexturePath);
 	}
 
 	private string GetWeaponUpgradeDescription(string weaponId)
@@ -292,7 +303,7 @@ public partial class UpgradeManager : Node
 			}
 		}
 
-		return $"Upgrade to Lv.{nextLevel}. Improves damage, cooldown, and later projectile count.";
+		return GameText.Format("ui.upgrade.weapon_upgrade_description", nextLevel);
 	}
 
 	private string GetPassiveUpgradeDescription(string passiveId)
@@ -308,25 +319,59 @@ public partial class UpgradeManager : Node
 			}
 		}
 
-		string effect = passiveConfig is null ? "Improves its stat bonus." : FormatPassiveEffect(passiveConfig);
-		return $"Upgrade to Lv.{nextLevel}. {effect}";
+		string effect = passiveConfig is null
+			? GameText.Tr("ui.upgrade.effect.generic_improvement")
+			: FormatPassiveEffect(passiveConfig);
+		return GameText.Format("ui.upgrade.passive_upgrade_description", nextLevel, effect);
 	}
 
 	private static string FormatPassiveEffect(PassiveConfig passive)
 	{
+		string rawValue = passive.IsMultiplier
+			? (passive.ValuePerLevel * 100.0f).ToString("0.#", CultureInfo.InvariantCulture)
+			: passive.ValuePerLevel.ToString("0.#", CultureInfo.InvariantCulture);
 		string value = passive.IsMultiplier
-			? $"{passive.ValuePerLevel * 100.0f:0.#}% per level"
-			: $"+{passive.ValuePerLevel:0.#} per level";
+			? GameText.Format("ui.upgrade.effect.percent_per_level", rawValue)
+			: GameText.Format("ui.upgrade.effect.flat_per_level", rawValue);
 
 		return passive.StatType switch
 		{
-			PlayerStatType.MoveSpeed => $"Move speed {value}.",
-			PlayerStatType.MaxHealth => $"Max health {value}.",
-			PlayerStatType.PickupRange => $"Pickup range {value}.",
-			PlayerStatType.WeaponDamageMultiplier => $"Weapon damage {value}.",
-			PlayerStatType.WeaponCooldownMultiplier => $"Weapon cooldown {value}.",
-			_ => $"Stat bonus {value}.",
+			PlayerStatType.MoveSpeed => GameText.Format("ui.upgrade.effect.move_speed", value),
+			PlayerStatType.MaxHealth => GameText.Format("ui.upgrade.effect.max_health", value),
+			PlayerStatType.PickupRange => GameText.Format("ui.upgrade.effect.pickup_range", value),
+			PlayerStatType.WeaponDamageMultiplier => GameText.Format("ui.upgrade.effect.weapon_damage", value),
+			PlayerStatType.WeaponCooldownMultiplier => GameText.Format("ui.upgrade.effect.weapon_cooldown", value),
+			_ => GameText.Format("ui.upgrade.effect.stat_bonus", value),
 		};
+	}
+
+	private void OnLanguageChanged(GameLanguage language)
+	{
+		if (!_isChoosing || _choicePanel is null || _currentOptions.Count == 0)
+		{
+			return;
+		}
+
+		List<UpgradeRewardConfig> rewards = new();
+		foreach (UpgradeChoiceOption option in _currentOptions)
+		{
+			if (option?.Reward != null)
+			{
+				rewards.Add(option.Reward);
+			}
+		}
+
+		_currentOptions.Clear();
+		foreach (UpgradeRewardConfig reward in rewards)
+		{
+			UpgradeChoiceOption option = BuildChoiceOption(reward);
+			if (option != null)
+			{
+				_currentOptions.Add(option);
+			}
+		}
+
+		_choicePanel.ShowChoices(_currentOptions);
 	}
 
 	private void OnOptionSelected(int optionIndex)

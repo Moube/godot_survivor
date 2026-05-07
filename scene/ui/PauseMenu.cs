@@ -20,11 +20,10 @@ public partial class PauseMenu : CanvasLayer
 	private PanelContainer _panel;
 	private Label _titleLabel;
 	private VBoxContainer _mainContent;
-	private VBoxContainer _settingsContent;
 	private Button _resumeButton;
 	private Button _settingsButton;
 	private Button _exitLevelButton;
-	private Button _settingsBackButton;
+	private SettingsMenu _settingsMenu;
 	private bool _wasPausedBeforeOpen;
 
 	public bool IsOpen => _root?.Visible == true;
@@ -35,10 +34,29 @@ public partial class PauseMenu : CanvasLayer
 		Layer = 50;
 		CreateMenu();
 		ApplyTextureStyles();
+		ApplyLocalizedText();
+
+		if (GameSettings.Instance != null)
+		{
+			GameSettings.Instance.LanguageChanged += OnLanguageChanged;
+		}
+	}
+
+	public override void _ExitTree()
+	{
+		if (GameSettings.Instance != null)
+		{
+			GameSettings.Instance.LanguageChanged -= OnLanguageChanged;
+		}
 	}
 
 	public override void _Input(InputEvent @event)
 	{
+		if (_settingsMenu?.IsOpen == true)
+		{
+			return;
+		}
+
 		if (!IsPauseToggleEvent(@event))
 		{
 			return;
@@ -62,6 +80,7 @@ public partial class PauseMenu : CanvasLayer
 
 	public void CloseWithoutUnpausing()
 	{
+		_settingsMenu?.CloseWithoutCallback();
 		HideMenu();
 	}
 
@@ -99,13 +118,19 @@ public partial class PauseMenu : CanvasLayer
 
 	private void OnSettingsPressed()
 	{
-		ShowSettingsContent();
-	}
+		if (_settingsMenu is null)
+		{
+			return;
+		}
 
-	private void OnSettingsBackPressed()
-	{
-		ShowMainContent();
-		_resumeButton?.GrabFocus();
+		HideMenu();
+		_settingsMenu.Open(() =>
+		{
+			ShowMainContent();
+			_root.Visible = true;
+			_root.MouseFilter = Control.MouseFilterEnum.Stop;
+			_settingsButton?.GrabFocus();
+		});
 	}
 
 	private void OnExitLevelPressed()
@@ -124,38 +149,13 @@ public partial class PauseMenu : CanvasLayer
 	{
 		if (_titleLabel != null)
 		{
-			_titleLabel.Text = "暂停";
+			_titleLabel.Text = GameText.Tr("ui.pause.title");
 		}
 
 		if (_mainContent != null)
 		{
 			_mainContent.Visible = true;
 		}
-
-		if (_settingsContent != null)
-		{
-			_settingsContent.Visible = false;
-		}
-	}
-
-	private void ShowSettingsContent()
-	{
-		if (_titleLabel != null)
-		{
-			_titleLabel.Text = "设置";
-		}
-
-		if (_mainContent != null)
-		{
-			_mainContent.Visible = false;
-		}
-
-		if (_settingsContent != null)
-		{
-			_settingsContent.Visible = true;
-		}
-
-		_settingsBackButton?.GrabFocus();
 	}
 
 	private static bool IsPauseToggleEvent(InputEvent @event)
@@ -221,7 +221,7 @@ public partial class PauseMenu : CanvasLayer
 		content.AddThemeConstantOverride("separation", 14);
 		margin.AddChild(content);
 
-		_titleLabel = CreateTitleLabel("暂停");
+		_titleLabel = CreateTitleLabel(GameText.Tr("ui.pause.title"));
 		content.AddChild(_titleLabel);
 
 		_mainContent = new VBoxContainer
@@ -231,32 +231,25 @@ public partial class PauseMenu : CanvasLayer
 		_mainContent.AddThemeConstantOverride("separation", 12);
 		content.AddChild(_mainContent);
 
-		_resumeButton = CreateMenuButton("继续游戏");
-		_settingsButton = CreateMenuButton("设置");
-		_exitLevelButton = CreateMenuButton("退出关卡");
+		_resumeButton = CreateMenuButton(GameText.Tr("ui.pause.resume"));
+		_settingsButton = CreateMenuButton(GameText.Tr("ui.main.settings"));
+		_exitLevelButton = CreateMenuButton(GameText.Tr("ui.pause.exit_level"));
 		_mainContent.AddChild(_resumeButton);
 		_mainContent.AddChild(_settingsButton);
 		_mainContent.AddChild(_exitLevelButton);
 
-		_settingsContent = new VBoxContainer
+		_settingsMenu = new SettingsMenu
 		{
-			Name = "SettingsContent",
-			Visible = false,
+			Name = "SettingsMenu",
 		};
-		_settingsContent.AddThemeConstantOverride("separation", 12);
-		content.AddChild(_settingsContent);
-
-		_settingsBackButton = CreateMenuButton("返回");
-		_settingsContent.AddChild(_settingsBackButton);
+		AddChild(_settingsMenu);
 
 		ConnectUiButtonSounds(_resumeButton);
 		ConnectUiButtonSounds(_settingsButton);
 		ConnectUiButtonSounds(_exitLevelButton);
-		ConnectUiButtonSounds(_settingsBackButton);
 		_resumeButton.Pressed += ResumeGame;
 		_settingsButton.Pressed += OnSettingsPressed;
 		_exitLevelButton.Pressed += OnExitLevelPressed;
-		_settingsBackButton.Pressed += OnSettingsBackPressed;
 	}
 
 	private static Label CreateTitleLabel(string text)
@@ -300,7 +293,34 @@ public partial class PauseMenu : CanvasLayer
 		ApplyButtonStyle(_resumeButton);
 		ApplyButtonStyle(_settingsButton);
 		ApplyButtonStyle(_exitLevelButton);
-		ApplyButtonStyle(_settingsBackButton);
+	}
+
+	private void ApplyLocalizedText()
+	{
+		if (_titleLabel != null)
+		{
+			_titleLabel.Text = GameText.Tr("ui.pause.title");
+		}
+
+		if (_resumeButton != null)
+		{
+			_resumeButton.Text = GameText.Tr("ui.pause.resume");
+		}
+
+		if (_settingsButton != null)
+		{
+			_settingsButton.Text = GameText.Tr("ui.main.settings");
+		}
+
+		if (_exitLevelButton != null)
+		{
+			_exitLevelButton.Text = GameText.Tr("ui.pause.exit_level");
+		}
+	}
+
+	private void OnLanguageChanged(GameLanguage language)
+	{
+		ApplyLocalizedText();
 	}
 
 	private static void ApplyPanelStyle(PanelContainer panel, string texturePath, float marginX, float marginY)

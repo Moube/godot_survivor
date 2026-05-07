@@ -58,14 +58,14 @@ public partial class Main : Control
 	private PanelContainer _mainMenuPanelContainer;
 	private Control _levelSelectPanel;
 	private PanelContainer _levelSelectPanelContainer;
-	private Control _settingsPanel;
-	private PanelContainer _settingsPanelContainer;
 	private GridContainer _levelButtonGrid;
+	private Label _mainMenuTitleLabel;
+	private Label _levelSelectTitleLabel;
 	private Button _startGameButton;
 	private Button _settingsButton;
 	private Button _quitButton;
 	private Button _levelSelectBackButton;
-	private Button _settingsBackButton;
+	private SettingsMenu _settingsMenu;
 	private StyleBoxTexture _buttonNormalStyle;
 	private StyleBoxTexture _buttonHoverStyle;
 	private StyleBoxTexture _buttonPressedStyle;
@@ -93,40 +93,54 @@ public partial class Main : Control
 		_mainMenuPanelContainer = GetNode<PanelContainer>("MainMenuPanel/PanelContainer");
 		_levelSelectPanel = GetNode<Control>("LevelSelectPanel");
 		_levelSelectPanelContainer = GetNode<PanelContainer>("LevelSelectPanel/PanelContainer");
-		_settingsPanel = GetNode<Control>("SettingsPanel");
-		_settingsPanelContainer = GetNode<PanelContainer>("SettingsPanel/PanelContainer");
 		_levelButtonGrid = GetNode<GridContainer>("LevelSelectPanel/PanelContainer/MarginContainer/Content/LevelScrollContainer/LevelButtonGrid");
+		_mainMenuTitleLabel = GetNode<Label>("MainMenuPanel/TitleLabel");
+		_levelSelectTitleLabel = GetNode<Label>("LevelSelectPanel/PanelContainer/MarginContainer/Content/TitleLabel");
 		_startGameButton = GetNode<Button>("MainMenuPanel/PanelContainer/PanelLayout/ButtonList/StartGameButton");
 		_settingsButton = GetNode<Button>("MainMenuPanel/PanelContainer/PanelLayout/ButtonList/SettingsButton");
 		_quitButton = GetNode<Button>("MainMenuPanel/PanelContainer/PanelLayout/ButtonList/QuitButton");
 		_levelSelectBackButton = GetNode<Button>("LevelSelectPanel/PanelContainer/MarginContainer/Content/BackButtonCenter/BackButton");
-		_settingsBackButton = GetNode<Button>("SettingsPanel/PanelContainer/MarginContainer/Content/BackButton");
+		_settingsMenu = new SettingsMenu
+		{
+			Name = "SettingsMenu",
+		};
+		AddChild(_settingsMenu);
 
 		ConnectUiClickSound(_startGameButton);
 		ConnectUiClickSound(_settingsButton);
 		ConnectUiClickSound(_quitButton);
 		ConnectUiClickSound(_levelSelectBackButton);
-		ConnectUiClickSound(_settingsBackButton);
 		_startGameButton.Pressed += OnStartGamePressed;
 		_settingsButton.Pressed += OnSettingsPressed;
 		_quitButton.Pressed += OnQuitPressed;
 		_levelSelectBackButton.Pressed += OnLevelSelectBackPressed;
-		_settingsBackButton.Pressed += OnSettingsBackPressed;
 
 		ApplyMainMenuPanelStyle();
-		ApplySettingsPanelStyle();
 		LoadMenuButtonStyles();
 		ApplyMenuButtonStyle(_startGameButton);
 		ApplyMenuButtonStyle(_settingsButton);
 		ApplyMenuButtonStyle(_quitButton);
-		ApplyMenuButtonStyle(_settingsBackButton);
 		ApplyLevelSelectPanelStyle();
 		LoadLevelSelectButtonStyles();
 		ApplyLevelSelectButtonStyle(_levelSelectBackButton);
 
+		if (GameSettings.Instance != null)
+		{
+			GameSettings.Instance.LanguageChanged += OnLanguageChanged;
+		}
+
+		ApplyLocalizedText();
 		PopulateLevelButtons();
 		ShowMainMenu();
 		AudioManager.Instance?.PlayTitleStinger();
+	}
+
+	public override void _ExitTree()
+	{
+		if (GameSettings.Instance != null)
+		{
+			GameSettings.Instance.LanguageChanged -= OnLanguageChanged;
+		}
 	}
 
 	public override void _Process(double delta)
@@ -173,7 +187,7 @@ public partial class Main : Control
 		string levelConfigId = level.Id;
 		Button button = new()
 		{
-			Text = string.IsNullOrWhiteSpace(level.DisplayName) ? level.Id : level.DisplayName,
+			Text = GameText.ConfigName("level", level.Id, string.IsNullOrWhiteSpace(level.DisplayName) ? level.Id : level.DisplayName),
 			CustomMinimumSize = LevelSelectButtonSize,
 		};
 		ApplyLevelSelectButtonStyle(button);
@@ -186,7 +200,7 @@ public partial class Main : Control
 	{
 		Button button = new()
 		{
-			Text = "Level 01",
+			Text = GameText.ConfigName("level", "level_01", "Level 01"),
 			CustomMinimumSize = LevelSelectButtonSize,
 		};
 		ApplyLevelSelectButtonStyle(button);
@@ -203,7 +217,7 @@ public partial class Main : Control
 
 	private void OnSettingsPressed()
 	{
-		ShowPanel(_settingsPanel);
+		_settingsMenu?.Open(() => _settingsButton?.GrabFocus());
 	}
 
 	private void OnQuitPressed()
@@ -212,11 +226,6 @@ public partial class Main : Control
 	}
 
 	private void OnLevelSelectBackPressed()
-	{
-		ShowMainMenu();
-	}
-
-	private void OnSettingsBackPressed()
 	{
 		ShowMainMenu();
 	}
@@ -261,7 +270,45 @@ public partial class Main : Control
 	{
 		_mainMenuPanel.Visible = activePanel == _mainMenuPanel;
 		_levelSelectPanel.Visible = activePanel == _levelSelectPanel;
-		_settingsPanel.Visible = activePanel == _settingsPanel;
+	}
+
+	private void ApplyLocalizedText()
+	{
+		if (_mainMenuTitleLabel != null)
+		{
+			_mainMenuTitleLabel.Text = GameText.Tr("ui.main.title");
+		}
+
+		if (_levelSelectTitleLabel != null)
+		{
+			_levelSelectTitleLabel.Text = GameText.Tr("ui.level_select.title");
+		}
+
+		if (_startGameButton != null)
+		{
+			_startGameButton.Text = GameText.Tr("ui.main.start");
+		}
+
+		if (_settingsButton != null)
+		{
+			_settingsButton.Text = GameText.Tr("ui.main.settings");
+		}
+
+		if (_quitButton != null)
+		{
+			_quitButton.Text = GameText.Tr("ui.main.quit");
+		}
+
+		if (_levelSelectBackButton != null)
+		{
+			_levelSelectBackButton.Text = GameText.Tr("ui.common.back");
+		}
+	}
+
+	private void OnLanguageChanged(GameLanguage language)
+	{
+		ApplyLocalizedText();
+		PopulateLevelButtons();
 	}
 
 	private void CreateAmbientBackground()
@@ -777,17 +824,6 @@ public partial class Main : Control
 		}
 
 		_mainMenuPanelContainer.AddThemeStyleboxOverride("panel", panelStyle);
-	}
-
-	private void ApplySettingsPanelStyle()
-	{
-		StyleBoxTexture panelStyle = CreateTextureStyle(MainMenuPanelTexturePath, MainMenuPanelTextureMarginX, MainMenuPanelTextureMarginY);
-		if (panelStyle is null)
-		{
-			return;
-		}
-
-		_settingsPanelContainer.AddThemeStyleboxOverride("panel", panelStyle);
 	}
 
 	private void ApplyLevelSelectPanelStyle()
