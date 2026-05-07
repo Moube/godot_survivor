@@ -439,6 +439,7 @@ public partial class Main : Control
 			Hframes = SlimeMoveAnimationFrameCount,
 			Position = new Vector2(0.0f, -3.0f),
 			Scale = Vector2.One * SlimeSceneSpriteBaseScale,
+			FlipH = false,
 		};
 		root.AddChild(sprite);
 		float collisionRadius = GetAmbientSlimeCollisionRadius(visualScaleMultiplier);
@@ -600,11 +601,6 @@ public partial class Main : Control
 		slime.MoveDuration = Mathf.Clamp(durationByDistance, SlimeMinMoveDuration, SlimeMaxMoveDuration);
 		slime.MoveElapsed = randomizeProgress ? _rng.RandfRange(0.0f, slime.MoveDuration * 0.45f) : 0.0f;
 		slime.IdleRemaining = 0.0f;
-
-		if (!Mathf.IsZeroApprox(target.X - start.X))
-		{
-			slime.Sprite.FlipH = target.X < start.X;
-		}
 	}
 
 	private Vector2 PickAmbientMoveTarget(AmbientSlime slime, Vector2 start, Vector2 viewportSize)
