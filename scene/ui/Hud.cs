@@ -63,6 +63,8 @@ public partial class Hud : CanvasLayer
 		_weaponSlotLevelLabels = CreateSlotLevelLabels(_weaponSlotIcons);
 		_passiveSlotLevelLabels = CreateSlotLevelLabels(_passiveSlotIcons);
 		ApplyHudTextureStyles();
+		_confirmButton.ButtonDown += PlayUiClickSound;
+		_confirmButton.MouseEntered += PlayUiHoverSound;
 		_confirmButton.Pressed += OnConfirmButtonPressed;
 
 		if (GameSession.Instance is null)
@@ -170,6 +172,16 @@ public partial class Hud : CanvasLayer
 		SetGameOverVisible(false, 0.0);
 		GetTree().Paused = false;
 		CallDeferred(nameof(ReturnToMainScene));
+	}
+
+	private static void PlayUiClickSound()
+	{
+		AudioManager.Instance?.PlayUiClick();
+	}
+
+	private static void PlayUiHoverSound()
+	{
+		AudioManager.Instance?.PlayUiHover();
 	}
 
 	private void ReturnToMainScene()

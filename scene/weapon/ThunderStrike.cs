@@ -120,6 +120,7 @@ public partial class ThunderStrike : Node2D
 			_impactRoot.Visible = true;
 		}
 
+		AudioManager.Instance?.PlayLightningSpell(this);
 		ApplyImpactDamage();
 		UpdateImpactVisual();
 	}

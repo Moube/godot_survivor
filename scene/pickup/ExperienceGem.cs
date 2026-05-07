@@ -143,14 +143,27 @@ public partial class ExperienceGem : Node2D
 		float distance = toTarget.Length();
 		if (distance <= CollectDistance)
 		{
-			ExperienceController.Instance?.AddExperience(ExperienceValue);
-			QueueFree();
+			Collect(targetPosition);
 			return;
 		}
 
 		_currentAttractionSpeed += AttractionAcceleration * (float)delta;
 		float step = Mathf.Min(distance, _currentAttractionSpeed * (float)delta);
+		if (step >= distance - CollectDistance)
+		{
+			Collect(targetPosition);
+			return;
+		}
+
 		GlobalPosition += toTarget.Normalized() * step;
+	}
+
+	private void Collect(Vector2 targetPosition)
+	{
+		GlobalPosition = targetPosition;
+		AudioManager.Instance?.PlayExperiencePickup(this);
+		ExperienceController.Instance?.AddExperience(ExperienceValue);
+		QueueFree();
 	}
 
 	private void UpdateVisualState()

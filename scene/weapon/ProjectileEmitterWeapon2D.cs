@@ -515,6 +515,13 @@ public partial class ProjectileEmitterWeapon2D : Weapon2D
 
 	private void SpawnProjectiles()
 	{
+		if (BulletScene == null)
+		{
+			GD.PushWarning($"{Name} cannot fire because BulletScene is not assigned.");
+			return;
+		}
+
+		AudioManager.Instance?.PlayWeaponFire(this);
 		Vector2 baseDirection = GetProjectileDirection();
 		int projectileCount = Mathf.Max(1, ProjectileCount);
 		if (projectileCount == 1)

@@ -92,6 +92,8 @@ public partial class GameSession : Node
 
 		IsGameOver = true;
 		FinalSurvivalTime = ElapsedRunTime;
+		AudioManager.Instance?.StopGameplayMusic();
+		AudioManager.Instance?.PlayGameOver();
 		EmitSignal(SignalName.GameOver, FinalSurvivalTime);
 		GetTree().Paused = true;
 		GD.Print($"Game Over. Final Survival Time: {FinalSurvivalTime:0.00}s");

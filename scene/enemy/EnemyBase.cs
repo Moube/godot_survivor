@@ -567,6 +567,7 @@ public partial class EnemyBase : CharacterBody2D
 
 	private void OnDamaged(int amount, int currentHealth, int maxHealth)
 	{
+		AudioManager.Instance?.PlayEnemyHit(this);
 		PlayHitReaction(amount, currentHealth, maxHealth);
 	}
 

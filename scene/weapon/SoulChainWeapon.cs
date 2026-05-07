@@ -90,6 +90,7 @@ public partial class SoulChainWeapon : Weapon2D
 			return false;
 		}
 
+		AudioManager.Instance?.PlaySoulChainSpell(this);
 		Node instance = ChainEffectScene.Instantiate();
 		if (instance is not SoulChainEffect effect)
 		{

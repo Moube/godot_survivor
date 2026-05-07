@@ -30,6 +30,7 @@ public partial class HolyWaterFlaskDrop : Node2D
 	private double _elapsed;
 	private Node2D _visualRoot;
 	private Sprite2D _bottleSprite;
+	private bool _hasLanded;
 
 	public void Initialize(int damage, float radius, float areaDurationSeconds, float damageIntervalSeconds)
 	{
@@ -38,6 +39,7 @@ public partial class HolyWaterFlaskDrop : Node2D
 		_areaDurationSeconds = Mathf.Max(0.1f, areaDurationSeconds);
 		_damageIntervalSeconds = Mathf.Max(0.05f, damageIntervalSeconds);
 		_elapsed = 0.0;
+		_hasLanded = false;
 		ApplyDropStart();
 	}
 
@@ -51,8 +53,20 @@ public partial class HolyWaterFlaskDrop : Node2D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (_hasLanded)
+		{
+			return;
+		}
+
 		_elapsed += delta;
-		float t = Mathf.Clamp((float)(_elapsed / Mathf.Max(0.01f, DropDurationSeconds)), 0.0f, 1.0f);
+		float rawProgress = (float)(_elapsed / Mathf.Max(0.01f, DropDurationSeconds));
+		if (rawProgress >= 1.0f)
+		{
+			Land();
+			return;
+		}
+
+		float t = Mathf.Clamp(rawProgress, 0.0f, 1.0f);
 		float eased = 1.0f - Mathf.Pow(1.0f - t, 2.0f);
 
 		if (_visualRoot != null)
@@ -61,11 +75,6 @@ public partial class HolyWaterFlaskDrop : Node2D
 			_visualRoot.RotationDegrees += RotationDegreesPerSecond * (float)delta;
 			float squash = t > 0.88f ? 1.0f + (t - 0.88f) * 0.9f : 1.0f;
 			_visualRoot.Scale = new Vector2(1.0f + (squash - 1.0f) * 0.35f, 1.0f / squash);
-		}
-
-		if (t >= 1.0f)
-		{
-			Land();
 		}
 	}
 
@@ -80,10 +89,24 @@ public partial class HolyWaterFlaskDrop : Node2D
 		_visualRoot.Position = new Vector2(0.0f, -DropHeight);
 		_visualRoot.RotationDegrees = 0.0f;
 		_visualRoot.Scale = Vector2.One;
+		_visualRoot.Visible = true;
 	}
 
 	private void Land()
 	{
+		if (_hasLanded)
+		{
+			return;
+		}
+
+		_hasLanded = true;
+		SetPhysicsProcess(false);
+		if (_visualRoot != null)
+		{
+			_visualRoot.Visible = false;
+		}
+
+		AudioManager.Instance?.PlayHolyWaterBreak(this);
 		if (AreaScene == null)
 		{
 			GD.PushWarning($"{Name} cannot create holy water area because AreaScene is not assigned.");

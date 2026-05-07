@@ -150,6 +150,7 @@ public partial class UpgradeManager : Node
 
 		_isChoosing = true;
 		_wasPausedBeforeChoice = GetTree().Paused;
+		AudioManager.Instance?.PlayLevelUp();
 		GetTree().Paused = true;
 		_choicePanel.ShowChoices(_currentOptions);
 	}

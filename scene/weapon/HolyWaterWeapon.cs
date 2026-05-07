@@ -100,6 +100,7 @@ public partial class HolyWaterWeapon : Weapon2D
 			return;
 		}
 
+		AudioManager.Instance?.PlayWeaponFire(this);
 		List<Vector2> spawnPositions = ResolveSpawnPositions();
 		foreach (Vector2 spawnPosition in spawnPositions)
 		{

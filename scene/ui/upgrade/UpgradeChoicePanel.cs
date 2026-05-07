@@ -32,7 +32,9 @@ public partial class UpgradeChoicePanel : Control
 			_typeLabels[i] = GetNode<Label>($"{contentPath}/TypeLabel");
 			_descriptionLabels[i] = GetNode<Label>($"{contentPath}/DescriptionLabel");
 			_buttons[i] = GetNode<Button>($"{cardPath}/SelectButton");
-			_buttons[i].Pressed += () => EmitSignal(SignalName.OptionSelected, optionIndex);
+			_buttons[i].ButtonDown += PlayUiClickSound;
+			_buttons[i].MouseEntered += PlayUiHoverSound;
+			_buttons[i].Pressed += () => OnSelectButtonPressed(optionIndex);
 		}
 
 		HideChoices();
@@ -63,6 +65,21 @@ public partial class UpgradeChoicePanel : Control
 	public void HideChoices()
 	{
 		Visible = false;
+	}
+
+	private void OnSelectButtonPressed(int optionIndex)
+	{
+		EmitSignal(SignalName.OptionSelected, optionIndex);
+	}
+
+	private static void PlayUiClickSound()
+	{
+		AudioManager.Instance?.PlayUiClick();
+	}
+
+	private static void PlayUiHoverSound()
+	{
+		AudioManager.Instance?.PlayUiHover();
 	}
 
 	private Texture2D LoadIconTexture(string path)

@@ -68,6 +68,12 @@ public abstract partial class SurvivorLevelBase : Node2D
 		StartSpawnDirector();
 		StartUpgradeManager();
 		QueueRedraw();
+		AudioManager.Instance?.PlayGameplayMusic();
+	}
+
+	public override void _ExitTree()
+	{
+		AudioManager.Instance?.StopGameplayMusic();
 	}
 
 	public override void _Process(double delta)

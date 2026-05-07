@@ -85,6 +85,7 @@ public partial class Main : Control
 	public override void _Ready()
 	{
 		GetTree().Paused = false;
+		AudioManager.Instance?.StopGameplayMusic();
 		_rng.Randomize();
 		CreateAmbientBackground();
 
@@ -101,11 +102,16 @@ public partial class Main : Control
 		_levelSelectBackButton = GetNode<Button>("LevelSelectPanel/PanelContainer/MarginContainer/Content/BackButtonCenter/BackButton");
 		_settingsBackButton = GetNode<Button>("SettingsPanel/PanelContainer/MarginContainer/Content/BackButton");
 
+		ConnectUiClickSound(_startGameButton);
+		ConnectUiClickSound(_settingsButton);
+		ConnectUiClickSound(_quitButton);
+		ConnectUiClickSound(_levelSelectBackButton);
+		ConnectUiClickSound(_settingsBackButton);
 		_startGameButton.Pressed += OnStartGamePressed;
 		_settingsButton.Pressed += OnSettingsPressed;
 		_quitButton.Pressed += OnQuitPressed;
-		_levelSelectBackButton.Pressed += ShowMainMenu;
-		_settingsBackButton.Pressed += ShowMainMenu;
+		_levelSelectBackButton.Pressed += OnLevelSelectBackPressed;
+		_settingsBackButton.Pressed += OnSettingsBackPressed;
 
 		ApplyMainMenuPanelStyle();
 		ApplySettingsPanelStyle();
@@ -120,6 +126,7 @@ public partial class Main : Control
 
 		PopulateLevelButtons();
 		ShowMainMenu();
+		AudioManager.Instance?.PlayTitleStinger();
 	}
 
 	public override void _Process(double delta)
@@ -170,7 +177,8 @@ public partial class Main : Control
 			CustomMinimumSize = LevelSelectButtonSize,
 		};
 		ApplyLevelSelectButtonStyle(button);
-		button.Pressed += () => StartLevel(scenePath, levelConfigId);
+		ConnectUiClickSound(button);
+		button.Pressed += () => OnLevelButtonPressed(scenePath, levelConfigId);
 		_levelButtonGrid.AddChild(button);
 	}
 
@@ -182,7 +190,8 @@ public partial class Main : Control
 			CustomMinimumSize = LevelSelectButtonSize,
 		};
 		ApplyLevelSelectButtonStyle(button);
-		button.Pressed += () => StartLevel(FallbackLevelScenePath, "level_01");
+		ConnectUiClickSound(button);
+		button.Pressed += () => OnLevelButtonPressed(FallbackLevelScenePath, "level_01");
 		_levelButtonGrid.AddChild(button);
 	}
 
@@ -200,6 +209,40 @@ public partial class Main : Control
 	private void OnQuitPressed()
 	{
 		GetTree().Quit();
+	}
+
+	private void OnLevelSelectBackPressed()
+	{
+		ShowMainMenu();
+	}
+
+	private void OnSettingsBackPressed()
+	{
+		ShowMainMenu();
+	}
+
+	private void OnLevelButtonPressed(string scenePath, string levelConfigId)
+	{
+		StartLevel(scenePath, levelConfigId);
+	}
+
+	private static void ConnectUiClickSound(Button button)
+	{
+		if (button != null)
+		{
+			button.ButtonDown += PlayUiClickSound;
+			button.MouseEntered += PlayUiHoverSound;
+		}
+	}
+
+	private static void PlayUiClickSound()
+	{
+		AudioManager.Instance?.PlayUiClick();
+	}
+
+	private static void PlayUiHoverSound()
+	{
+		AudioManager.Instance?.PlayUiHover();
 	}
 
 	private void StartLevel(string scenePath, string levelConfigId)
