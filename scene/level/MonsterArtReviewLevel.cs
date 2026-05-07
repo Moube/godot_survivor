@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public partial class MonsterArtReviewLevel : Node2D
+public partial class MonsterArtReviewLevel : PausableLevelBase
 {
 	private static readonly string[] ReviewEnemyConfigIds =
 	{

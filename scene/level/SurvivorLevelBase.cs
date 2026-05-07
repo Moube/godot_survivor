@@ -1,6 +1,6 @@
 using Godot;
 
-public abstract partial class SurvivorLevelBase : Node2D
+public abstract partial class SurvivorLevelBase : PausableLevelBase
 {
 	[Export]
 	public PackedScene PlayerScene { get; set; }
@@ -51,6 +51,7 @@ public abstract partial class SurvivorLevelBase : Node2D
 
 	public override void _EnterTree()
 	{
+		base._EnterTree();
 		GameSession.Instance?.StartNewRun();
 	}
 
@@ -97,6 +98,11 @@ public abstract partial class SurvivorLevelBase : Node2D
 	protected virtual Vector2 GetSpawnOrigin()
 	{
 		return GlobalPosition;
+	}
+
+	protected override bool CanOpenPauseMenu()
+	{
+		return GameSession.Instance?.IsGameOver != true && !IsUpgradeChoiceVisible();
 	}
 
 	protected void AddYSortedWorldChild(Node2D child, Vector2 globalPosition)
@@ -269,6 +275,7 @@ public abstract partial class SurvivorLevelBase : Node2D
 		}
 
 		_spawnDirector?.Stop();
+		ClosePauseMenuWithoutUnpausing();
 		GameSession.Instance?.TriggerGameOver();
 	}
 
@@ -283,6 +290,12 @@ public abstract partial class SurvivorLevelBase : Node2D
 		{
 			node.QueueFree();
 		}
+	}
+
+	private bool IsUpgradeChoiceVisible()
+	{
+		Control upgradeChoicePanel = GetNodeOrNull<Control>("Hud/UpgradeChoicePanel");
+		return upgradeChoicePanel?.Visible == true;
 	}
 
 	public override void _Draw()
