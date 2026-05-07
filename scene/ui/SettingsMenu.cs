@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class SettingsMenu : Control
 {
@@ -43,7 +44,11 @@ public partial class SettingsMenu : Control
 	private Button _backButton;
 	private VBoxContainer _gamePage;
 	private VBoxContainer _audioPage;
+	private Label _displayModeLabel;
+	private Label _resolutionLabel;
 	private Label _languageLabel;
+	private OptionButton _displayModeOption;
+	private OptionButton _resolutionOption;
 	private OptionButton _languageOption;
 	private Label _masterVolumeLabel;
 	private Label _sfxVolumeLabel;
@@ -54,6 +59,7 @@ public partial class SettingsMenu : Control
 	private HSlider _masterVolumeSlider;
 	private HSlider _sfxVolumeSlider;
 	private HSlider _musicVolumeSlider;
+	private readonly List<Vector2I> _resolutionOptions = new();
 	private bool _isRefreshing;
 	private Action _closedCallback;
 	private SettingsPage _currentPage = SettingsPage.Game;
@@ -304,6 +310,12 @@ public partial class SettingsMenu : Control
 
 	private void CreateGamePage()
 	{
+		_displayModeOption = CreateGameOptionButton("DisplayModeOption");
+		_displayModeLabel = AddControlRow(_gamePage, _displayModeOption);
+
+		_resolutionOption = CreateGameOptionButton("ResolutionOption");
+		_resolutionLabel = AddControlRow(_gamePage, _resolutionOption);
+
 		_languageOption = new OptionButton
 		{
 			Name = "LanguageOption",
@@ -335,6 +347,8 @@ public partial class SettingsMenu : Control
 		_backButton.Pressed += Close;
 		_gameTabButton.Pressed += () => ShowPage(SettingsPage.Game);
 		_audioTabButton.Pressed += () => ShowPage(SettingsPage.Audio);
+		_displayModeOption.ItemSelected += OnDisplayModeSelected;
+		_resolutionOption.ItemSelected += OnResolutionSelected;
 		_languageOption.ItemSelected += OnLanguageSelected;
 		_masterVolumeSlider.ValueChanged += OnMasterVolumeChanged;
 		_sfxVolumeSlider.ValueChanged += OnSfxVolumeChanged;
@@ -388,9 +402,20 @@ public partial class SettingsMenu : Control
 		_isRefreshing = true;
 		GameSettings settings = GameSettings.Instance;
 		GameLanguage language = settings?.CurrentLanguage ?? GameLanguage.Chinese;
+		GameWindowMode windowMode = settings?.WindowMode ?? GameWindowMode.Windowed;
+		Vector2I windowResolution = settings?.WindowResolution ?? new Vector2I(1280, 720);
 		float masterVolume = settings?.MasterVolume ?? 1.0f;
 		float sfxVolume = settings?.SfxVolume ?? 1.0f;
 		float musicVolume = settings?.MusicVolume ?? 1.0f;
+
+		_displayModeOption.Clear();
+		_displayModeOption.AddItem(GameText.Tr("ui.settings.display_mode.windowed"), (int)GameWindowMode.Windowed);
+		_displayModeOption.AddItem(GameText.Tr("ui.settings.display_mode.fullscreen"), (int)GameWindowMode.Fullscreen);
+		SelectDisplayModeOption(windowMode);
+
+		PopulateResolutionOptions(windowResolution);
+		SelectResolutionOption(windowResolution);
+		SyncResolutionControlState(windowMode);
 
 		_languageOption.Clear();
 		_languageOption.AddItem(GameText.Tr("ui.settings.language.chinese"), (int)GameLanguage.Chinese);
@@ -421,6 +446,16 @@ public partial class SettingsMenu : Control
 			_audioTabButton.Text = GameText.Tr("ui.settings.tab.audio");
 		}
 
+		if (_displayModeLabel != null)
+		{
+			_displayModeLabel.Text = GameText.Tr("ui.settings.display_mode");
+		}
+
+		if (_resolutionLabel != null)
+		{
+			_resolutionLabel.Text = GameText.Tr("ui.settings.resolution");
+		}
+
 		if (_languageLabel != null)
 		{
 			_languageLabel.Text = GameText.Tr("ui.settings.language");
@@ -446,6 +481,34 @@ public partial class SettingsMenu : Control
 	{
 		RefreshFromSettings();
 		ApplyLocalizedText();
+	}
+
+	private void OnDisplayModeSelected(long itemIndex)
+	{
+		if (_isRefreshing || _displayModeOption == null)
+		{
+			return;
+		}
+
+		GameWindowMode mode = (GameWindowMode)_displayModeOption.GetItemId((int)itemIndex);
+		GameSettings.Instance?.SetWindowMode(mode);
+		SyncResolutionControlState(mode);
+	}
+
+	private void OnResolutionSelected(long itemIndex)
+	{
+		if (_isRefreshing || _resolutionOption == null)
+		{
+			return;
+		}
+
+		int index = (int)itemIndex;
+		if (index < 0 || index >= _resolutionOptions.Count)
+		{
+			return;
+		}
+
+		GameSettings.Instance?.SetWindowResolution(_resolutionOptions[index]);
 	}
 
 	private void OnLanguageSelected(long itemIndex)
@@ -511,6 +574,90 @@ public partial class SettingsMenu : Control
 		SetValueLabel(_masterVolumeValueLabel, _masterVolumeSlider);
 		SetValueLabel(_sfxVolumeValueLabel, _sfxVolumeSlider);
 		SetValueLabel(_musicVolumeValueLabel, _musicVolumeSlider);
+	}
+
+	private void SelectDisplayModeOption(GameWindowMode mode)
+	{
+		for (int i = 0; i < _displayModeOption.ItemCount; i++)
+		{
+			if (_displayModeOption.GetItemId(i) == (int)mode)
+			{
+				_displayModeOption.Select(i);
+				return;
+			}
+		}
+
+		_displayModeOption.Select(0);
+	}
+
+	private void PopulateResolutionOptions(Vector2I selectedResolution)
+	{
+		_resolutionOptions.Clear();
+		_resolutionOption.Clear();
+
+		foreach (Vector2I resolution in GameSettings.SupportedWindowResolutions)
+		{
+			AddResolutionOption(resolution);
+		}
+
+		if (!ContainsResolution(selectedResolution))
+		{
+			AddResolutionOption(selectedResolution);
+		}
+	}
+
+	private void AddResolutionOption(Vector2I resolution)
+	{
+		if (resolution.X <= 0 || resolution.Y <= 0 || ContainsResolution(resolution))
+		{
+			return;
+		}
+
+		_resolutionOptions.Add(resolution);
+		_resolutionOption.AddItem(FormatResolution(resolution), _resolutionOptions.Count - 1);
+	}
+
+	private bool ContainsResolution(Vector2I resolution)
+	{
+		foreach (Vector2I option in _resolutionOptions)
+		{
+			if (option == resolution)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private void SelectResolutionOption(Vector2I resolution)
+	{
+		for (int i = 0; i < _resolutionOptions.Count; i++)
+		{
+			if (_resolutionOptions[i] == resolution)
+			{
+				_resolutionOption.Select(i);
+				return;
+			}
+		}
+
+		if (_resolutionOption.ItemCount > 0)
+		{
+			_resolutionOption.Select(0);
+		}
+	}
+
+	private void SyncResolutionControlState(GameWindowMode mode)
+	{
+		if (_resolutionOption != null)
+		{
+			_resolutionOption.Disabled = mode == GameWindowMode.Fullscreen;
+		}
+	}
+
+	private static string FormatResolution(Vector2I resolution)
+	{
+		return $"{resolution.X} x {resolution.Y}";
 	}
 
 	private static void SetValueLabel(Label label, Slider slider)
@@ -587,6 +734,19 @@ public partial class SettingsMenu : Control
 		label.AddThemeColorOverride("font_outline_color", new Color(0.13f, 0.06f, 0.02f, 0.92f));
 		label.AddThemeConstantOverride("outline_size", 2);
 		return label;
+	}
+
+	private static OptionButton CreateGameOptionButton(string name)
+	{
+		OptionButton optionButton = new()
+		{
+			Name = name,
+			CustomMinimumSize = new Vector2(360.0f, 54.0f),
+			SizeFlagsHorizontal = SizeFlags.ShrinkEnd,
+			Alignment = HorizontalAlignment.Center,
+		};
+		ApplyPopupControlStyle(optionButton);
+		return optionButton;
 	}
 
 	private static HSlider CreateVolumeSlider(string name)
@@ -680,6 +840,7 @@ public partial class SettingsMenu : Control
 		control.AddThemeStyleboxOverride("pressed", pressedStyle);
 		control.AddThemeStyleboxOverride("hover_pressed", pressedStyle);
 		control.AddThemeStyleboxOverride("focus", hoverStyle);
+		control.AddThemeStyleboxOverride("disabled", normalStyle);
 
 		control.AddThemeIconOverride("arrow", CreateTransparentIcon());
 		control.AddThemeConstantOverride("arrow_margin", 0);
@@ -689,6 +850,7 @@ public partial class SettingsMenu : Control
 		control.AddThemeColorOverride("font_focus_color", new Color(1.0f, 0.96f, 0.78f));
 		control.AddThemeColorOverride("font_pressed_color", new Color(1.0f, 0.93f, 0.76f));
 		control.AddThemeColorOverride("font_hover_pressed_color", new Color(1.0f, 0.96f, 0.80f));
+		control.AddThemeColorOverride("font_disabled_color", new Color(0.66f, 0.57f, 0.43f));
 		control.AddThemeColorOverride("font_outline_color", new Color(0.11f, 0.05f, 0.02f, 0.9f));
 		control.AddThemeFontSizeOverride("font_size", 24);
 		control.AddThemeConstantOverride("outline_size", 2);
