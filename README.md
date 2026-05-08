@@ -1,8 +1,7 @@
 # Arcane Survivor
 
-Arcane Survivor 是一个基于 Godot 4.6.2 .NET 与 C# ，完全由AI主导开发的 2D 轻量幸存者玩法项目。
-项目需求，代码实现，美术资源均由AI生成，人工负责验收功能/美术以及搜集一些免费音效。
-用于个人验证与学习AI独立开发游戏。
+- Arcane Survivor 是一个基于 Godot 4.6.2 .NET 与 C# ，完全由AI主导开发的 2D 轻量幸存者玩法项目。项目需求，代码实现，美术资源均由AI生成，人工负责验收功能/美术以及搜集一些免费音效。用于个人验证与学习AI独立开发游戏。
+- [视频演示](https://www.bilibili.com/video/BV1ANduBTEAc)
 
 ## 开发环境
 
@@ -62,6 +61,7 @@ script/
 | 暂停/继续 | `Esc`           |
 | 菜单操作  | 鼠标点击            |
 
+
 ## Windows 导出
 
 当前仓库包含 `Windows Desktop` 导出预设。正式导出前请确认本机已经安装 Godot 4.6.2 对应的 Export Templates。
@@ -74,4 +74,3 @@ script/
 6. 发布正式版时不要勾选 `Export With Debug`。
 
 `asset/config/*.tsv` 必须进入导出包，否则关卡、武器、刷怪和升级配置会在发布版中缺失。
-
