@@ -1,6 +1,22 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# C# build outputs
+bin/
+obj/
+.mono/
+
+# Local tools and editor state
 /.dotnet_home
 /.vscode
+
+# Temporary files and local exports
 /tmp/
+/build/
+/dist/
+/exports/
+*.bak
+*.tmp
+*.log
+*.user

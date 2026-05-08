@@ -466,7 +466,8 @@ public partial class AudioManager : Node
 	{
 		foreach (string path in paths)
 		{
-			if (string.IsNullOrWhiteSpace(path) || !FileAccess.FileExists(path))
+			if (string.IsNullOrWhiteSpace(path)
+				|| (!ResourceLoader.Exists(path, nameof(AudioStream)) && !FileAccess.FileExists(path)))
 			{
 				continue;
 			}
